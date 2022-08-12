@@ -1,0 +1,17 @@
+.b-container{
+    display:inline-block;
+    position:relative;
+    }
+    
+.b-container a{
+    font-size: 0.6rem;
+    position: absolute;
+    bottom:1em;
+    right:1em;
+    background-color:#8F0005;
+    border-radius:1.5em;
+    color:white;
+    text-transform:uppercase;
+    
+    }
+

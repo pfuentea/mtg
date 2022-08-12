@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block titulo %}INDEX USUARIO{% endblock %}
+
+{% block contenido %}
+<h1>Bienvenid@: {{request.session.user.name}}</h1>
+
+
+{% endblock %}
+
+{% block libreria %}
+{% endblock %}

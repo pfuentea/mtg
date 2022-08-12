@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block titulo %}Listas para ofrecer{% endblock %}
+
+{% block contenido %}
+<div class="container">
+    <div class="row">
+        <div class="col-10">
+            <h1>Listas para Ofrecer</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-10">
+            <button>
+                Crear nueva lista
+            </button>
+        </div>
+    </div>
+    <div class="row ">
+        <div class="col">
+            <form action="/list/offer/new" method="post">
+                {% csrf_token %}
+                <input type="text" name="new_list" id="new_list">
+               <button type="submit">Crear</button>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-10">
+           <p>LISTAS</p> 
+            {% for l in listas %}
+            <li>
+                <a href="/list/{{l.id}}">{{l.nombre}}</a>
+                
+            </li>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block libreria %}
+{% endblock %}

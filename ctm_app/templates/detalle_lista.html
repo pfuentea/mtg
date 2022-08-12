@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block titulo %}Listas para ofrecer{% endblock %}
+
+{% block contenido %}
+<div class="container">
+    <div class="row">
+        <div class="col-10">
+            <h1>Detalle de la lista: {{lista.nombre}}</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-10">
+            <button>
+                Agregar nueva carta
+            </button>
+        </div>
+    </div>
+    <div class="row ">
+        <div class="col">
+            <form action="/list/search/" method="post">
+                {% csrf_token %}
+                <input type="search" name="searching_card" id="searching_card" list="cartones">
+                <input type="hidden" name="action" value="search">
+                <button id="get_cartas">Buscar Versiones</button>
+                <div id="resultados">
+
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            {% for s in search%}
+            <li>
+                <a href="/list/{{lista_id}}/{{s.id}}">{{s.nombre}}</a>
+            </li>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-10">
+            <p>Cartas</p> 
+            {% for i in items %}
+            <li>
+                {{i.carta.nombre}}                
+            </li>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<datalist id="cartones">
+
+</datalist>
+<script>
+    $('#searching_card').keyup(function(){
+        //console.log(e.key, e.keyCode)
+        var buscar=$(this).val();
+        //console.log(buscar.length);
+        if(buscar.length >3){
+            $('#cartones').html("");
+            urls="https://api.scryfall.com/cards/autocomplete?q="+buscar;
+            //console.log(urls);
+            axios.get(urls,{
+                responseType: 'text'
+            })
+            .then(function(response){
+                option="";
+                if(response.status==200) {
+                    $.each(response.data.data, function(i,item){
+                        console.log(item)
+                        //option='<option value=\"'+item.id+'\">'+item.nombre+'</option>'
+                        option=option+ "<option value=\""+item+"\">";
+                        
+                    });
+                    $('#cartones').append(option);
+                    console.log(response);
+
+                    }
+                })
+            .catch(function(error){
+                console.log(error);
+            })
+            .then(function(){
+
+            });            
+        }
+    });
+    $('#get_cartas').on("click",function(){
+        $('#resultados').empty();
+        carton= $('#searching_card').val();
+        console.log(carton);
+        carton=carton.replace(" ", "+");
+        console.log(carton);
+        urls="https://api.scryfall.com/cards/search?q="+carton+"&unique=prints";
+        console.log(urls);
+        axios.get(urls,{    
+                responseType: 'text'
+            })
+            .then(function(response){
+                option="";
+                if(response.status==200) {
+                    $.each(response.data.data, function(i,item){
+                        console.log(item)
+                        imagen=item.image_uris.small
+                        imagen=imagen.split("?")
+                        nombre=item.name
+                        card_id="'"+item.set+"',"+item.collector_number+",'"+nombre+"'"
+                        console.log("img:"+imagen[0])
+
+                        //option='<option value=\"'+item.id+'\">'+item.nombre+'</option>'
+                        option=option+ "<div class=\"b-container\" ><img src=\""+imagen[0]+"\" id_value=\""+card_id+"\"  class=\"card_result m-1\"  > \n <a class=\"btn\" onclick=\"agregar("+card_id+");\">Añadir </a> </div>";
+                        
+                    });
+                    $('#resultados').append(option);
+                    console.log(response);
+                    $(".card_result").bind("click",function(){
+                        var card_id=$(this).attr('id_value');
+                        console.log(card_id)
+                    });
+
+                }
+            })
+            .catch(function(error){
+                console.log(error);
+            })
+            .then(function(){
+
+            });  
+
+        return false;
+    }
+    ) ;
+
+    function agregar(set,id,nombre){
+        console.log("set:",set);
+        console.log("id:",id);
+        console.log("nombre:",nombre);
+        const data= {
+            "set":set,
+            "id":id,
+            "nombre":nombre
+        };
+        url="/"
+        axios.put(url,data)
+            .then(response=> element.innerHTML = response.data.updatedAt);
+        
+
+    }
+
+    
+        //card_id=$this.getAttr('id_value')
+        
+
+</script>
+
+{% endblock %}
+
+{% block libreria %}
+
+{% endblock %}

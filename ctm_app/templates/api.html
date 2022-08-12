@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Dragones</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <link href="https://fonts.googleapis.com/css?family=Prompt:200,300,400,500" rel="stylesheet">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+       
+    </head>
+    <body>
+        <div class="container">
+           <div class="row">
+				<div class="col">
+					<input type="button" value="Cargar ediciones" id="ver">
+					<select id="ediciones" name="ediciones">
+						<option></option>
+					</select>
+					<select id="tipo" name="tipo">
+						<option value="elf">Elfos</option>
+						<option value="dragon">Dragones</option>
+						<option value="angel">Angeles</option>
+						<option value="land">Tierras</option>
+					</select>
+					<input type="button" value="Cargar cartas" id="ver_cartas">
+				</div>
+			
+				<div class="col-10">
+					<span id="fila"></span>		<br>
+					Total:<span id="total"></span>						
+				</div>
+				<div class="col">
+				</div>
+				
+           </div>      
+        </div>
+        <script>
+            
+           
+
+            $('#ver').on("click", function(){
+                let setcode='emn'
+				let id=136
+				let url="https://api.scryfall.com/sets";
+				// let url="https://api.scryfall.com/cards/"+setcode+"/"+id;
+				$.get(url,function(respuesta){
+                   // console.log(respuesta);
+                    limpiar();
+						var data_length = respuesta.data.length;
+						for (var i = 0; i < data_length; i++) {			  
+							code=respuesta.data[i].code;
+							nombre=respuesta.data[i].name;
+							padre=respuesta.data[i].parent_set_code;
+							url=respuesta.data[i].scryfall_uri;
+							fecha=	respuesta.data[i].released_at;
+							set_type=respuesta.data[i].set_type;
+							// 2021-07-23
+							mes=fecha.substring(5,7) 
+							year=fecha.substring(0,4) 
+								let fila=nombre+";"+mes+";"+year+";"+code+";"+set_type+"<br>";
+							//$('#code_set').append(code);
+							//$('#fila').append(fila);
+							new_edicion="<option value=\""+code+"\">"+nombre+"</option>";
+							$('#ediciones').append(new_edicion);
+							
+							//$('#padre').append(padre);
+							//$('#url').append(url);
+					
+						}
+					 
+					 
+					/*
+					rareza=''
+                    $('#card_name').append(respuesta.name);
+					if (respuesta.rarity =="mythic"){
+						rareza='MR';
+						}
+					if(respuesta.rarity =="mythic"){
+						rareza='R';
+						}
+					$('#rareza').append(rareza);	
+					$('#edicion').append(respuesta.set_name);
+					$('#type').append(respuesta.type_line);
+					*/
+                });
+            });
+			
+			 $('#ver_cartas').on("click", function(){
+				let edicion= $('#ediciones').val();
+				let tipo= $('#tipo').val();
+				//alert(tipo);
+				limpiar();
+				url="https://api.scryfall.com/cards/search?as=grid&order=name&q=type%3A"+tipo+"+set%3A"+edicion;
+				$.get(url,function(respuesta){
+					console.log(respuesta);
+					//name: "Arid Mesa"
+					//set: "mh2"
+					//set_name: "Modern Horizons 2"
+					//type_line: "Basic Land — Plains"
+					var data_length = respuesta.data.length;
+					var contador=0;
+					for (var i = 0; i < data_length; i++) {	
+						nombre=respuesta.data[i].name+"<br>";
+						tipo=respuesta.data[i].type_line;
+						if (tipo.substring(0,10) !="Basic Land"){
+							$('#fila').append(nombre);
+							contador++;
+						}						
+					}
+					$('#total').append(contador);
+				});
+				
+			});
+            function limpiar(){
+                $('#card_name').html("");
+				$('#fila').html("");   
+				$('#total').html("");                
+            };
+
+        </script>
+    </body>
+</html>
