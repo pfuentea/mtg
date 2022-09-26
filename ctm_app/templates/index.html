@@ -5,6 +5,23 @@
 {% block contenido %}
 <h1>Bienvenid@: {{request.session.user.name}}</h1>
 
+<div class="container">
+    <div class="row">
+        <div class="col text-center">
+            <h2>Tus listas</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col"></div>
+        <div class="col-4 sketch">Listas de cartas que busco (compro/cambio)</div>
+        <div class="col-4 border_sketch">Listas de cartas que ofrezco (vendo/cambio)</div>
+
+        <div class="col"></div>
+    </div>
+
+</div>
+
+
 
 {% endblock %}
 

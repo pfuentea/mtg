@@ -51,6 +51,7 @@ class User(models.Model):
 
 class Edicion(models.Model):
     nombre = models.CharField(max_length=100)
+    set_code  = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -61,27 +62,37 @@ class Color(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 class Tipo(models.Model):
-    nombre  = models.CharField(max_length=20)
+    nombre  = models.CharField(max_length=30)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
 class Carta(models.Model):
     nombre = models.CharField(max_length=100)
+    Edicion  = models.ForeignKey(Edicion, related_name='cartas', on_delete=models.CASCADE)
+    number_collector =models.IntegerField()
+    small_image=models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     
 class Listados(models.Model):
+    BUSCA='Cartas que buscas'
+    OFRECE='Cartas que ofrece'
+    SIN_DEFINIR='Listado sin definir'
+    DEFAULT='Lista por defecto'
     LIST_TYPE = (
-        ("B", 'Busca'),
-        ("O", 'Ofrece'),
-        ("N", 'Sin Definir'),
+        (BUSCA, 'Busca'),
+        (OFRECE, 'Ofrece'),
+        (SIN_DEFINIR, 'Sin Definir'),
+        (DEFAULT, 'Default'),
         
     )
     owner = models.ForeignKey(User,related_name='listas', on_delete=models.CASCADE)
     nombre =models.TextField(max_length=100)
-    tipo =  models.CharField(max_length=2, choices=LIST_TYPE)
+    tipo =  models.CharField(max_length=30, choices=LIST_TYPE,default=DEFAULT)
     descripcion =models.TextField(max_length=500)
+    referencia_web = models.TextField(max_length=500)
+    referencia_precio= models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -93,3 +104,4 @@ class ItemLista(models.Model):
     lista=models.ForeignKey(Listados,related_name='items', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    observacion= models.TextField(max_length=500)

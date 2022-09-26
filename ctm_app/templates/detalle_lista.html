@@ -6,24 +6,31 @@
 <div class="container">
     <div class="row">
         <div class="col-10">
-            <h1>Detalle de la lista: {{lista.nombre}}</h1>
+            <h1>Detalle de la lista: {{lista.nombre}} </h1>
+        </div>
+        <div class="my-3">
+            {% if lista.tipo == 'B' %}
+            <a href="/list/hunt" ><button>Volver a mis listas</button></a>
+            {% else %}
+            <a href="/list/offer"><button>Volver a mis listas</button></a>
+            {% endif %}
         </div>
     </div>
-    <div class="row">
-        <div class="col-10">
-            <button>
+    <div class="row my-3">
+        <div class="col-10 ">
+            <button id="open_search">
                 Agregar nueva carta
             </button>
         </div>
     </div>
-    <div class="row ">
+    <div class="row " id="new_search">
         <div class="col">
             <form action="/list/search/" method="post">
                 {% csrf_token %}
-                <input type="search" name="searching_card" id="searching_card" list="cartones">
+                <input type="search" name="searching_card" id="searching_card" list="cartones" class="border_sketch">
                 <input type="hidden" name="action" value="search">
                 <button id="get_cartas">Buscar Versiones</button>
-                <div id="resultados">
+                <div id="resultados" class="text-center">
 
                 </div>
             </form>
@@ -33,26 +40,108 @@
         <div class="col">
             {% for s in search%}
             <li>
-                <a href="/list/{{lista_id}}/{{s.id}}">{{s.nombre}}</a>
+                <a href="/list/{{lista_id}}/{{s.id}}">{{s.nombre}} </a>
             </li>
             {% endfor %}
         </div>
     </div>
+
     <div class="row">
         <div class="col-10">
-            <p>Cartas</p> 
-            {% for i in items %}
-            <li>
-                {{i.carta.nombre}}                
-            </li>
-            {% endfor %}
+            <p>Cartas en la lista : ({{items.count}})</p> 
+
+            <div class="table-responsive">
+                <table id="lista_cartas" class="table table-striped table-bordered" width="100%" >
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Edicion</th>
+                            <th>Cantidad</th>
+                            <th>Imagen</th>
+                            <th class="dt-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in items %}
+                        <tr>
+                            <td> 
+                                <a href="/card/{{i.id}}">{{i.carta.nombre}}</a>                             
+                            </td>
+                            <td> {{i.carta.Edicion.nombre}}</td>
+                            <td>{{i.cantidad}}</td>
+                            <td> <img src="{{i.carta.small_image}}" alt="" class="carta_tumb"></td>
+                            <td class="dt-center"> 
+                                    <a href="#"  data-href="/card/remove/{{lista_id}}/{{i.id}}"  class="btn btn-sm btn-outline-danger btn-delete-trv" data-bs-toggle="modal" data-bs-target="#confirm-delete" title="Borrar">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                   
+                            </td>
+                        </tr>       
+                    {% endfor %}
+                    </tbody>    
+                </table>
+            </div>
+
+
+           
         </div>
     </div>
 </div>
 <datalist id="cartones">
 
 </datalist>
+
+<form action="/list/add/{{lista_id}}" method="post" id="form_agregar">
+    {% csrf_token %}
+    <input type="hidden" name="set" value="" id="set">
+    <input type="hidden" name="card_id" value="" id="card_id">
+    <input type="hidden" name="nombre" value="" id="nombre">
+    <input type="hidden" name="set_name" value="" id="set_name">
+    <input type="hidden" name="img_small" value="" id="img_small">
+
+</form>
+
+
+<div class="modal fade" id="confirm-delete" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Eliminar</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                Esta seguro que desea eliminar esta carta?
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <a class="btn btn-danger btn-ok">Eliminar</a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
+    $(document).ready(function() {
+        $('#new_search').hide();
+
+        var oTblReport = $('#lista_cartas')
+        
+
+        oTblReport.DataTable({
+            "language": { 
+                "search": 'Buscar',
+                "lengthMenu": "Mostrar _MENU_ registros por página",
+                //"info": "Mostrando _ENTRIES_ página _PAGE_ de _PAGES_",
+                "paginate":{
+                    previous: '‹',
+                    next:     '›'
+                }
+            },
+            "aLengthMenu":[[5,10,15,25,-1],[5,10,15,25,"Todos"]],
+            "iDisplayLength":20
+        });
+    });
+
     $('#searching_card').keyup(function(){
         //console.log(e.key, e.keyCode)
         var buscar=$(this).val();
@@ -89,11 +178,11 @@
     $('#get_cartas').on("click",function(){
         $('#resultados').empty();
         carton= $('#searching_card').val();
-        console.log(carton);
+    console.log(carton);
         carton=carton.replace(" ", "+");
-        console.log(carton);
-        urls="https://api.scryfall.com/cards/search?q="+carton+"&unique=prints";
-        console.log(urls);
+    console.log(carton);
+        urls="https://api.scryfall.com/cards/search?order=released&dir=asc&q="+carton+"&unique=prints";
+    console.log(urls);
         axios.get(urls,{    
                 responseType: 'text'
             })
@@ -105,11 +194,28 @@
                         imagen=item.image_uris.small
                         imagen=imagen.split("?")
                         nombre=item.name
-                        card_id="'"+item.set+"',"+item.collector_number+",'"+nombre+"'"
+                        card_id="`"+item.set+"`,"+item.collector_number+",`"+nombre+"`,`"+item.set_name+"`,`"+imagen+"`"
+                        //card_id='"'+item.set+'",'+item.collector_number+',"'+nombre+'","'+item.set_name+'"'
                         console.log("img:"+imagen[0])
+                        if(item.games.length=1 && item.games[0]=='mtgo' ){
+                            return;  
+                        }
+
+                        titulo=item.set_name;
+                        if(item.border_color=="borderless"){
+                            titulo=titulo+" ("+item.border_color+")";
+                        }
+                        
+                        
+                        if (item.finishes.length==1){
+                            if (item.finishes[0]=='etched'){
+                                titulo=titulo+" (Foil-Etched)";
+                            }
+                        }
+
 
                         //option='<option value=\"'+item.id+'\">'+item.nombre+'</option>'
-                        option=option+ "<div class=\"b-container\" ><img src=\""+imagen[0]+"\" id_value=\""+card_id+"\"  class=\"card_result m-1\"  > \n <a class=\"btn\" onclick=\"agregar("+card_id+");\">Añadir </a> </div>";
+                        option=option+ "<div class=\"b-container card text-center\" ><div class=\"card-header\">"+titulo+"</div><img src=\""+imagen[0]+"\" id_value=\""+card_id+"\"  class=\"card_result m-1\"  > <div class=\"card-body\"> <button type=\"button\" onclick=\"agregar("+card_id+");\">Añadir </button></div> </div>";
                         
                     });
                     $('#resultados').append(option);
@@ -132,7 +238,19 @@
     }
     ) ;
 
-    function agregar(set,id,nombre){
+    function agregar(set,id,nombre,set_name,img_small){
+
+        $('#set').val(set);
+        $('#card_id').val(id);
+        $('#nombre').val(nombre);
+        $('#set_name').val(set_name);
+        $('#img_small').val(img_small);
+        
+
+        //console.log(set+";"+id+";"+nombre)
+        
+        $('#form_agregar').submit();
+        /*
         console.log("set:",set);
         console.log("id:",id);
         console.log("nombre:",nombre);
@@ -145,13 +263,20 @@
         axios.put(url,data)
             .then(response=> element.innerHTML = response.data.updatedAt);
         
-
+        */
     }
 
+    // para agregar una nueva carta se hace click
+    $('#open_search').on('click',function(){
+        $('#new_search').fadeIn();
+    }
+    )
     
         //card_id=$this.getAttr('id_value')
-        
-
+    
+    $('#confirm-delete').on('show.bs.modal', function(e) {
+        $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
+    }); 
 </script>
 
 {% endblock %}

@@ -13,18 +13,18 @@
             <h1>Listas de busquedas</h1>
         </div>
     </div>
-    <div class="row">
+    <div class="row mb-2">
         <div class="col-10">
-            <button>
+            <button id="open_search">
                 Crear nueva lista
             </button>
         </div>
     </div>
-    <div class="row ">
+    <div class="row mb-2" id="new_list">
         <div class="col">
             <form action="/list/hunt/new" method="post">
                 {% csrf_token %}
-                <input type="text" name="new_list" id="new_list">
+                <input type="text" name="new_list" id="new_list" placeholder="Nombre de nuevo listado">
                <button type="submit">Crear</button>
             </form>
         </div>
@@ -32,16 +32,61 @@
     <div class="row">
         <div class="col-10">
            <p>LISTAS</p> 
-            {% for l in listas %}
-            <li>
-                <a href="/list/{{l.id}}">{{l.nombre}}</a>
-                
-            </li>
-            {% endfor %}
+
+            <div class="table-responsive">
+                <table id="listas" class="table table-striped table-bordered" width="100%" >
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Cantidad de cartas</th>
+                            <th class="dt-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for l in listas %}
+                        <tr>
+                            <td> 
+                                <a href="/list/{{l.id}}">{{l.nombre}}</a>                      
+                            </td>
+                            <td> {{l.items.count}}</td>
+                            <td class="dt-center"> 
+                                    <a href="#"  data-href="/card/remove/{{lista_id}}/{{i.id}}"  class="btn btn-sm btn-outline-danger btn-delete-trv" data-bs-toggle="modal" data-bs-target="#confirm-delete" title="Borrar">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                   
+                            </td>
+                        </tr>       
+                    {% endfor %}
+                    </tbody>    
+                </table>
+            </div>
         </div>
     </div>
 </div>
+<script>
+     $(document).ready(function() {
+        $('#new_list').hide();
+        var oTblReport = $('#listas')
 
+        oTblReport.DataTable({
+            "language": { 
+                "search": 'Buscar',
+                "lengthMenu": "Mostrar _MENU_ registros por página",
+                //"info": "Mostrando _ENTRIES_ página _PAGE_ de _PAGES_",
+                "paginate":{
+                    previous: '‹',
+                    next:     '›'
+                }
+            },
+            "aLengthMenu":[[5,10,15,25,-1],[5,10,15,25,"Todos"]],
+            "iDisplayLength":20
+        });
+    });
+
+    $('#open_search').on('click',function(){
+        $('#new_list').fadeIn();
+    });
+</script>
 {% endblock %}
 
 {% block libreria %}

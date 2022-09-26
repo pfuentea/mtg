@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block titulo %}Detalle Carta{% endblock %}
+
+{% block contenido %}
+<h1>
+    Agregar detalles 
+</h1>
+<form action="/card/update/{{carta.id}}" method="post">
+    {% csrf_token %}
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <div class="row">
+                    <div class="col">
+                        Nombre: {{carta.carta.nombre}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        Edición: {{carta.carta.Edicion.nombre}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">Pertece a la lista:</div>
+                    <div class="col">{{carta.lista.nombre}}({{carta.lista.tipo}})</div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        Cantidad: 
+                    </div>
+                    <div class="col">
+                        <input type="number" name="cantidad" id="" value="{{carta.cantidad}}">               
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        Precio: 
+                    </div>
+                    <div class="col">
+                        <input type="number" name="precio" id="" value="{{carta.precio}}">    
+                       
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        
+                        Observaciones: 
+                    </div>
+                    <div class="col">
+                        <textarea rows="" cols="" name="observaciones">{{carta.observaciones}}</textarea>                       
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-4">
+                        <button>Guardar</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col"> 
+                        <a href="/list/{{carta.lista.id}}" class="button">Regresar a lista</a>
+                        
+                    </div>
+                </div>
+
+            </div>
+            <div class="col">
+                <img src="{{carta.carta.small_image}}" alt="">
+            </div>
+        </div>
+
+
+        
+        
+    </div>
+</form>
+
+
+
+
+
+{% endblock %}
+
+{% block libreria %}
+{% endblock %}
