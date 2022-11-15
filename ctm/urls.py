@@ -18,13 +18,8 @@ from django.contrib import admin
 from django.urls import path
 from django.urls import include
 from django.contrib.auth.models import User
-from rest_framework import routers, serializers, viewsets
-
-from post.api.router import router_posts
 
 urlpatterns = [
     path('', include('ctm_app.urls')),
     path('admin/', admin.site.urls),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    path('api/',include(router_posts.urls))
 ]
