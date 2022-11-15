@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block titulo %}Listas para ofrecer de {{usuario}} {% endblock %}
+
+{% block contenido %}
+
+
+<h2>
+    {{lista.nombre}} by {{usuario}} ( {% if lista.tipo == 'B' %}Busco{% elif lista.tipo == 'O' %}Dispone{% endif %} )
+</h2>
+<a href="/list/share/{{lista.id}}?view=list">Ver listado </a>| 
+<a href="/list/share/{{lista.id}}?view=img">Ver Imagenes </a>
+
+{% if vista == 'lista' %}
+<div class="container">
+    <div class="row">
+        <div class="col-10">
+            <p>Cartas en la lista : ({{items.count}})</p> 
+            <div class="table-responsive">
+                <table id="lista_cartas" class="table table-striped table-bordered" width="100%" >
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Edicion</th>
+                            <th>Cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in items %}
+                        <tr>
+                            <td> 
+                                <a href="https://scryfall.com/card/{{i.carta.Edicion.set_code}}/{{i.carta.number_collector}}"  title="Ver en scryfall">{{i.carta.nombre}}</a>                             
+                            </td>
+                            <td> {{i.carta.Edicion.nombre}}</td>
+                            <td>{{i.cantidad}}</td>                            
+                        </tr>       
+                    {% endfor %}
+                    </tbody>    
+                </table>
+            </div>
+        </div>
+    </div>
+  
+</div>
+{% elif vista == 'imgs' %}
+    <div class="row">
+        {% for i in items %}
+        <div class="card" style="width: 7rem;">   
+            <a href="https://scryfall.com/card/{{i.carta.Edicion.set_code}}/{{i.carta.number_collector}}" target="_blank" title="Ver en scryfall">
+            <img src="{{i.carta.small_image}}" style="width: 6rem;">
+            </a>
+            <div class="card-title mb-2 text-muted ">
+                {{i.carta.nombre}} x <b>{{i.cantidad}}({{i.carta.Edicion.set_code}})</b>
+            </div>   
+          
+        </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+{% endblock %}
+
+{% block libreria %}
+
+{% endblock %}

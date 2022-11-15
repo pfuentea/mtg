@@ -26,6 +26,8 @@ SECRET_KEY = 'django-insecure-_095_gmm$y(4(wftlgv(lid#y5hpury2^+d^&x^vm!(yi_$8@0
 DEBUG = True
 
 ALLOWED_HOSTS = []
+#ALLOWED_HOSTS = ['35.173.122.172']
+
 
 
 # Application definition
@@ -38,9 +40,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
-    'post',
-    
 ]
 
 MIDDLEWARE = [
@@ -145,3 +144,5 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ]
 }
+
+#STATIC_ROOT= os.path.join(BASE_DIR,"static/")

@@ -16,8 +16,10 @@ urlpatterns = [
 
     path('list/<int:lista_id>', views.list_detail),
     path('list/add/<int:lista_id>', views.add_to_list),
-    
+    path('list/remove/<int:lista_id>', views.delete_list),
     path('list/search/', views.list_detail),
+
+    path('list/share/<int:lista_id>', views.share),
 
     path('card/<int:item_id>/', views.card_detail),
     path('card/update/<int:item_id>', views.card_update), 

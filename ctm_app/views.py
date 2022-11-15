@@ -4,16 +4,21 @@ from django.shortcuts import redirect, render
 import bcrypt
 from .decorators import login_required
 from .models import *
-
+from datetime import datetime, timedelta
 
 
 @login_required
 def index(request):
 
+    user= User.objects.get(id=request.session['user']['id'])
+    listas_hunt= Listados.objects.filter(owner=user,tipo='B')
+    listas_off= Listados.objects.filter(owner=user,tipo='O')
     context = {
-        'saludo': 'Hola'
-    }
-    return render(request, 'index.html', context)
+            'saludo': 'Hola',
+            "listas_hunt":listas_hunt, 
+            "listas_off":listas_off
+        }
+    return render(request, 'index.html', context=context )
 
 @login_required
 def list_hunt(request):
@@ -58,18 +63,40 @@ def list_detail(request,lista_id):
     #print (f"User_id:{user_id}")
     user= User.objects.get(id=user_id)
     lista=Listados.objects.get(id=lista_id)
+    ahora = datetime.now()
+    ultima_act = lista.updated_at
+
+    print(f"Ahora:{ahora},UPD:{ultima_act}")
+    #diferencia = ((ahora-ultima_act) / 60 / 60 / 24)
+    #print(diferencia.total_seconds())
+    duracion=lista.updated_at
     
     if request.method == "GET":        
         items= ItemLista.objects.filter(lista=lista)
+        resultado=[]
+        for elemento in items:
+            
+            print(elemento.carta.id)
+
+            resultado1=ItemLista.objects.filter(carta=elemento.carta).exclude(lista__owner=elemento.lista.owner)
+            if len(resultado1) >0:
+                #resultado.append(resultado1)
+                for r in resultado1:
+                    print(f"lista:{r.lista.nombre}")
+                    resultado.append(r)
+
         context = {
             'saludo': 'Hola',
             "items":items,
             "lista_id":lista_id,
-            "lista":lista
+            "lista":lista,
+            "duracion":duracion,
+            "resultado":resultado
         }
         return render(request, 'detalle_lista.html', context)
     if request.method == "POST":
         if request.POST['action'] == 'search':
+            
             resultado=Carta.objects.filter(nombre=request.POST['searching_card'])
             items= ItemLista.objects.filter(lista=lista)
             context = {
@@ -77,14 +104,37 @@ def list_detail(request,lista_id):
                 "resultado":resultado,
                 "lista_id":lista_id,
                 "items":items,
-                "search":""
-
+                "search":"",
+                "duracion":duracion
             }
         return render(request, 'detalle_lista.html', context)
         new_carta=request.POST['new_card']
 
         nueva_lista=Listados.objects.create(owner=user,nombre=new_list,tipo='O')
         return redirect('/list/offer')
+
+def share(request,lista_id):
+    lista=Listados.objects.get(id=lista_id)
+    items= ItemLista.objects.filter(lista=lista)
+    usuario=lista.owner.name
+    vista="lista"
+    if 'view' in request.GET:
+        if request.GET['view'] == 'img' :
+            vista="imgs"
+
+        
+        
+
+    context = {
+            'saludo': 'Hola',
+            "items":items,
+            "lista_id":lista_id,
+            "lista":lista,
+            "usuario":usuario,
+            "vista":vista
+        }
+    return render(request, 'share.html', context)
+
 
 @login_required
 def list_edit(request,lista_id):
@@ -215,3 +265,9 @@ def remove_from_list(request,lista_id,item_id):
     item.delete()
     return redirect('/list/'+str(lista_id))
     
+
+@login_required
+def delete_list(request,lista_id):
+    lista=Listados.objects.get(id=lista_id)
+    lista.delete()
+    return redirect('/list/hunt')

@@ -13,12 +13,26 @@
     </div>
     <div class="row">
         <div class="col"></div>
-        <div class="col-4 sketch">Listas de cartas que busco (compro/cambio)</div>
+        <div class="col-4 sketch">Listas de cartas que busco (compro/cambio) </div>
         <div class="col-4 border_sketch">Listas de cartas que ofrezco (vendo/cambio)</div>
 
         <div class="col"></div>
     </div>
-
+    <div class="row">
+        <div class="col"></div>
+        <div class="col-4">
+            {% for l1 in listas_hunt %}
+            <p> <a href="/list/{{l1.id}}"> {{l1.nombre}}</a>   </p>
+                       
+            {% endfor %}
+        </div>
+        <div class="col-4"> 
+            {% for l2 in listas_off %}
+            <p><a href="/list/{{l2.id}}"> {{l2.nombre}}</a>   </p>
+                        
+            {% endfor %}</div>
+        <div class="col"></div>
+    </div>
 </div>
 
 

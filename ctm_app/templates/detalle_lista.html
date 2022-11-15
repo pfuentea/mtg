@@ -8,13 +8,21 @@
         <div class="col-10">
             <h1>Detalle de la lista: {{lista.nombre}} </h1>
         </div>
+
         <div class="my-3">
             {% if lista.tipo == 'B' %}
             <a href="/list/hunt" ><button>Volver a mis listas</button></a>
             {% else %}
             <a href="/list/offer"><button>Volver a mis listas</button></a>
             {% endif %}
+        </div>        
+    </div>
+    <div class="row ">
+        
+        <div class="col-10 bg-info">
+            Duración : {{duracion}}
         </div>
+        <div class="col"></div>
     </div>
     <div class="row my-3">
         <div class="col-10 ">
@@ -48,9 +56,9 @@
 
     <div class="row">
         <div class="col-10">
-            <p>Cartas en la lista : ({{items.count}})</p> 
+            <p>Cartas en la lista : ({{items.count}}) <span Id="span_hidden">Ocultar</span><span Id="span_show" class="d-none">Mostrar</span></p> 
 
-            <div class="table-responsive">
+            <div class="table-responsive" id="main_table">
                 <table id="lista_cartas" class="table table-striped table-bordered" width="100%" >
                     <thead>
                         <tr>
@@ -71,6 +79,7 @@
                             <td>{{i.cantidad}}</td>
                             <td> <img src="{{i.carta.small_image}}" alt="" class="carta_tumb"></td>
                             <td class="dt-center"> 
+                                    
                                     <a href="#"  data-href="/card/remove/{{lista_id}}/{{i.id}}"  class="btn btn-sm btn-outline-danger btn-delete-trv" data-bs-toggle="modal" data-bs-target="#confirm-delete" title="Borrar">
                                         <i class="bi bi-trash"></i>
                                     </a>
@@ -86,6 +95,45 @@
            
         </div>
     </div>
+    <!-- zona de resultados busqueda -->
+    {% if lista.tipo == 'B' %}
+    <div class="row">
+        <div class="col">
+            Personas que ofrecen las cartas que buscas
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="table-responsive" id="table_result">
+                <table id="lista_usuarios" class="table table-striped table-bordered" width="100%" >
+                    <thead>
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Lista</th>
+                            <th>Cantidad de Cartas</th>
+                            <th class="dt-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{resultado}}
+                        {% for r in resultado %}
+                        <tr>
+                            <td> 
+                                {{r.lista.nombre}}                             
+                            </td>
+                            <td> {{r.lista.nombre}}</td>
+                            <td>cantidad</td>
+                            <td class="dt-center">                                     
+                                Ver                                   
+                            </td>
+                        </tr>       
+                    {% endfor %}
+                    </tbody>    
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </div>
 <datalist id="cartones">
 
@@ -149,20 +197,28 @@
         if(buscar.length >3){
             $('#cartones').html("");
             urls="https://api.scryfall.com/cards/autocomplete?q="+buscar;
-            //console.log(urls);
+            console.log(urls);
             axios.get(urls,{
                 responseType: 'text'
             })
             .then(function(response){
                 option="";
                 if(response.status==200) {
-                    $.each(response.data.data, function(i,item){
-                        console.log(item)
+                    n=0;
+                    //console.log(response.data)
+                    response_data=JSON.parse(response.data)
+                    //console.log("response_data")
+                    //console.log(response_data)
+                    $.each(response_data.data, function(i,item){
+                        //console.log("item")
+                        //console.log(item)
                         //option='<option value=\"'+item.id+'\">'+item.nombre+'</option>'
                         option=option+ "<option value=\""+item+"\">";
-                        
+                        n++;
                     });
+                    //console.log(n)
                     $('#cartones').append(option);
+                    //console.log("respuesta")
                     console.log(response);
 
                     }
@@ -189,7 +245,13 @@
             .then(function(response){
                 option="";
                 if(response.status==200) {
-                    $.each(response.data.data, function(i,item){
+                    //console.log(response)
+                    response_data=JSON.parse(response.data)
+                    //console.log("init")
+                    //console.log(response_data)
+                    //console.log("end")
+                    $.each(response_data.data, function(i,item){
+                        //console.log("item")
                         console.log(item)
                         imagen=item.image_uris.small
                         imagen=imagen.split("?")
@@ -213,9 +275,17 @@
                             }
                         }
 
+                        usd="-"
+                        if(item.prices.usd != null){
+                            usd=item.prices.usd 
+                        }
+                        usd_foil="-"
+                        if(item.prices.usd_foil != null){
+                            usd_foil=item.prices.usd_foil
+                        }
 
                         //option='<option value=\"'+item.id+'\">'+item.nombre+'</option>'
-                        option=option+ "<div class=\"b-container card text-center\" ><div class=\"card-header\">"+titulo+"</div><img src=\""+imagen[0]+"\" id_value=\""+card_id+"\"  class=\"card_result m-1\"  > <div class=\"card-body\"> <button type=\"button\" onclick=\"agregar("+card_id+");\">Añadir </button></div> </div>";
+                        option=option+ "<div class=\"b-container card text-center\" ><div class=\"card-header\">"+titulo+"</div><img src=\""+imagen[0]+"\" id_value=\""+card_id+"\"  class=\"card_result m-1\"  > <div class=\"card-body\"><p>TCGPlayer:"+usd+" usd/"+usd_foil+" usd </p><button type=\"button\" onclick=\"agregar("+card_id+");\">Añadir </button></div> </div>";
                         
                     });
                     $('#resultados').append(option);
@@ -277,6 +347,18 @@
     $('#confirm-delete').on('show.bs.modal', function(e) {
         $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
     }); 
+
+    $('#span_hidden').on('click',function(){
+        $('#span_show').removeClass('d-none')
+        $('#span_hidden').addClass('d-none')
+        $('#main_table').addClass('d-none')
+    });
+    $('#span_show').on('click',function(){
+        $('#span_hidden').removeClass('d-none')
+        $('#span_show').addClass('d-none')
+        $('#main_table').removeClass('d-none')
+    });
+
 </script>
 
 {% endblock %}
