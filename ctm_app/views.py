@@ -244,10 +244,10 @@ def card_update(request,item_id):
     if request.method == "POST":
         cantidad=request.POST['cantidad']
         precio=request.POST['precio']
-        observaciones=request.POST['observaciones']
+        observacion=request.POST['observacion']
         item.cantidad=cantidad
         item.precio=precio
-        item.observaciones=observaciones
+        item.observacion=observacion
         item.save()
         messages.success(request, "Los cambios han sido guardados.")
     print(item)

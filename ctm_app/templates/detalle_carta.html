@@ -48,7 +48,7 @@
                         Observaciones: 
                     </div>
                     <div class="col">
-                        <textarea rows="" cols="" name="observaciones">{{carta.observaciones}}</textarea>                       
+                        <textarea rows="" cols="" name="observacion">{{carta.observacion}}</textarea>                       
                     </div>
                 </div>
                 <div class="row mb-2">
@@ -66,7 +66,14 @@
             </div>
             <div class="col">
                 <img src="{{carta.carta.small_image}}" alt="">
+                <p>
+                    <a href="https://scryfall.com/card/{{carta.carta.Edicion.set_code}}/{{carta.carta.number_collector}}" target="_blank">
+                        Ver en Scryfall
+                    </a>
+                    
+                </p>
             </div>
+
         </div>
 
 

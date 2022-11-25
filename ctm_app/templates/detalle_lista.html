@@ -1,6 +1,12 @@
 {% extends "base.html" %}
 
-{% block titulo %}Listas para ofrecer{% endblock %}
+{% block titulo %}Listas para  
+    {% if lista.tipo == 'B' %}
+        Buscar
+    {% else %}
+        Ofrecer
+    {% endif %}
+{% endblock %}
 
 {% block contenido %}
 <div class="container">
@@ -339,6 +345,7 @@
     // para agregar una nueva carta se hace click
     $('#open_search').on('click',function(){
         $('#new_search').fadeIn();
+        $('#searching_card').focus();
     }
     )
     

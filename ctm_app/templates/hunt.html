@@ -24,7 +24,7 @@
         <div class="col">
             <form action="/list/hunt/new" method="post">
                 {% csrf_token %}
-                <input type="text" name="new_list" id="new_list" placeholder="Nombre de nuevo listado">
+                <input type="text" name="new_list" id="list" placeholder="Nombre de nuevo listado">
                <button type="submit">Crear</button>
             </form>
         </div>
@@ -105,6 +105,7 @@
 
     $('#open_search').on('click',function(){
         $('#new_list').fadeIn();
+        $('#list').focus();
     });
 
     $('#confirm-delete').on('show.bs.modal', function(e) {
