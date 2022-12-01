@@ -79,13 +79,15 @@
         <div class="col-4">
             {% for l1 in listas_hunt %}
             <p> <a href="/list/{{l1.id}}"> {{l1.nombre}}</a>   </p>
-                       
+            {% empty %}
+            <p>Aun no has creado listas de busquedas </p>
             {% endfor %}
         </div>
         <div class="col-4"> 
             {% for l2 in listas_off %}
             <p><a href="/list/{{l2.id}}"> {{l2.nombre}}</a>   </p>
-                        
+            {% empty %}
+            <p>Aun no has creado listas para ofrecer</p>
             {% endfor %}</div>
         <div class="col"></div>
     </div>
