@@ -7,6 +7,62 @@
 
 <div class="container">
     <div class="row">
+        <div class="col-8">
+            <div class="accordion" id="accordionExample">
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="headingOne">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                      ¿Que es esta aplicación?
+                    </button>
+                  </h2>
+                  <div id="collapseOne" class="accordion-collapse collapse " aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                    <div class="accordion-body">
+                      Esta App fue creada para mejorar la busqueda y el intercambio de cartas a través de la creación de listas, las cuales pueden ser para ofrecer en cambio y/o venta (Ofrezco) o de cartas que buscamos (Busco). Para el caso de busquedas, un algoritmo realiza una rastreo entre todas las cartas que se ofrecen y así ver si alguien más la tiene y poder contactar a su dueño. </div>
+                  </div>
+                </div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="headingTwo">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                      ¿Como funciona esta App?
+                    </button>
+                  </h2>
+                  <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+                    <div class="accordion-body">
+                     
+                      <p>
+                        Si eres una persona que <strong>ofrece sus cartas para venta y/o cambio</strong>, debes ir al menú <a href="/list/offer">Listas->Ofrezco</a>  y crear un listado, presionando el botón [Crear nueva lista] y luego que aparezca en la tabla de listados, debes pinchar su nombre y agregar cartas. 
+                      </p>
+                      <p>
+                        Si eres una persona que <strong>busca cartas para comprar o cambiar</strong>, debes ir al menú <a href="/list/hunt">Listas->Busco</a>  y crear un listado, presionando el botón [Crear nueva lista] y luego que aparezca en la tabla de listados, debes pinchar su nombre y agregar cartas. 
+                      </p>
+                      <p>
+                        Para agregar una carta: Presiona el botón [Agregar nueva carta] y escribe el nombre de la carta en inglés. Al ir escribiendo, se realizará una busqueda por nombre que podrás seleccionar. Luego debes presionar [Buscar Versiones] para mostrar todas las versiones de esa carta, si es que tiene más de una, y finalmente presionar el botón [Añadir] para agregarla al listado.                        
+                      </p>
+                      <p>Ya en el listado podrás modificar la cantidad, poner un precio y alguna observación de la carta (si está firmada; condición:nueva,jugada,etc.;si es proxy). Cuando modifiques algo debes presionar [Guardar] antes de volver al listado.</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="headingThree">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                     Duración de listados
+                    </button>
+                  </h2>
+                  <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+                    <div class="accordion-body">
+                      Para realizar una busqueda más óptima, se ha definido que una lista tenga 2 semanas de vigencia desde que se crea o modifica. Esto no significa que tu listas desaparezcan, solo no serán consideradas en el rastreo, ya sean cartas que se ofrezcan o se busquen.
+                    </div>
+                  </div>
+                </div>
+              </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col">
+            <h4>Acá puedes ver las listas que has creado.</h4>
+        </div>
+    </div>
+    <div class="row">
         <div class="col text-center">
             <h2>Tus listas</h2>
         </div>
