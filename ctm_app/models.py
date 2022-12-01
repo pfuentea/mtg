@@ -55,7 +55,8 @@ class Edicion(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):
-        return f"{self.nombre}"+"("+{self.set_code}+")"
+        ed={self.nombre}+"("+{self.set_code}+")"
+        return ed
 
 class Color(models.Model):
     nombre  = models.CharField(max_length=20)
