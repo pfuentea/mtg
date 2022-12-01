@@ -113,5 +113,5 @@ class ItemLista(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     observacion= models.TextField(max_length=500)
     def __str__(self):
-        item=self.carta.nombre+"("+self.carta.Edicion.nombre+"):"+self.lista.nombre+"("+self.cantidad+")"
+        item=self.carta.nombre+"("+self.carta.Edicion.nombre+"):"+self.lista.nombre+"("+str(self.cantidad)+")"
         return item
