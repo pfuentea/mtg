@@ -100,7 +100,9 @@ class Listados(models.Model):
     referencia_precio= models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
+    def __str__(self):
+        lista=self.nombre+":"+self.owner.name+"("+self.tipo+")"
+        return lista
 
 class ItemLista(models.Model):
     carta = models.ForeignKey(Carta, related_name='items', on_delete=models.CASCADE)
@@ -110,3 +112,6 @@ class ItemLista(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     observacion= models.TextField(max_length=500)
+    def __str__(self):
+        item=self.carta.nombre+":"+self.lista+"("+self.cantidad+")"
+        return item
