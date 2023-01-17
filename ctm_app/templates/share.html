@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block titulo %}Listas para ofrecer de {{usuario}} {% endblock %}
+{% block titulo %} {% if lista.tipo == 'B' %}Lista de busqueda de{% elif lista.tipo == 'O' %}Lista para ofrecer de{% endif %}  {{usuario}} {% endblock %}
 
 {% block contenido %}
 
@@ -10,6 +10,11 @@
 </h2>
 <a href="/list/share/{{lista.id}}?view=list">Ver listado </a>| 
 <a href="/list/share/{{lista.id}}?view=img">Ver Imagenes </a>
+
+<div class="" >URL:
+    <span id="url"></span>
+    <button onclick="copy('#url')" id="to_copy">Copiar enlace al clipboard</button>
+</div>
 
 {% if vista == 'lista' %}
 <div class="container">
@@ -58,6 +63,26 @@
     </div>
 {% endif %}
 
+<script>
+    $( document ).ready(function() {
+
+        url= document.location.href
+        console.log(url)
+        $("#url").text(url)
+    });
+
+    function copy(selector){
+        var $temp = $("<div>");
+        $("body").append($temp);
+        $temp.attr("contenteditable", true)
+            .html($(selector).html()).select()
+            .on("focus", function() { document.execCommand('selectAll',false,null); })
+            .focus();
+        document.execCommand("copy");
+        $temp.remove();
+        }
+   
+</script>
 {% endblock %}
 
 {% block libreria %}

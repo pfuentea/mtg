@@ -51,10 +51,10 @@
           <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
             <li><a class="dropdown-item" href="/list/hunt">Busco</a></li>
             <li><a class="dropdown-item" href="/list/offer">Ofrezco</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="#">Something else here</a></li>
+
           </ul>
           </li>
+          {% if request.session.user.role == 'admin' %} 
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="true">
               Mantenedores
@@ -67,10 +67,21 @@
               <li><a class="dropdown-item" href="/manage/type">Tipo</a></li>
             </ul>
             </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="true">
+                Estadisticas
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <li><a class="dropdown-item" href="/estadisticas">Usuarios</a></li>
+
+              </ul>
+              </li>
+            {% endif %}
         </ul>
         {% if request.session.user %}
         <div class="d-flex">
           <a class="btn btn-outline-success" href="/logout">Logout</a>
+         
         </div>
         {% endif %}
       </div>

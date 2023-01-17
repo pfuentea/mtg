@@ -12,11 +12,11 @@
 <div class="container">
     <div class="row">
         <div class="col-10">
-            <h1>Detalle de la lista: {{lista.nombre}} </h1>
+            <h1>Detalle de la lista:  </h1>
         </div>
 
         <div class="my-3">
-            {% if lista.tipo == 'B' %}
+            {% if tipo == 'B' %}
             <a href="/list/hunt" ><button>Volver a mis listas</button></a>
             {% else %}
             <a href="/list/offer"><button>Volver a mis listas</button></a>
@@ -71,6 +71,7 @@
                             <th>Nombre</th>
                             <th>Edicion</th>
                             <th>Cantidad</th>
+                            <th>Lista</th>
                             <th>Imagen</th>
                             <th class="dt-center">Actions</th>
                         </tr>
@@ -82,7 +83,10 @@
                                 <a href="/card/{{i.id}}">{{i.carta.nombre}}</a>                             
                             </td>
                             <td> {{i.carta.Edicion.nombre}}</td>
+                            
                             <td>{{i.cantidad}}</td>
+                            <td><a href="/list/{{i.lista.id}}">{{i.lista.nombre}}</a> 
+                                </td>
                             <td> <img src="{{i.carta.small_image}}" alt="" class="carta_tumb"></td>
                             <td class="dt-center"> 
                                     
@@ -121,16 +125,16 @@
                         </tr>
                     </thead>
                     <tbody>
-                        
+                        {{resultado}}
                         {% for r in resultado %}
                         <tr>
                             <td> 
-                                {{r.name}}                             
+                                {{r.lista.nombre}}                             
                             </td>
-                            <td> {{r.lname}}</td>
-                            <td> {{r.qty}}</td>
-                            <td class="dt-center">     
-                                <a href="/list/share/{{r.list_id}}?view=img">Ver lista completa</a>                                   
+                            <td> {{r.lista.nombre}}</td>
+                            <td>cantidad</td>
+                            <td class="dt-center">                                     
+                                Ver                                   
                             </td>
                         </tr>       
                     {% endfor %}

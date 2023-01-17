@@ -1,5 +1,6 @@
 from django.urls import path
-from . import views, auth
+from . import views, auth , manage  
+
 urlpatterns = [
     path('', views.index),
     path('registro', auth.registro),
@@ -19,7 +20,11 @@ urlpatterns = [
     path('list/remove/<int:lista_id>', views.delete_list),
     path('list/search/', views.list_detail),
 
+    path('list/view_all_hunt', views.view_all_hunt),
+    
+
     path('list/share/<int:lista_id>', views.share),
+    path('list/share/all', views.share_all),
 
     path('card/<int:item_id>/', views.card_detail),
     path('card/update/<int:item_id>', views.card_update), 
@@ -30,5 +35,7 @@ urlpatterns = [
     path('manage/set', views.list_offer),
     path('manage/color', views.list_hunt),
     path('manage/type', views.list_offer),
+
+    path('estadisticas', manage.stats), 
 
 ]

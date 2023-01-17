@@ -18,6 +18,7 @@ def index(request):
             "listas_hunt":listas_hunt, 
             "listas_off":listas_off
         }
+    print (f"USer:{request.session['user']}")
     return render(request, 'index.html', context=context )
 
 @login_required
@@ -72,26 +73,44 @@ def list_detail(request,lista_id):
     duracion=lista.updated_at
     
     if request.method == "GET":        
+        
         items= ItemLista.objects.filter(lista=lista)
-        resultado=[]
+        #resultado=[]
+        lstdict=[]
         for elemento in items:
             
-            print(elemento.carta.id)
+            print(f"carta_id:{elemento.carta.id}/{elemento.carta.nombre}")
 
             resultado1=ItemLista.objects.filter(carta=elemento.carta).exclude(lista__owner=elemento.lista.owner)
             if len(resultado1) >0:
+                print("Encontre la carta en otra lista!")
                 #resultado.append(resultado1)
-                for r in resultado1:
-                    print(f"lista:{r.lista.nombre}")
-                    resultado.append(r)
 
+                for r in resultado1:
+                    print(f"lista:{r.lista.nombre},dueño:{r.lista.owner.name}")
+                    indice=next((i for i, x in enumerate(lstdict) if x["name"] == r.lista.owner.name and  x["lname"] ==r.lista.nombre), None)
+                    if indice is None:
+                        new_elem={
+                            'name':r.lista.owner.name ,
+                            'lname':r.lista.nombre,
+                            'list_id':r.lista.id,
+                            'owner_id':r.lista.owner.id,
+                            'qty':1
+                        }
+                        lstdict.append(new_elem)
+                    else:
+                        lstdict[indice]['qty']+=1
+
+                    #resultado.append(r)
+        
+        print(lstdict)
         context = {
             'saludo': 'Hola',
             "items":items,
             "lista_id":lista_id,
             "lista":lista,
             "duracion":duracion,
-            "resultado":resultado
+            "resultado":lstdict
         }
         return render(request, 'detalle_lista.html', context)
     if request.method == "POST":
@@ -135,6 +154,25 @@ def share(request,lista_id):
         }
     return render(request, 'share.html', context)
 
+def share_all(request,lista_id):
+    lista=Listados.objects.get(id=lista_id)
+    items= ItemLista.objects.filter(lista=lista)
+    usuario=lista.owner.name
+    vista="lista"
+    if 'view' in request.GET:
+        if request.GET['view'] == 'img' :
+            vista="imgs"
+
+        
+    context = {
+            'saludo': 'Hola',
+            "items":items,
+            "lista_id":lista_id,
+            "lista":lista,
+            "usuario":usuario,
+            "vista":vista
+        }
+    return render(request, 'share.html', context)
 
 @login_required
 def list_edit(request,lista_id):
@@ -155,11 +193,12 @@ def add_to_list(request,lista_id):
         
         set=request.POST['set']
         carta_id=request.POST['card_id']
+        
         nombre=request.POST['nombre']
         set_name=request.POST['set_name']
         imagen=request.POST['img_small']
         img_small=imagen.split(',')
-
+        
         print(img_small)
         img_small=img_small[0]
         #primero reviso si existe la edicion
@@ -178,20 +217,29 @@ def add_to_list(request,lista_id):
 
         print("Edicion:"+edicion.nombre)
         print("carta_id:"+carta_id)
-        
+        last_char = carta_id[-1]
+        print(f"ultimo char:{last_char}")
+        try:
+            x=int(last_char)
+            carta_id_num=carta_id
+            
+        except:
+            carta_id_num=carta_id[:-1]
+
         print("Revisando la carta...")
         try: #intento agregar una carta nueva, si falla es que ya existe
-            carta=Carta.objects.filter(number_collector=carta_id,Edicion=edicion)
+            carta=Carta.objects.filter(number_collector_txt=carta_id,Edicion=edicion)
             #print(carta)
             #print(len(carta))
         except:   
             pass
+
         if len(carta) < 1:
             #edicion=Edicion.objects.create(set_code=set, nombre=set_name)         
             print("Añadiendo Carta...")
             url_carta="https://scryfall.com/card/"+set+"/"+carta_id+"/"
            
-            carta=Carta.objects.create(nombre=nombre,Edicion=edicion,number_collector=carta_id,small_image=img_small)
+            carta=Carta.objects.create(nombre=nombre,Edicion=edicion,number_collector_txt=carta_id,small_image=img_small,number_collector=carta_id_num)
         else:
             carta=carta[0]
         #agregamos si es que no existe
@@ -199,7 +247,7 @@ def add_to_list(request,lista_id):
             print("Revisando si la carta esta en la lista.")
             is_item=ItemLista.objects.filter(carta=carta,lista=lista)
             
-            print(len(is_item))
+            print(f"# veces en la lista: {len(is_item)}")
         except:
             print("ERROR:consulta con problema")
         if len(is_item)<1:
@@ -209,8 +257,6 @@ def add_to_list(request,lista_id):
         else:
             messages.warning(request, "Carta ya existe en la lista.")
             print("La Carta ya existe.")#sumamos 1?   
-
-            
 
         #print(request.POST)
         items=ItemLista.objects.filter(lista=lista)
@@ -271,3 +317,18 @@ def delete_list(request,lista_id):
     lista=Listados.objects.get(id=lista_id)
     lista.delete()
     return redirect('/list/hunt')
+
+@login_required
+def view_all_hunt(request):
+    user_id=request.session['user']['id']
+        #print (f"User_id:{user_id}")
+    user= User.objects.get(id=user_id)
+    
+    items= ItemLista.objects.filter(lista__owner=user,lista__tipo='B')
+    context = {
+                
+                "items":items,
+                "search":"",
+                "tipo":'B'
+            }
+    return render(request, 'detalle_lista_all.html', context)

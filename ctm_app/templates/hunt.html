@@ -18,6 +18,7 @@
             <button id="open_search">
                 Crear nueva lista
             </button>
+            <a href="/list/view_all_hunt" ><button>Ver todas las cartas buscadas</button></a>
         </div>
     </div>
     <div class="row mb-2" id="new_list">
@@ -50,10 +51,12 @@
                             </td>
                             <td> {{l.items.count}}</td>
                             <td class="dt-center"> 
-                                <a href="/list/edit/{{l.id}}" class="btn btn-sm btn-outline-primary> <i class="bi bi-eye"></i></a>
-                                    <a href="#"  data-href="/list/remove/{{l.id}}"  class="btn btn-sm btn-outline-danger btn-delete-trv" data-bs-toggle="modal" data-bs-target="#confirm-delete" title="Borrar">
+                                <a href="/list/edit/{{l.id}}" class="btn btn-sm btn-outline-primary"> 
+                                    <i class="bi bi-eye"></i></a>
+                                    <a href="#"  data-href="/list/remove/{{l.id}}" class="btn btn-sm btn-outline-danger btn-delete-trv" data-bs-toggle="modal" data-bs-target="#confirm-delete" title="Borrar">
                                         <i class="bi bi-trash"></i>
                                     </a>
+                                    <a href="/list/share/{{l.id}}" class="btn btn-sm btn-outline-primary"> [C]</a>
                                    
                             </td>
                         </tr>       

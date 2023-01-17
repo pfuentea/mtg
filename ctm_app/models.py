@@ -44,10 +44,10 @@ class User(models.Model):
     objects = UserManager()
 
     def __str__(self):
-        return f"{self.name}"
+        return f"{self.name}/{self.role}"
 
     def __repr__(self):
-        return f"{self.name}"
+        return f"{self.name}/{self.role}"
 
 class Edicion(models.Model):
     nombre = models.CharField(max_length=100)
@@ -73,6 +73,7 @@ class Carta(models.Model):
     nombre = models.CharField(max_length=100)
     Edicion  = models.ForeignKey(Edicion, related_name='cartas', on_delete=models.CASCADE)
     number_collector =models.IntegerField()
+    number_collector_txt =models.CharField(max_length=10)
     small_image=models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
