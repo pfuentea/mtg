@@ -105,9 +105,12 @@
     {% if lista.tipo == 'B' %}
     <div class="row">
         <div class="col">
-            Personas que ofrecen las cartas que buscas
+            Personas que ofrecen las cartas que buscas:
         </div>
     </div>
+    {% if resultado|length > 0 %}
+    
+    
     <div class="row">
         <div class="col">
             <div class="table-responsive" id="table_result">
@@ -139,6 +142,10 @@
             </div>
         </div>
     </div>
+    {% else %}
+    No hay otros usuarios que posean las cartas que buscas.
+    {% endif %}
+    
     {% endif %}
 </div>
 <datalist id="cartones">
