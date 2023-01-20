@@ -35,7 +35,7 @@ def list_hunt(request):
         for l in listas:
             estado="Activa"
             ahora = datetime.now(timezone.utc) #datetime.datetime
-            ultima_act=l.updated_at
+            ultima_act=l.updated_at.replace(tzinfo=pytz.UTC)
             diff=ahora - ultima_act       
             dias=divmod(diff.total_seconds() ,24 * 60 * 60 )[0] 
             if dias >14:
@@ -95,7 +95,7 @@ def list_offer(request):
         for l in listas:
             estado="Activa"
             ahora = datetime.now(timezone.utc) #datetime.datetime
-            ultima_act=l.updated_at
+            ultima_act=l.updated_at.replace(tzinfo=pytz.UTC)
             diff=ahora - ultima_act       
             dias=divmod(diff.total_seconds() ,24 * 60 * 60 )[0] 
             if dias >14:
