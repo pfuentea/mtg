@@ -6,7 +6,7 @@ from .decorators import login_required
 from .models import *
 from datetime import datetime, timedelta,timezone
 from django.http import HttpRequest
-
+import pytz
 
 @login_required
 def index(request):
@@ -126,7 +126,7 @@ def list_detail(request,lista_id):
     user= User.objects.get(id=user_id)
     lista=Listados.objects.get(id=lista_id)
     ahora = datetime.now(timezone.utc) #datetime.datetime
-    ultima_act=lista.updated_at
+    ultima_act=lista.updated_at.replace(tzinfo=pytz.UTC)
     diff=ahora - ultima_act
     #minutos=divmod(diff.total_seconds() ,  60 )[0]
     #horas=divmod(diff.total_seconds() , 60 * 60 )[0]
