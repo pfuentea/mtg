@@ -67,9 +67,11 @@
     $( document ).ready(function() {
 
         url= document.location.href
-        console.log(url)
+        url_ante= document.referrer
+        console.log(url_ante)
         $("#url").text(url)
     });
+    
 
     function copy(selector){
         var $temp = $("<div>");
@@ -80,6 +82,7 @@
             .focus();
         document.execCommand("copy");
         $temp.remove();
+        toastr.success("Url copiada con exito!")
         }
    
 </script>

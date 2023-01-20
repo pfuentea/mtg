@@ -26,6 +26,9 @@ urlpatterns = [
     path('list/share/<int:lista_id>', views.share),
     path('list/share/all', views.share_all),
 
+    path('list/activar/<int:lista_id>', views.activar),
+    path('list/desactivar/<int:lista_id>', views.desactivar),
+
     path('card/<int:item_id>/', views.card_detail),
     path('card/update/<int:item_id>', views.card_update), 
     path('card/remove/<int:lista_id>/<int:item_id>', views.remove_from_list),

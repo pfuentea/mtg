@@ -67,6 +67,9 @@ button.dashed.thin{
    border-bottom-right-radius: 225px 15px;
    border-bottom-left-radius:15px 255px;
 }
+.input_search_card{
+   width:300px;
+}
 /*PARA LAS LISTAS*/
 li a{
    text-decoration: none;

@@ -34,6 +34,7 @@
                     <tr>
                         <th>Nombre</th>
                         <th>Cantidad de cartas</th>
+                        <th>Estado</th>
                         <th class="dt-center">Actions</th>
                     </tr>
                 </thead>
@@ -44,10 +45,19 @@
                             <a href="/list/{{l.id}}">{{l.nombre}}</a>                      
                         </td>
                         <td> {{l.items.count}}</td>
+                        <td class="{%if l.estado == 'Activa' %}text-success {% else %}text-warning{% endif %}">{{l.estado}}</td>
                         <td class="dt-center"> 
+                            <a href="/list/edit/{{l.id}}" class="btn btn-sm btn-outline-primary" title="Editar detalles"> 
+                                <i class="bi bi-eye"></i></a>
+
                                 <a href="#"  data-href="/card/remove/{{lista_id}}/{{i.id}}"  class="btn btn-sm btn-outline-danger btn-delete-trv" data-bs-toggle="modal" data-bs-target="#confirm-delete" title="Borrar">
                                     <i class="bi bi-trash"></i>
                                 </a>
+
+                                <a href="/list/share/{{l.id}}" class="btn btn-sm btn-outline-primary" title="Compartir"> <i class="bi bi-share"></i></a>
+                                {%if l.estado == 'Expirada' %}
+                                <a href="/list/activar/{{l.id}}" class="btn btn-sm btn-outline-primary" title="Activar"> <i class="bi bi-play"></i></a>
+                                {% endif %}  
                                
                         </td>
                     </tr>       
