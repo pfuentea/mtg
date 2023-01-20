@@ -44,10 +44,10 @@ class User(models.Model):
     objects = UserManager()
 
     def __str__(self):
-        return f"{self.name}/{self.role}"
+        return f"{self.name}"
 
     def __repr__(self):
-        return f"{self.name}/{self.role}"
+        return f"{self.name}"
 
 class Edicion(models.Model):
     nombre = models.CharField(max_length=100)
