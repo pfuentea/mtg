@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.shortcuts import redirect, render
 import bcrypt
-from .models import User
+from .models.user import User
 
 
 def logout(request):
@@ -23,7 +23,9 @@ def login(request):
                     "id" : log_user.id,
                     "name": f"{log_user}",
                     "email": log_user.email,
-                    "role": log_user.role
+                    "role": log_user.role,
+                    "nick":log_user.nick,
+                    "ubicacion":log_user.ubicacion
                 }
 
                 request.session['user'] = user

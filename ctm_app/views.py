@@ -3,7 +3,13 @@ from django.contrib import messages
 from django.shortcuts import redirect, render
 import bcrypt
 from .decorators import login_required
-from .models import *
+#importacion de clases
+from .models.user import User
+from .models.listados import Listados
+from .models.item_lista import ItemLista
+from .models.carta import Carta
+from .models.edicion import Edicion
+
 from datetime import datetime, timedelta,timezone
 from django.http import HttpRequest
 import pytz
@@ -19,7 +25,7 @@ def index(request):
             "listas_hunt":listas_hunt, 
             "listas_off":listas_off
         }
-    print (f"USer:{request.session['user']}")
+    #print (f"USer:{request.session['user']}")
     return render(request, 'index.html', context=context )
 
 @login_required
@@ -35,10 +41,10 @@ def list_hunt(request):
         for l in listas:
             estado="Activa"
             ahora = datetime.now(timezone.utc) #datetime.datetime
-            ultima_act=l.updated_at.replace(tzinfo=pytz.UTC)
-            diff=ahora - ultima_act       
+            fecha_exp=l.expiracion.replace(tzinfo=pytz.UTC)
+            diff= fecha_exp - ahora        
             dias=divmod(diff.total_seconds() ,24 * 60 * 60 )[0] 
-            if dias >14:
+            if dias < 0:
                 estado="Expirada"
 
             new_elem={
@@ -63,8 +69,8 @@ def list_hunt(request):
 @login_required
 def activar(request,lista_id):
     lista=Listados.objects.get(id=lista_id)
-    ahora = datetime.now(timezone.utc) #datetime.datetime
-    lista.updated_at=ahora
+    ahora_mas_14 = datetime.now(timezone.utc) + timedelta(days=14)#datetime.datetime
+    lista.expiracion=ahora_mas_14
     lista.save()
 
     previous_url = request.META.get('HTTP_REFERER')
@@ -93,12 +99,13 @@ def list_offer(request):
         listas= Listados.objects.filter(owner=user,tipo='O')
         result=[]
         for l in listas:
+            
             estado="Activa"
             ahora = datetime.now(timezone.utc) #datetime.datetime
-            ultima_act=l.updated_at.replace(tzinfo=pytz.UTC)
-            diff=ahora - ultima_act       
+            fecha_exp=l.expiracion.replace(tzinfo=pytz.UTC)
+            diff= fecha_exp - ahora        
             dias=divmod(diff.total_seconds() ,24 * 60 * 60 )[0] 
-            if dias >14:
+            if dias < 0:
                 estado="Expirada"
 
             new_elem={
@@ -126,22 +133,35 @@ def list_detail(request,lista_id):
     user= User.objects.get(id=user_id)
     lista=Listados.objects.get(id=lista_id)
     ahora = datetime.now(timezone.utc) #datetime.datetime
-    ultima_act=lista.updated_at.replace(tzinfo=pytz.UTC)
-    diff=ahora - ultima_act
+    fecha_exp=lista.expiracion.replace(tzinfo=pytz.UTC)
+    diff= fecha_exp - ahora     
+
+    dias=divmod(diff.total_seconds() ,24 * 60 * 60 )[0]
+
+    #print(f"dias:{dias}") 
     #minutos=divmod(diff.total_seconds() ,  60 )[0]
     #horas=divmod(diff.total_seconds() , 60 * 60 )[0]
-    dias=divmod(diff.total_seconds() ,24 * 60 * 60 )[0]
+  
     #print(ultima_act)
     
     if request.method == "GET":        
-        
-        items= ItemLista.objects.filter(lista=lista)
+        #aca hacemos la busqueda en otras listas
+        #obtenemos las cartas de la lista
+        items= ItemLista.objects.filter(lista=lista) 
         lstdict=[]
+        lstdict2=[]
+        cartaslist=[]
+        #para cada carta buscaremos otras listas (de cambio/venta) donde aparece
         for elemento in items:
             
-            #print(f"carta_id:{elemento.carta.id}/{elemento.carta.nombre}")
 
+           
+            print(f"carta_id:{elemento.carta.id}/{elemento.carta.nombre}")
+            #buscamos por la misma carta (mismo nombre, misma edicion, mismo tipo de borde)
             resultado1=ItemLista.objects.filter(carta=elemento.carta).exclude(lista__owner=elemento.lista.owner)
+            #aca debemos buscar por nombre en caso de que este activado esto
+            resultado_por_nombre=ItemLista.objects.filter(carta__nombre=elemento.carta.nombre).exclude(lista__owner=elemento.lista.owner)
+            #print(resultado_por_nombre)
             if len(resultado1) >0:
                 #print("Encontre la carta en otra lista!")
                 for r in resultado1:
@@ -159,15 +179,47 @@ def list_detail(request,lista_id):
                         lstdict.append(new_elem)
                     else:
                         lstdict[indice]['qty']+=1
+            if len(resultado_por_nombre)>1:
+                sumar=True
+                if elemento.carta.nombre in cartaslist:
+                    sumar=False
+                else:
+                    cartaslist.append(elemento.carta.nombre)
+                for r2 in resultado_por_nombre:
+                    
+                    #print(f"itemlista.carta.nombre:{r2.carta.nombre}")
+                    #si la carta existe, me la salto
+                    #print(f"lista:{r.lista.nombre},dueño:{r.lista.owner.name}")
+                    #busco el indice donde exista un dict con name= r.lista.owner.name y lname=r.lista.nombre, si no existe: creo el dict y lo agrego
+                    indice2=next((i for i, x in enumerate(lstdict2) if x["name"] == r2.lista.owner.name and  x["lname"] ==r2.lista.nombre and x["cname"] == r2.carta.nombre), None)
+                    
 
+                    #print(f"carta:{elemento.carta.nombre} la sumo?:{sumar} ")    
+                    if indice2 is None:
+                        new_elem2={
+                            'name':r2.lista.owner.name ,
+                            'lname':r2.lista.nombre,
+                            'list_id':r2.lista.id,
+                            'owner_id':r2.lista.owner.id,
+                            'cname':r2.carta.nombre,
+                            'qty':1
+                        }
+                        lstdict2.append(new_elem2)
+                        indice2=0
+                    else:
+                        if sumar:
+                        #considerar no repetir si ya esta otra carta con mismo nombre en la lista
+                            lstdict2[indice2]['qty']+=1
+                    
         #print(lstdict)
         context = {
             'saludo': 'Hola',
             "items":items,
             "lista_id":lista_id,
             "lista":lista,
-            "duracion":14-dias,
-            "resultado":lstdict
+            "duracion":dias,
+            "resultado":lstdict,
+            "resultado_por_nombre":lstdict2
         }
         return render(request, 'detalle_lista.html', context)
     if request.method == "POST":
@@ -181,7 +233,7 @@ def list_detail(request,lista_id):
                 "lista_id":lista_id,
                 "items":items,
                 "search":"",
-                "duracion":duracion
+                "duracion":dias
             }
         return render(request, 'detalle_lista.html', context)
         new_carta=request.POST['new_card']
@@ -193,10 +245,32 @@ def share(request,lista_id):
     lista=Listados.objects.get(id=lista_id)
     items= ItemLista.objects.filter(lista=lista)
     usuario=lista.owner.name
-    vista="lista"
+    ubicacion=lista.owner.ubicacion
+    vista="imgs"
     if 'view' in request.GET:
-        if request.GET['view'] == 'img' :
-            vista="imgs"
+        if request.GET['view'] == 'list' :
+            vista="lista"
+
+    nick=lista.owner.nick
+
+    if request.method == "POST": #esta creando el nick en este caso
+        nick_avail=User.objects.filter(nick=request.POST['nick']) 
+        user= User.objects.get(id=request.session['user']['id'])
+        print(f"nick_avail:{nick_avail}")
+        if nick_avail.count() == 0:
+            print("no existe el nick y podemos crearlo")
+            user.nick=request.POST['nick']
+            user.save()
+            nick=request.POST['nick']
+            request.session['user']['nick']=nick
+
+            #print( request.session['user']['nick'])
+           
+            messages.success(request, "Nick seteado con exito!")
+        else :
+            messages.warning(request, "Este Nick ya está siendo usado por otro usuario. Favor elija uno nuevo")
+
+    #print(lista.owner.nick)
 
     context = {
             'saludo': 'Hola',
@@ -204,7 +278,9 @@ def share(request,lista_id):
             "lista_id":lista_id,
             "lista":lista,
             "usuario":usuario,
-            "vista":vista
+            "vista":vista,
+            "nickname":nick,
+            "ubicacion":ubicacion
         }
     return render(request, 'share.html', context)
 

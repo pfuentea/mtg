@@ -1,7 +1,12 @@
 from django.contrib import admin
-from .models import User, Edicion,Color,Tipo,Carta,Listados,ItemLista
 
-# Register your models here.
+from .models.user import User
+from .models.listados import Listados
+from .models.item_lista import ItemLista
+from .models.carta import Carta
+from .models.edicion import Edicion
+from .models.color import Color
+from .models.tipo import Tipo
 
 admin.site.register(User)
 admin.site.register(Edicion)

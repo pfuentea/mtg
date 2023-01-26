@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views, auth , manage  
+from . import views, auth , manage  ,user
 
 urlpatterns = [
     path('', views.index),
@@ -38,6 +38,9 @@ urlpatterns = [
     path('manage/set', views.list_offer),
     path('manage/color', views.list_hunt),
     path('manage/type', views.list_offer),
+
+    path('user/preferencias', user.preferencias),
+
 
     path('estadisticas', manage.stats), 
 

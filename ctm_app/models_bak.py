@@ -39,6 +39,8 @@ class User(models.Model):
     email = models.EmailField(max_length=255, unique=True)
     role = models.CharField(max_length=255, choices=CHOICES)
     password = models.CharField(max_length=70)
+    nick= models.CharField(max_length=70,blank=True) 
+    ubicacion = models.CharField(max_length=255,blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = UserManager()
@@ -101,6 +103,7 @@ class Listados(models.Model):
     referencia_precio= models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    expiracion = models.DateTimeField(auto_now_add=True)
     def __str__(self):
         lista=self.nombre+":"+self.owner.name+"("+self.tipo+")"
         return lista

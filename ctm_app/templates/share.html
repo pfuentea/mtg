@@ -6,15 +6,43 @@
 
 
 <h2>
-    {{lista.nombre}} by {{usuario}} ( {% if lista.tipo == 'B' %}Busco{% elif lista.tipo == 'O' %}Dispone{% endif %} )
+    {{lista.nombre}} by 
+    {% if nickname != '' %}
+    {{nickname}}
+    {% else %}
+    {{usuario}} 
+    {% endif %}
+    ( {% if lista.tipo == 'B' %}Busco{% elif lista.tipo == 'O' %}Venta/Cambio{% endif %} )
 </h2>
+<h3>
+    {% if ubicacion != '' %}Ubicación:{{ubicacion}} {% endif %}
+</h3>
 <a href="/list/share/{{lista.id}}?view=list">Ver listado </a>| 
 <a href="/list/share/{{lista.id}}?view=img">Ver Imagenes </a>
+{% if request.session.user.name == usuario %}
+    <div class="" >URL:
+        <span id="url"></span>
+        <button onclick="copy('#url')" id="to_copy">Copiar enlace al clipboard</button>
+    </div>
+{% endif %}
+{% if request.session.user %}
+    {% if nickname != '' %}
+        
+            Usted compartira el siguinte listado, con el nick: {{nickname}}
+    
+    {% else %}
 
-<div class="" >URL:
-    <span id="url"></span>
-    <button onclick="copy('#url')" id="to_copy">Copiar enlace al clipboard</button>
-</div>
+        <p>Para poder compartir la lista, te solicitamos la creación de un Username 
+            y así resguardar información personal que solo debe ser compartida por miembros registrados.</p>
+        <p>En caso de no querer usar un nick, se mostrará su nombre. </p>
+
+        <form action="/list/share/{{lista.id}}" method="POST" id="set_nick">
+            {% csrf_token %}
+            <input type="text" name="nick" >
+            <button id="send_nick" type="submit">Crear Nick</button>
+        </form>
+    {% endif %}
+{% endif %}
 
 {% if vista == 'lista' %}
 <div class="container">
@@ -55,7 +83,7 @@
             <img src="{{i.carta.small_image}}" style="width: 6rem;">
             </a>
             <div class="card-title mb-2 text-muted ">
-                {{i.carta.nombre}} x <b>{{i.cantidad}}({{i.carta.Edicion.set_code}})</b>
+                {{i.carta.nombre}} x <b>{{i.cantidad}} ({{i.carta.Edicion.set_code}})</b>
             </div>   
           
         </div>

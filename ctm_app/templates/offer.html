@@ -54,9 +54,11 @@
                                     <i class="bi bi-trash"></i>
                                 </a>
 
-                                <a href="/list/share/{{l.id}}" class="btn btn-sm btn-outline-primary" title="Compartir"> <i class="bi bi-share"></i></a>
+                                
                                 {%if l.estado == 'Expirada' %}
                                 <a href="/list/activar/{{l.id}}" class="btn btn-sm btn-outline-primary" title="Activar"> <i class="bi bi-play"></i></a>
+                                {% else %}
+                                <a href="/list/share/{{l.id}}" class="btn btn-sm btn-outline-primary" title="Compartir"> <i class="bi bi-share"></i></a>
                                 {% endif %}  
                                
                         </td>

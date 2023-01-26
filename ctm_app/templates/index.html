@@ -61,17 +61,19 @@
         <div class="col-8">
             <h4>Acá puedes ver las listas que has creado.</h4>
         </div>
+      
     </div>
     <div class="row">
         <div class="col-8 text-center">
             <h2>Tus listas</h2>
         </div>
+
     </div>
     <div class="row">
         <div class="col-1 "></div>
         <div class="col-4 sketch">Listas de cartas que busco (compro/cambio) </div>
         <div class="col-4 border_sketch">Listas de cartas que ofrezco (vendo/cambio)</div>
-        <div class="col"></div>
+        <div class="col">Última actividad </div>
     </div>
     <div class="row">
         <div class="col-1"></div>
@@ -88,7 +90,23 @@
             {% empty %}
             <p>Aun no has creado listas para ofrecer</p>
             {% endfor %}</div>
-        <div class="col"></div>
+            <div class="col bg-info">
+              <p>
+                Usuario X: ha creado la lista de busqueda XXX
+              </p>
+              <p>
+                Usuario Y: Se ha unido al sitio.
+              </p>
+              <p>
+                Usuario X: ha creado la lista de busqueda XXX
+              </p>
+              <p>
+                Usuario X: ha creado la lista de busqueda XXX
+              </p>
+              <p>
+                Usuario Z: ha creado la lista para ofrecer XXX
+              </p>
+            </div>
     </div>
 </div>
 
