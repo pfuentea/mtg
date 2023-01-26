@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.shortcuts import redirect, render
 from .decorators import login_required
-from .models import *
+from .models.user import User
 
 from .forms.userForm import UserForm
 
