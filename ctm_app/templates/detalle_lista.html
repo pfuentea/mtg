@@ -154,7 +154,8 @@
                 </div>
             </div>
         {% else %}
-            No hay otros usuarios que posean las cartas que buscas.
+        <p> No hay otros usuarios que posean las cartas exactas que buscas.</p>
+           
         {% endif %}
 
         {% if resultado_por_nombre|length > 0 %}
@@ -196,7 +197,10 @@
                 </div>
             </div>
         {% else %}
-            No hay otros usuarios que posean las cartas que buscas.
+        <p m-5>
+            No hay otros usuarios que posean las cartas que buscas por el nombre.
+        </p>
+            
         {% endif %}
     
     {% endif %}
