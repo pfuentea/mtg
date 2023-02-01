@@ -28,6 +28,13 @@ def preferencias(request):
     }
     return render(request, 'user/preferencias.html', context=context )
 
+@login_required
+def view(request,user_id):
+    user= User.objects.get(id=user_id)
+    context={
+        "user":user
+    }
+    return render(request, 'user/view.html', context=context )
 
 '''
 def cambiar_contraseña(request):

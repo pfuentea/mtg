@@ -8,7 +8,7 @@ def logout(request):
     if 'user' in request.session:
         del request.session['user']
     
-    return redirect("/login")
+    return redirect("/")
     
 
 def login(request):
@@ -30,7 +30,7 @@ def login(request):
 
                 request.session['user'] = user
                 messages.success(request, "Logueado correctamente.")
-                return redirect("/")
+                return redirect("/index")
             else:
                 messages.error(request, "Password o Email  incorrectos.")
         else:
@@ -40,6 +40,9 @@ def login(request):
 
         return redirect("/login")
     else:
+        if 'user' in request.session:
+            messages.success(request, "Ya habías ingresado anteriormente.")
+            return redirect('/index')
         return render(request, 'login.html')
 
 
@@ -76,7 +79,7 @@ def registro(request):
                 "name": f"{usuario_nuevo.name}",
                 "email": usuario_nuevo.email
             }
-            return redirect("/")
+            return redirect("/index")
 
         return redirect("/registro")
     else:

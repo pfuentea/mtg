@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTM.a.g.i.c.</title>
+    <!--BOOTSTRAP-->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href='{% static "/css/style.css" %}'>
+    <link rel="preload" href='{% static "/fonts/Garde.woff2" %}' as="font" type="font/woff2" crossorigin>
+</head>
+<body>
+    <div class="container contenido logo_orange mt-5 p-5">
+        <h1 class="garde">
+            CTM.a.g.i.c.
+        </h1><img src='{% static "/imgs/logo_02.png" %}' alt="" class="logo_orange">
+
+    </div>
+    <div id="#quees"></div>
+    <div class="container contenido mt-2 p-3">
+        <h4 class="garde">Que es CTM.a.g.i.c.?</h4>
+        <p>
+            Fue pensado como una herramienta para facilitar el intercambio de cartas coleccionables MAGIC, en donde los usuarios podrán generar listas de cartas que buscan, las cuales serán comparadas con listas de cartas de otros usuarios que las ofrecen.
+        </p> 
+        <p>En la aplicación podrás compartir tus listas, ya sea si buscas u ofreces alguna carta.</p>
+
+    </div>
+    <div id="#como"></div>
+    <div class="container contenido mt-2 p-3">
+        <h4 class="garde">Como funciona CTM.a.g.i.c.?</h4>
+        <p>
+            <span class="garde"> CTM.a.g.i.c. </span> utiliza información pública disponible desde la API de <a href="https://www.scryfall.com" target="_blank" class="naranjo">Scryfall</a>, por esto mismo, los listados se generan con los nombres de las cartas en inglés.           
+        </p>
+
+    </div>
+    <div id="#join"></div>
+    <div class="container contenido mt-2 p-3">
+        <h4 class="garde">Como me uno a CTM.a.g.i.c.?</h4>
+        <p>
+            <a href="/registro" class="naranjo">Registrate</a> o 
+            <a href="/login" class="naranjo">inicia sesión</a>
+             en <span class="garde"> CTM.a.g.i.c. </span> y empieza a crear tus listas y compartirlas.          
+        </p>
+
+    </div>
+    <div class="container contenido mt-2 p-3">
+        <h4 class="garde">Quieres opinar sobre CTM.a.g.i.c.?</h4>
+        <p>
+            En <span class="garde"> CTM.a.g.i.c. </span> estamos atentos a tus comentarios, favor hazlos llegar en este 
+            <a href="/contacto" class="naranjo">formulario</a>.    
+        </p>
+
+    </div>
+    <!--
+        Aca la idea es mostrar:
+        1.- objetivo de la pagina
+        2.- ultimas 10 listas de busquedas
+        3.- ultimas 10 listas de ofrecimiento
+
+    -->
+</body>
+</html>

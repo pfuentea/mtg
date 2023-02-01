@@ -9,10 +9,17 @@ from .models.listados import Listados
 from .models.item_lista import ItemLista
 from .models.carta import Carta
 from .models.edicion import Edicion
+from .models.actividad import Actividad
 
 from datetime import datetime, timedelta,timezone
 from django.http import HttpRequest
 import pytz
+
+def landing(request):
+    context = {
+               
+            }
+    return render(request, 'landing.html', context=context )
 
 @login_required
 def index(request):
@@ -20,10 +27,12 @@ def index(request):
     user= User.objects.get(id=request.session['user']['id'])
     listas_hunt= Listados.objects.filter(owner=user,tipo='B')
     listas_off= Listados.objects.filter(owner=user,tipo='O')
+    last_act=Actividad.objects.all().order_by('-updated_at')[:10]
     context = {
             'saludo': 'Hola',
             "listas_hunt":listas_hunt, 
-            "listas_off":listas_off
+            "listas_off":listas_off,
+            "actividades":last_act,
         }
     #print (f"USer:{request.session['user']}")
     return render(request, 'index.html', context=context )
@@ -64,6 +73,10 @@ def list_hunt(request):
     if request.method == "POST":
         new_list=request.POST['new_list']
         nueva_lista=Listados.objects.create(owner=user,nombre=new_list,tipo='B',referencia_web='',referencia_precio=0)
+        # esta accion registra una actividad
+
+        mensaje=f" ha creado la lista de busqueda"
+        new_act=Actividad.objects.create(actor=user,accion=mensaje,lista=nueva_lista)  
         return redirect('/list/hunt')
 
 @login_required
@@ -83,7 +96,7 @@ def activar(request,lista_id):
 def desactivar(request,lista_id):
     lista=Listados.objects.get(id=lista_id)
     ahora = datetime.now(timezone.utc) #datetime.datetime
-    lista.updated_at=ahora- timedelta(days=14) #no funciona porque al actualizar con -14 días se actualiza con la fecha actual
+    lista.expiracion=ahora
     lista.save()
     if lista.tipo == 'B':
         return redirect('/list/hunt')
@@ -124,6 +137,10 @@ def list_offer(request):
     if request.method == "POST":
         new_list=request.POST['new_list']
         nueva_lista=Listados.objects.create(owner=user,nombre=new_list,tipo='O',referencia_web='',referencia_precio=0)
+        # esta accion registra una actividad
+        mensaje=f" ha creado la lista para ofrecer"
+        new_act=Actividad.objects.create(actor=user,accion=mensaje,lista=nueva_lista)       
+
         return redirect('/list/offer')
 
 @login_required
@@ -152,8 +169,7 @@ def list_detail(request,lista_id):
         lstdict2=[]
         cartaslist=[]
         #para cada carta buscaremos otras listas (de cambio/venta) donde aparece
-        for elemento in items:
-            
+        for elemento in items:          
 
            
             print(f"carta_id:{elemento.carta.id}/{elemento.carta.nombre}")
@@ -245,6 +261,7 @@ def share(request,lista_id):
     lista=Listados.objects.get(id=lista_id)
     items= ItemLista.objects.filter(lista=lista)
     usuario=lista.owner.name
+    usuario_id=lista.owner.id
     ubicacion=lista.owner.ubicacion
     vista="imgs"
     if 'view' in request.GET:
@@ -278,6 +295,7 @@ def share(request,lista_id):
             "lista_id":lista_id,
             "lista":lista,
             "usuario":usuario,
+            "usuario_id":usuario_id,
             "vista":vista,
             "nickname":nick,
             "ubicacion":ubicacion
@@ -471,3 +489,7 @@ def view_all_hunt(request):
                 "tipo":'B'
             }
     return render(request, 'detalle_lista_all.html', context)
+
+def contacto(request):
+    context = {}
+    return render(request, 'contacto.html', context)

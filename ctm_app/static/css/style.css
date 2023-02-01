@@ -1,7 +1,7 @@
 
 body{
    /* font-family: 'Amatic SC', cursive;*/
-   font-family: 'Cabin Sketch', cursive;
+   font-family: 'Montserrat', sans-serif;
 }
 
 /*PARA LAS CARTAS*/
@@ -113,3 +113,45 @@ a.button:hover{
 a.button.lined.thick{
    
 }
+
+.contenido{
+  
+   background: rgb(54,79,107);
+   background: linear-gradient(45deg, rgba(54,79,107,1) 0%, rgba(103,122,143,1) 100%);
+   border-radius: 10px;
+   color: #abc9fe;
+   
+}
+.contenido::after{
+   opacity: 0.25;
+   background: radial-gradient(circle, rgb(255, 255, 255) 0%, rgba(255, 255, 255, 0) 100%);
+}
+
+.garde {
+   font-family: 'Garde';
+   font-weight: normal;
+   font-style: normal;
+}
+
+h1.garde{
+   font-family: 'Garde';
+   font-weight: normal;
+   font-style: normal;
+   color: #F77e0d;
+   font-size: 4rem;
+   text-align: center;
+}
+
+div.logo_orange {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+ }
+
+img.logo_orange {
+   
+ }
+
+.naranjo{
+   color: #F77e0d;
+ }

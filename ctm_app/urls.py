@@ -1,8 +1,13 @@
 from django.urls import path
-from . import views, auth , manage  ,user
+from . import views, auth , manage  ,users
+from .models import user
 
 urlpatterns = [
-    path('', views.index),
+    path('', views.landing),
+    path('inicio', views.landing),
+    path('index', views.index),
+    path('contacto', views.contacto),
+
     path('registro', auth.registro),
     path('login', auth.login),
     path('logout', auth.logout),
@@ -39,7 +44,8 @@ urlpatterns = [
     path('manage/color', views.list_hunt),
     path('manage/type', views.list_offer),
 
-    path('user/preferencias', user.preferencias),
+    path('user/preferencias', users.preferencias),
+    path('user/<int:user_id>', users.view),
 
 
     path('estadisticas', manage.stats), 
