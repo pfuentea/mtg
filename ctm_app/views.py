@@ -11,6 +11,9 @@ from .models.carta import Carta
 from .models.edicion import Edicion
 from .models.actividad import Actividad
 
+from .models.comentario import Comentario
+from .forms.comentarioForm import ComentarioForm
+
 from datetime import datetime, timedelta,timezone
 from django.http import HttpRequest
 import pytz
@@ -491,5 +494,15 @@ def view_all_hunt(request):
     return render(request, 'detalle_lista_all.html', context)
 
 def contacto(request):
-    context = {}
+    if request.method == 'POST':
+        form = ComentarioForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Su comentario ha sido enviado correctamente.")
+            return redirect('/contacto')
+    else:
+        form=ComentarioForm()
+    context = {
+        'form':form,
+    }
     return render(request, 'contacto.html', context)

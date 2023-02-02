@@ -142,6 +142,15 @@ h1.garde{
    text-align: center;
 }
 
+h2.garde{
+   font-family: 'Garde';
+   font-weight: normal;
+   font-style: normal;
+   color: #F77e0d;
+   font-size: 3rem;
+   text-align: center;
+}
+
 div.logo_orange {
    display: flex;
    justify-content: center;
