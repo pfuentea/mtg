@@ -30,18 +30,19 @@
     {% if nickname != '' %}
         {% if request.session.user.id == usuario_id %}
             Usted compartira el siguinte listado, con el nick: {{nickname}}
+            <p>Para poder compartir la lista, te solicitamos la creación de un Username 
+                y así resguardar información personal que solo debe ser compartida por miembros registrados.</p>
+            <p>En caso de no querer usar un nick, se mostrará su nombre. </p>
+    
+            <form action="/list/share/{{lista.id}}" method="POST" id="set_nick">
+                {% csrf_token %}
+                <input type="text" name="nick" >
+                <button id="send_nick" type="submit">Crear Nick</button>
+            </form>
         {% endif %}
-    {% else %}
+    
 
-        <p>Para poder compartir la lista, te solicitamos la creación de un Username 
-            y así resguardar información personal que solo debe ser compartida por miembros registrados.</p>
-        <p>En caso de no querer usar un nick, se mostrará su nombre. </p>
-
-        <form action="/list/share/{{lista.id}}" method="POST" id="set_nick">
-            {% csrf_token %}
-            <input type="text" name="nick" >
-            <button id="send_nick" type="submit">Crear Nick</button>
-        </form>
+        
     {% endif %}
 {% endif %}
 

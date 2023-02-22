@@ -73,20 +73,22 @@ def list_hunt(request):
             "listas":result
         }
         return render(request, 'hunt.html', context)
-    if request.method == "POST":
+    if request.method == "POST": #creacion de nueva lista
         new_list=request.POST['new_list']
-        nueva_lista=Listados.objects.create(owner=user,nombre=new_list,tipo='B',referencia_web='',referencia_precio=0)
+        dos_semanas= datetime.now(timezone.utc) + timedelta(days=14)
+        nueva_lista=Listados.objects.create(owner=user,nombre=new_list,tipo='B',referencia_web='',referencia_precio=0,expiracion=dos_semanas)
         # esta accion registra una actividad
 
         mensaje=f" ha creado la lista de busqueda"
         new_act=Actividad.objects.create(actor=user,accion=mensaje,lista=nueva_lista)  
+
         return redirect('/list/hunt')
 
 @login_required
 def activar(request,lista_id):
     lista=Listados.objects.get(id=lista_id)
-    ahora_mas_14 = datetime.now(timezone.utc) + timedelta(days=14)#datetime.datetime
-    lista.expiracion=ahora_mas_14
+    dos_semanas = datetime.now(timezone.utc) + timedelta(days=14)#datetime.datetime
+    lista.expiracion=dos_semanas
     lista.save()
 
     previous_url = request.META.get('HTTP_REFERER')

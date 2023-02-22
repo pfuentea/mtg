@@ -19,3 +19,10 @@ def stats(request):
         'cantidad_cartas':cantidad_cartas,
     }
     return render(request, 'manage/users.html', context=context )
+
+@login_required
+def ranking(request):
+    context={
+       
+    }
+    return render(request, 'manage/ranking.html', context=context )

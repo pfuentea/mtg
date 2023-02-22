@@ -49,5 +49,6 @@ urlpatterns = [
 
 
     path('estadisticas', manage.stats), 
+    path('ranking', manage.ranking), 
 
 ]
