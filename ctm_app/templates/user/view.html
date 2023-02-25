@@ -3,7 +3,15 @@
 {% block titulo %}PREFERENCIAS USUARIO{% endblock %}
 
 {% block contenido %}
-<h1>Usuario: {{user.name}}</h1>
+<h1>Usuario: {{user.name}} 
+    {% if user.nick != '' %} ({{user.nick}}) {% endif %}
+</h1>
+
+<h4>Ubicacion: {{user.ubicacion}}</h4>
+<div>Cantidad de listas: {{user.listas.count}}</div>
+<div>Cantidad de listas de busqueda: {{listas_busqueda.count}}</div>
+<div>Cantidad de listas de cambio/venta: {{listas_venta.count}}</div>
+
 
 
 

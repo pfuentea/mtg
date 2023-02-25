@@ -11,6 +11,7 @@
     <div class="container">
         <div class="row">
             <div class="col">
+
                 <div class="row">
                     <div class="col">
                         Nombre: {{carta.carta.nombre}}
@@ -23,34 +24,27 @@
                 </div>
                 <div class="row">
                     <div class="col">Pertece a la lista:</div>
-                    <div class="col">{{carta.lista.nombre}}({{carta.lista.tipo}})</div>
+                    <div class="col">{{carta.lista.nombre}}
+                        {% if carta.lista.tipo == 'O' %}
+                            <i class="bi bi-box-arrow-up" title="Venta/Cambio"></i>
+                        {% else %}
+                            <i class="bi bi-box-arrow-in-down" title="Busqueda"></i>
+                        {% endif %}                        
+                    </div>
                 </div>
+
+                {% for field in form %}
                 <div class="row">
-                    <div class="col">
-                        Cantidad: 
+                    <div class='form-group col'>
+                        <label for="{{ field.name }}">{{ field.label }}:</label>
                     </div>
-                    <div class="col">
-                        <input type="number" name="cantidad" id="" value="{{carta.cantidad}}">               
-                    </div>
+                    <div class="col">{{ field }}</div>
                 </div>
-                <div class="row">
-                    <div class="col">
-                        Precio: 
-                    </div>
-                    <div class="col">
-                        <input type="number" name="precio" id="" value="{{carta.precio}}">    
-                       
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        
-                        Observaciones: 
-                    </div>
-                    <div class="col">
-                        <textarea rows="" cols="" name="observacion">{{carta.observacion}}</textarea>                       
-                    </div>
-                </div>
+                {% endfor %}
+
+               
+
+
                 <div class="row mb-2">
                     <div class="col-4">
                         <button>Guardar</button>

@@ -13,6 +13,7 @@ from .models.actividad import Actividad
 
 from .models.comentario import Comentario
 from .forms.comentarioForm import ComentarioForm
+from .forms.itemListaForm import ItemListaForm
 
 from datetime import datetime, timedelta,timezone
 from django.http import HttpRequest
@@ -36,6 +37,7 @@ def index(request):
             "listas_hunt":listas_hunt, 
             "listas_off":listas_off,
             "actividades":last_act,
+            "user":user
         }
     #print (f"USer:{request.session['user']}")
     return render(request, 'index.html', context=context )
@@ -70,7 +72,8 @@ def list_hunt(request):
 
         context = {
             'saludo': 'Hola',
-            "listas":result
+            "listas":result,
+            "user":user
         }
         return render(request, 'hunt.html', context)
     if request.method == "POST": #creacion de nueva lista
@@ -90,7 +93,7 @@ def activar(request,lista_id):
     dos_semanas = datetime.now(timezone.utc) + timedelta(days=14)#datetime.datetime
     lista.expiracion=dos_semanas
     lista.save()
-
+    messages.success(request, "La lista ha sido activada con éxito!")
     previous_url = request.META.get('HTTP_REFERER')
     print(previous_url)
 
@@ -136,7 +139,8 @@ def list_offer(request):
             result.append(new_elem)  
         context = {
             'saludo': 'Hola',
-            "listas":result
+            "listas":result,
+            "user":user
         }
         return render(request, 'offer.html', context)
     if request.method == "POST":
@@ -160,6 +164,14 @@ def list_detail(request,lista_id):
 
     dias=divmod(diff.total_seconds() ,24 * 60 * 60 )[0]
 
+    #revisar que la lista sea del mismo usuario
+
+    if user != lista.owner:
+        print("Esta tratando de ver una lista que no es de el")
+        messages.warning(request, "Intentas ver una lista de la que no eres propietario!")
+        return redirect("/index")
+    else:
+        print("todo ok!")
     #print(f"dias:{dias}") 
     #minutos=divmod(diff.total_seconds() ,  60 )[0]
     #horas=divmod(diff.total_seconds() , 60 * 60 )[0]
@@ -240,7 +252,8 @@ def list_detail(request,lista_id):
             "lista":lista,
             "duracion":dias,
             "resultado":lstdict,
-            "resultado_por_nombre":lstdict2
+            "resultado_por_nombre":lstdict2,
+            "user":user
         }
         return render(request, 'detalle_lista.html', context)
     if request.method == "POST":
@@ -269,6 +282,7 @@ def share(request,lista_id):
     usuario_id=lista.owner.id
     ubicacion=lista.owner.ubicacion
     vista="imgs"
+    user= User.objects.get(id=request.session['user']['id'])
     if 'view' in request.GET:
         if request.GET['view'] == 'list' :
             vista="lista"
@@ -277,7 +291,7 @@ def share(request,lista_id):
 
     if request.method == "POST": #esta creando el nick en este caso
         nick_avail=User.objects.filter(nick=request.POST['nick']) 
-        user= User.objects.get(id=request.session['user']['id'])
+        
         print(f"nick_avail:{nick_avail}")
         if nick_avail.count() == 0:
             print("no existe el nick y podemos crearlo")
@@ -303,7 +317,8 @@ def share(request,lista_id):
             "usuario_id":usuario_id,
             "vista":vista,
             "nickname":nick,
-            "ubicacion":ubicacion
+            "ubicacion":ubicacion,
+            "user":user
         }
     return render(request, 'share.html', context)
 
@@ -351,18 +366,18 @@ def list_edit(request,list_id):
 @login_required
 def add_to_list(request,lista_id):
     lista=Listados.objects.get(id=lista_id)
+    user= User.objects.get(id=request.session['user']['id'])
     if request.method == "POST":
         
         set=request.POST['set']
-        carta_id=request.POST['card_id']
-        
+        carta_id=request.POST['card_id']        
         nombre=request.POST['nombre']
         set_name=request.POST['set_name']
         imagen=request.POST['img_small']
         img_small=imagen.split(',')
-        
-        print(img_small)
+        #print(img_small)
         img_small=img_small[0]
+        qty=request.POST['qty']
         #primero reviso si existe la edicion
         try:            
             edicion=Edicion.objects.filter(set_code=set)            
@@ -383,8 +398,7 @@ def add_to_list(request,lista_id):
         print(f"ultimo char:{last_char}")
         try:
             x=int(last_char)
-            carta_id_num=carta_id
-            
+            carta_id_num=carta_id            
         except:
             carta_id_num=carta_id[:-1]
 
@@ -415,11 +429,10 @@ def add_to_list(request,lista_id):
         if len(is_item)<1:
             print("La Carta no existe. La agregamos...")
             messages.success(request, "Carta agregada con exito a la lista.")
-            new_item=ItemLista.objects.create(carta=carta,cantidad=1,precio=0,lista=lista)
+            new_item=ItemLista.objects.create(carta=carta,cantidad=qty,precio=0,lista=lista)
         else:
             messages.warning(request, "Carta ya existe en la lista.")
-            print("La Carta ya existe.")#sumamos 1?   
-
+            print("La Carta ya existe.") #sumamos 1? 
         #print(request.POST)
         items=ItemLista.objects.filter(lista=lista)
     else:
@@ -432,17 +445,27 @@ def add_to_list(request,lista_id):
                 "items":items,
                 "search":"",
                 "lista": lista,
-
+                "user":user
             }
     return render(request, 'detalle_lista.html', context)
 
 @login_required
 def card_detail(request,item_id):
     item=ItemLista.objects.get(id=item_id)
+    user= User.objects.get(id=request.session['user']['id'])
     #print(item)
-    
+    if request.method == "POST":
+        form=ItemListaForm(request.POST,instance=item)
+        if form.is_valid():
+            user.save()
+            messages.success(request, "Se ha actualizado con éxito!")
+    else:
+        form=ItemListaForm(instance=item)
+
     context = {
-                "carta":item
+                "carta":item,
+                "user":user,
+                'form':form
             }
     return render(request, 'detalle_carta.html', context)
 

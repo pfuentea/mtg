@@ -17,6 +17,13 @@
 <h3>
     {% if ubicacion != '' %}Ubicación:{{ubicacion}} {% endif %}
 </h3>
+<h5>
+    {% if lista.referencia_web != '' %}Precios desde :{{lista.referencia_web}} {% endif %}
+</h5>
+<h5>
+    {% if lista.referencia_precio != '' %}Valor tipo cambio(USD):{{lista.referencia_precio}} {% endif %}
+</h5>
+
 <a href="/list/share/{{lista.id}}?view=list">Ver listado </a>| 
 <a href="/list/share/{{lista.id}}?view=img">Ver Imagenes </a>
 

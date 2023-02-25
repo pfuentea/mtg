@@ -11,7 +11,7 @@
 {% block contenido %}
 <div class="container">
     <div class="row">
-        <div class="col-10">
+        <div class="col-12">
             <h1>Detalle de la lista:  </h1>
         </div>
 
@@ -25,13 +25,13 @@
     </div>
     <div class="row ">
         
-        <div class="col-10 bg-info">
+        <div class="col-12 bg-info">
             Duración : {{duracion}}
         </div>
         <div class="col"></div>
     </div>
     <div class="row my-3">
-        <div class="col-10 ">
+        <div class="col-12 ">
             <button id="open_search">
                 Agregar nueva carta
             </button>
@@ -61,7 +61,7 @@
     </div>
 
     <div class="row">
-        <div class="col-10">
+        <div class="col-12">
             <p>Cartas en la lista : ({{items.count}}) <span Id="span_hidden">Ocultar</span><span Id="span_show" class="d-none">Mostrar</span></p> 
 
             <div class="table-responsive" id="main_table">

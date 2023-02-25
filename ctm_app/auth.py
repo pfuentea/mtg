@@ -16,6 +16,7 @@ def login(request):
         user = User.objects.filter(email=request.POST['email'])
         if user:
             log_user = user[0]
+            print(f"DM:{log_user.modo_oscuro}")
 
             if bcrypt.checkpw(request.POST['password'].encode(), log_user.password.encode()):
 
@@ -25,7 +26,8 @@ def login(request):
                     "email": log_user.email,
                     "role": log_user.role,
                     "nick":log_user.nick,
-                    "ubicacion":log_user.ubicacion
+                    "ubicacion":log_user.ubicacion,
+                    "modo_oscuro":log_user.modo_oscuro
                 }
 
                 request.session['user'] = user
@@ -77,7 +79,8 @@ def registro(request):
             request.session['user'] = {
                 "id" : usuario_nuevo.id,
                 "name": f"{usuario_nuevo.name}",
-                "email": usuario_nuevo.email
+                "email": usuario_nuevo.email,
+                "modo_oscuro":usuario_nuevo.modo_oscuro
             }
             return redirect("/index")
 

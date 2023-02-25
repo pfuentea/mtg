@@ -11,7 +11,7 @@
 {% block contenido %}
 <div class="container">
     <div class="row">
-        <div class="col-10">
+        <div class="col-12">
             <h1>Detalle de la lista: {{lista.nombre}} </h1>
         </div>
 
@@ -25,7 +25,7 @@
     </div>
     <div class="row ">
         
-        <div class="col-10 {% if duracion > 0 %} bg-info {% else %} bg-warning {% endif  %}">
+        <div class="col-12 {% if duracion > 0 %} bg-info {% else %} bg-warning {% endif  %}">
             Duración : 
             {% if duracion > 0 %}
                 {{duracion}} 
@@ -38,7 +38,7 @@
         <div class="col"></div>
     </div>
     <div class="row my-3">
-        <div class="col-10 ">
+        <div class="col-12 ">
             <button id="open_search">
                 Agregar nueva carta
             </button>
@@ -48,7 +48,7 @@
         <div class="col">
             <form action="/list/search/" method="post">
                 {% csrf_token %}
-                <input type="search" name="searching_card" id="searching_card" list="cartones" class="border_sketch input_search_card" >
+                <input type="search" name="searching_card" id="searching_card" list="cartones" class=" input_search_card" placeholder="Escriba su carta en ingles">
                 <input type="hidden" name="action" value="search">
                 <button id="get_cartas">Buscar Versiones</button>
                 <div id="resultados" class="text-center">
@@ -68,7 +68,7 @@
     </div>
 
     <div class="row">
-        <div class="col-10">
+        <div class="col-12">
             <p>Cartas en la lista : ({{items.count}}) <span Id="span_hidden">Ocultar</span><span Id="span_show" class="d-none">Mostrar</span></p> 
 
             <div class="table-responsive" id="main_table">
@@ -216,6 +216,7 @@
     <input type="hidden" name="nombre" value="" id="nombre">
     <input type="hidden" name="set_name" value="" id="set_name">
     <input type="hidden" name="img_small" value="" id="img_small">
+    <input type="hidden" name="qty" value="" id="qty">
 
 </form>
 
@@ -233,6 +234,26 @@
                 <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                 <a class="btn btn-danger btn-ok">Eliminar</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="confirm-add" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Agregar nueva carta</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                Cantidad?
+                <input type="number" value="1" id="qty_to_add" name="qty_to_add" class="mx-5">
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cerrar</button>
+                <a class="btn btn-danger btn-add btn-sm" id="agregarBtn">Agregar</a>
             </div>
         </div>
     </div>
@@ -355,14 +376,35 @@
                         }
 
                         //option='<option value=\"'+item.id+'\">'+item.nombre+'</option>'
-                        option=option+ "<div class=\"b-container card text-center\" ><div class=\"card-header\">"+titulo+"</div><img src=\""+imagen[0]+"\" id_value=\""+card_id+"\"  class=\"card_result m-1\"  > <div class=\"card-body\"><p>TCGPlayer:"+usd+" usd/"+usd_foil+" usd </p><button type=\"button\" onclick=\"agregar("+card_id+");\">Añadir </button></div> </div>";
+                        /*
+                        option=option+ "<div class=\"b-container card text-center\" ><div class=\"card-header\">"+titulo+"</div><img src=\""+imagen[0]+"\" id_value=\""+card_id+"\"  class=\"card_result m-1\"  > <div class=\"card-body\"><p>TCGPlayer:"+usd+" usd/"+usd_foil+" usd </p> <button type=\"button\" onclick=\"agregar("+card_id+");\">Añadir </button></div> </div>";
+                        */
+                        option=option+ "<div class=\"b-container card text-center\" ><div class=\"card-header\">"+titulo+"</div><img src=\""+imagen[0]+"\" id_value=\""+card_id+"\"  class=\"card_result m-1\"  > <div class=\"card-body\"><p>TCGPlayer:"+usd+" usd/"+usd_foil+" usd </p> ";
+                        option=option+"<a href=\"#\" class=\"btn btn-sm btn-outline-dark btn-add-btn\"  data-bs-toggle=\"modal\" data-bs-target=\"#confirm-add\" title=\"Agregar\" data-id=\""+card_id+"\" href=\"#\"> Agregar </a>";
+                        option=option+"</div> </div>";
+
+                        /*
+                        <a href="#"  data-href="/card/remove/{{lista_id}}/{{i.id}}"  class="btn btn-sm btn-outline-danger btn-delete-trv" data-bs-toggle="modal" data-bs-target="#confirm-delete" title="Borrar">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                    */
                         
                     });
                     $('#resultados').append(option);
                     console.log(response);
                     $(".card_result").bind("click",function(){
                         var card_id=$(this).attr('id_value');
-                        console.log(card_id)
+                        console.log("CI:"+card_id)
+                    });
+
+                    $('.btn-add-btn').bind("click",function(){
+                        var id = $(this).attr('data-id');
+                        $('#agregarBtn').on('click', function() {
+                            vals=id.replace(/`/g,'').split(',')
+                            //console.log("val1:"+vals[0]);
+                            agregar( vals[0],vals[1],vals[2],vals[3],vals[4],vals[5],vals[6],vals[7] );
+                            //console.log("ID:"+id); // Imprime el id en la consola
+                        });
                     });
 
                 }
@@ -373,21 +415,22 @@
             .then(function(){
 
             });  
-
-        return false;
-    }
+        return false;   
+        }
     ) ;
 
     function agregar(set,id,nombre,set_name,img_small){
+
 
         $('#set').val(set);
         $('#card_id').val(id);
         $('#nombre').val(nombre);
         $('#set_name').val(set_name);
         $('#img_small').val(img_small);
-        
 
-        //console.log(set+";"+id+";"+nombre)
+        $('#qty').val($('#qty_to_add').val());
+        //console.log("qty:"+$('#qty').val() )
+        //console.log(set+";"+id+";"+nombre+";"+set_name+";"+img_small)
         
         $('#form_agregar').submit();
         /*
@@ -410,14 +453,22 @@
     $('#open_search').on('click',function(){
         $('#new_search').fadeIn();
         $('#searching_card').focus();
-    }
-    )
+    })
     
         //card_id=$this.getAttr('id_value')
     
     $('#confirm-delete').on('show.bs.modal', function(e) {
         $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
     }); 
+
+    /*
+    $('a.btn[data-bs-toggle="modal"]').on('click', function() {
+        var id = $(this).attr('data-id');
+        $('#agregarBtn').on('click', function() {
+            console.log(id); // Imprime "123" en la consola
+        });
+    });
+    */
 
     $('#span_hidden').on('click',function(){
         $('#span_show').removeClass('d-none')

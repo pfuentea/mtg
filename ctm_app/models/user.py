@@ -41,6 +41,7 @@ class User(models.Model):
     ubicacion = models.CharField(max_length=255,blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    modo_oscuro=models.BooleanField(auto_created=False,default=False)
     objects = UserManager()
 
     def __str__(self):

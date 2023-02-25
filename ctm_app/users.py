@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.shortcuts import redirect, render
 from .decorators import login_required
 from .models.user import User
+from .models.listados import Listados
 
 from .forms.userForm import UserForm
 
@@ -31,8 +32,12 @@ def preferencias(request):
 @login_required
 def view(request,user_id):
     user= User.objects.get(id=user_id)
+    listas_busqueda=Listados.objects.filter(owner=user, tipo='B')
+    listas_venta=Listados.objects.filter(owner=user, tipo='O')
     context={
-        "user":user
+        "user":user,
+        "listas_busqueda":listas_busqueda,
+        "listas_venta":listas_venta
     }
     return render(request, 'user/view.html', context=context )
 
