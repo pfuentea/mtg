@@ -283,7 +283,7 @@ def share(request,lista_id):
     ubicacion=lista.owner.ubicacion
     vista="imgs"
     user=""
-    if request.session['user']:
+    if 'user' in request.session:
         user= User.objects.get(id=request.session['user']['id'])
     if 'view' in request.GET:
         if request.GET['view'] == 'list' :
