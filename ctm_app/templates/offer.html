@@ -22,6 +22,7 @@
                 {% csrf_token %}
                 <input type="text" name="new_list" id="new_list">
                <button type="submit">Crear</button>
+               <button id="cl_btm">Cancelar</button>
             </form>
         </div>
     </div>
@@ -93,6 +94,9 @@
 
    $('#open_search').on('click',function(){
        $('#new_list').fadeIn();
+   });
+   $('#cl_btm').on('click',function(){
+       $('#new_list').fadeOut();
    });
 </script>
 {% endblock %}

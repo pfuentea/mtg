@@ -12,73 +12,30 @@
 <div class="container">
     <form action="/list/edit/{{lista.id}}" method="post" id="form_edit" name="form_edit">
         {% csrf_token %}
-    <div class="row">
-        <div class="col-2">
-            Nombre:
-        </div>
-        <div class="col-6">
-            <input type="text" name="nombre" id="nombre" value="{{lista.nombre}}" class="border_sketch input_search_card">
-        </div>
-        <div class="col"></div>
-    </div>
     
-    <div class="row">
-        <div class="col-2">
-            Tipo:
+        {% for field in form %}
+        <div class="row mb-1">
+            <div class='form-group col-3'>
+                <label for="{{ field.name }}">{{ field.label }}:</label>
+            </div>
+            <div class="col-4">{{ field }}</div>
         </div>
-        <div class="col-6">
-            <select name="tipo" id="tipo" class="border_sketch my-1">
-                <option value="B" {% if lista.tipo == 'B' %} selected {% endif %}>Busqueda</option>
-                <option value="O" {% if lista.tipo == 'O' %} selected {% endif %}>Ofrece</option>
-            </select>
-        </div>
-        <div class="col"></div>
-    </div>
-    <div class="row">
-        <div class="col-2">
-            Referencia Web:
-        </div>
-        <div class="col-6">
-            <input type="text" name="ref_web" id="ref_web" value="{{lista.referencia_web}}" class="border_sketch input_search_card mb-1">
-        </div>
-        <div class="col"></div>
-    </div>
-    <div class="row">
-        <div class="col-2">
-            Referencia precio:
-        </div>
-        <div class="col-6">
-            <input type="text" name="ref_precio" id="ref_precio" value="{{lista.referencia_precio}}" class="border_sketch input_search_card  mb-1">
-        </div>
-        <div class="col"></div>
-    </div>
-    <div class="row">
-        <div class="col-2">
-            Descripción:
-        </div>
-        <div class="col-6">
-            <textarea name="descripcion" id="descripcion" cols="35" rows="5" class="border_sketch">{{lista.descripcion}}</textarea>
-        </div>
-        <div class="col"></div>
-    </div>
-</form>
+        {% endfor %}
+   
     <div class="row">
         <div class="col-2"></div>
         <div class="col-2">
-            <button id="guardar" class="btn-success">
+            <button id="guardar" class="btn btn-sm btn-success mt-2">
                 Guardar
             </button>
-            
+        </form>        
         </div>
-        <div class="col">
-           
-                <a href="/list/{% if lista.tipo == 'B' %}hunt{% else %}offer{% endif %}"> 
-                    <button> Cancelar </button>
-            </a>
-           
+        <div class="col">           
+                <a href="/list/{% if lista.tipo == 'B' %}hunt{% else %}offer{% endif %}" class="btn btn-sm"> 
+                    A Listas 
+            </a>          
         </div>
     </div>
-
 
     <div class="row  mt-3" >
         <div class="col-8">
@@ -117,13 +74,13 @@
         console.log(url2)
         $("#url").text(url2)
 
-        $('#tipo').on('click',function(){
+        $('#id_tipo').on('click',function(){
             toastr.warning("Cambiar esto hara que la lista cambie de tipo y por tanto de lugar")           
         });
-        $('#ref_web').on('focus',function(){
+        $('#id_referencia_web').on('focus',function(){
             toastr.success("Página con los precios de referencia de la lista (EJ: CK,SCG,TCG) ")           
         });
-        $('#ref_precio').on('focus',function(){
+        $('#id_referencia_precio').on('focus',function(){
             toastr.success("Precio de dolar para intercambio o venta de las cartas de la lista")           
         });
 

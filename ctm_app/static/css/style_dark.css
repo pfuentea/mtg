@@ -100,7 +100,21 @@ td a{
 a.button {
    text-decoration: none;
    color:#fff;
-   background:transparent;
+   background: black;
+   padding:0.3rem 0.3rem;
+   margin:0.5rem 0.5rem;
+   font-size:1rem;
+
+   border-top: 1px solid #CCCCCC;
+   border-right: 1px solid #333333;
+   border-bottom: 1px solid #333333;
+   border-left: 1px solid #CCCCCC;
+   border:solid 2px #41403E;
+}
+a.btn {
+   text-decoration: none;
+   color:#fff;
+   background: black;
    padding:0.3rem 0.3rem;
    margin:0.5rem 0.5rem;
    font-size:1rem;

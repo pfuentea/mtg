@@ -14,6 +14,7 @@ from .models.actividad import Actividad
 from .models.comentario import Comentario
 from .forms.comentarioForm import ComentarioForm
 from .forms.itemListaForm import ItemListaForm
+from .forms.listaForm import ListaForm
 
 from datetime import datetime, timedelta,timezone
 from django.http import HttpRequest
@@ -347,7 +348,24 @@ def share_all(request,lista_id):
 def list_edit(request,list_id):
     lista=Listados.objects.get(id=list_id)
     usuario=lista.owner.name
-        
+    user= User.objects.get(id=request.session['user']['id'])
+    #form=ListaForm(instance=lista)
+
+    if request.method == 'POST':
+        #print(request.POST)
+        form = ListaForm(request.POST,instance=lista)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Lista modificada con exito.")
+        else:
+            print(form.errors)
+            messages.warning(request, "Algo pasa.")
+            #messages.success(request, "Su comentario ha sido enviado correctamente.")
+            #return redirect('/contacto')
+    else:
+        form=ListaForm(instance=lista)
+
+    '''
     if request.method == "POST":
         lista.nombre=request.POST['nombre']
         lista.tipo=request.POST['tipo']
@@ -356,12 +374,15 @@ def list_edit(request,list_id):
         lista.descripcion=request.POST['descripcion']
         lista.save()
         messages.success(request, "Lista modificada con exito.")
+        '''
 
     context = {
         'saludo': 'Hola',
         "lista":lista,
         "lista_id":list_id,
         "usuario":usuario,
+        "user":user,
+        "form":form
         }
     return render(request, 'update_lista.html', context)
 
@@ -370,7 +391,7 @@ def add_to_list(request,lista_id):
     lista=Listados.objects.get(id=lista_id)
     user= User.objects.get(id=request.session['user']['id'])
     if request.method == "POST":
-        
+        print(request.POST)
         set=request.POST['set']
         carta_id=request.POST['card_id']        
         nombre=request.POST['nombre']
