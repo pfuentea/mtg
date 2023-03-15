@@ -1,6 +1,6 @@
 from operator import itemgetter
 from django.contrib import messages
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render,get_object_or_404
 import bcrypt
 from .decorators import login_required
 #importacion de clases
@@ -32,13 +32,18 @@ def index(request):
     user= User.objects.get(id=request.session['user']['id'])
     listas_hunt= Listados.objects.filter(owner=user,tipo='B')
     listas_off= Listados.objects.filter(owner=user,tipo='O')
-    last_act=Actividad.objects.all().order_by('-updated_at')[:10]
+
+    last_act=Actividad.objects.filter(objetivo__isnull=True).order_by('-updated_at')[:10]
+    last_act_propia=Actividad.objects.filter(objetivo=user).order_by('-updated_at')[:10]
+
+    print(f"u_act:{last_act_propia}")
     context = {
             'saludo': 'Hola',
             "listas_hunt":listas_hunt, 
             "listas_off":listas_off,
             "actividades":last_act,
-            "user":user
+            "user":user,
+            "last_act_propia":last_act_propia
         }
     #print (f"USer:{request.session['user']}")
     return render(request, 'index.html', context=context )
@@ -146,7 +151,9 @@ def list_offer(request):
         return render(request, 'offer.html', context)
     if request.method == "POST":
         new_list=request.POST['new_list']
-        nueva_lista=Listados.objects.create(owner=user,nombre=new_list,tipo='O',referencia_web='',referencia_precio=0)
+        dos_semanas= datetime.now(timezone.utc) + timedelta(days=14)
+        print(f"2sem:{dos_semanas}")
+        nueva_lista=Listados.objects.create(owner=user,nombre=new_list,tipo='O',referencia_web='',referencia_precio=0,expiracion=dos_semanas)
         # esta accion registra una actividad
         mensaje=f" ha creado la lista para ofrecer"
         new_act=Actividad.objects.create(actor=user,accion=mensaje,lista=nueva_lista)       
@@ -187,14 +194,12 @@ def list_detail(request,lista_id):
         lstdict2=[]
         cartaslist=[]
         #para cada carta buscaremos otras listas (de cambio/venta) donde aparece
-        for elemento in items:          
-
-           
+        for elemento in items:
             print(f"carta_id:{elemento.carta.id}/{elemento.carta.nombre}")
             #buscamos por la misma carta (mismo nombre, misma edicion, mismo tipo de borde)
-            resultado1=ItemLista.objects.filter(carta=elemento.carta).exclude(lista__owner=elemento.lista.owner)
+            resultado1=ItemLista.objects.filter(carta=elemento.carta,lista__tipo='O').exclude(lista__owner=elemento.lista.owner)
             #aca debemos buscar por nombre en caso de que este activado esto
-            resultado_por_nombre=ItemLista.objects.filter(carta__nombre=elemento.carta.nombre).exclude(lista__owner=elemento.lista.owner)
+            resultado_por_nombre=ItemLista.objects.filter(carta__nombre=elemento.carta.nombre,lista__tipo='O').exclude(lista__owner=elemento.lista.owner)
             #print(resultado_por_nombre)
             if len(resultado1) >0:
                 #print("Encontre la carta en otra lista!")
@@ -390,6 +395,11 @@ def list_edit(request,list_id):
 def add_to_list(request,lista_id):
     lista=Listados.objects.get(id=lista_id)
     user= User.objects.get(id=request.session['user']['id'])
+    ahora = datetime.now(timezone.utc) #datetime.datetime
+    fecha_exp=lista.expiracion.replace(tzinfo=pytz.UTC)
+    diff= fecha_exp - ahora   
+    dias=divmod(diff.total_seconds() ,24 * 60 * 60 )[0]
+
     if request.method == "POST":
         print(request.POST)
         set=request.POST['set']
@@ -468,25 +478,33 @@ def add_to_list(request,lista_id):
                 "items":items,
                 "search":"",
                 "lista": lista,
-                "user":user
+                "user":user,
+                "duracion":dias,
             }
     return render(request, 'detalle_lista.html', context)
 
 @login_required
 def card_detail(request,item_id):
-    item=ItemLista.objects.get(id=item_id)
+    #item=ItemLista.objects.get(id=item_id)
+    item_lista = get_object_or_404(ItemLista, pk=item_id)
     user= User.objects.get(id=request.session['user']['id'])
     #print(item)
+    
     if request.method == "POST":
-        form=ItemListaForm(request.POST,instance=item)
+        print(request.POST)
+        form=ItemListaForm(request.POST,instance=item_lista)
         if form.is_valid():
-            user.save()
+            item_lista = form.save(commit=False)
+            item_lista.save()
             messages.success(request, "Se ha actualizado con éxito!")
+        else:
+            print(form.errors)
+            messages.warning(request, "Algo va mal")
     else:
-        form=ItemListaForm(instance=item)
+        form=ItemListaForm(instance=item_lista)
 
     context = {
-                "carta":item,
+                "carta":item_lista,
                 "user":user,
                 'form':form
             }
@@ -524,7 +542,8 @@ def remove_from_list(request,lista_id,item_id):
 def delete_list(request,lista_id):
     lista=Listados.objects.get(id=lista_id)
     lista.delete()
-    return redirect('/list/hunt')
+    previous_url = request.META.get('HTTP_REFERER')
+    return redirect(previous_url)
 
 @login_required
 def view_all_hunt(request):
@@ -537,7 +556,8 @@ def view_all_hunt(request):
                 
                 "items":items,
                 "search":"",
-                "tipo":'B'
+                "tipo":'B',
+                "user":user
             }
     return render(request, 'detalle_lista_all.html', context)
 
@@ -554,3 +574,4 @@ def contacto(request):
         'form':form,
     }
     return render(request, 'contacto.html', context)
+

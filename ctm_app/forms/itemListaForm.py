@@ -3,10 +3,10 @@ from ..models.item_lista import ItemLista
 
 class ItemListaForm(forms.ModelForm):
     FOIL_CHOICES = [
-        (True, 'Sí'),
+        (True, 'Si'),
         (False, 'No'),
     ]
-    es_foil = forms.ChoiceField(choices=FOIL_CHOICES, widget=forms.RadioSelect)
+    es_foil = forms.BooleanField(required=False, widget=forms.RadioSelect(choices=((True, 'Sí'), (False, 'No'))))
     class Meta:
         model=ItemLista
 
@@ -16,7 +16,7 @@ class ItemListaForm(forms.ModelForm):
             'cantidad':('Cantidad'),
             'precio':('Precio'),
             'observacion':('Observaciones'),
-            'es_foil':('Foil'),
+            'es_foil':('Foil'), 
         }
         help_texts = {
             
@@ -25,6 +25,7 @@ class ItemListaForm(forms.ModelForm):
             'cantidad': {
                 'max_length': ("No puede agregar más de 100"),
             },
+            
         }
         widgets = {
             'cantidad': forms.NumberInput(attrs={'class': 'form-control'}),

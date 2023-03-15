@@ -1,6 +1,7 @@
 from django.urls import path
-from . import views, auth , manage  ,users
+from . import views, auth , manage  ,users, mensajes
 from .models import user
+
 
 urlpatterns = [
     path('', views.landing),
@@ -47,7 +48,16 @@ urlpatterns = [
 
     path('user/preferencias', users.preferencias),
     path('user/<int:user_id>', users.view),
+    path('user/add_contacto/<contacto_id>', users.add_contacto),
+    path('user/password/request', users.password_change_request),
+    path('user/password/new/<int:user_id>/<token>', users.password_new), 
+    path('user/password/change', users.password_change), 
+    
 
+    path('msg/send', mensajes.send), 
+    path('msg/get', mensajes.get),
+    path('msg/new', mensajes.new), 
+    path('mostrar_modal/<int:msg_id>/', mensajes.VerMensaje, name='mostrar_modal'),
 
     path('estadisticas', manage.stats), 
     path('ranking', manage.ranking), 

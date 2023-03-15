@@ -21,7 +21,7 @@ class Listados(models.Model):
     referencia_precio= models.IntegerField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    expiracion = models.DateTimeField(auto_now_add=True)
+    expiracion = models.DateTimeField(blank=True)
     def __str__(self):
         lista=self.nombre+":"+self.owner.name+"("+self.tipo+")"
         return lista

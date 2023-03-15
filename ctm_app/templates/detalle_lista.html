@@ -86,7 +86,7 @@
                         {% for i in items %}
                         <tr>
                             <td> 
-                                <a href="/card/{{i.id}}">{{i.carta.nombre}}</a>                             
+                                <a href="/card/{{i.id}}">{{i.carta.nombre}} {% if i.es_foil %}(Foil){% endif %}</a>                             
                             </td>
                             <td> {{i.carta.Edicion.nombre}}</td>
                             <td>{{i.cantidad}}</td>
@@ -144,7 +144,9 @@
                                     <td> {{r.lname}}</td>
                                     <td> {{r.qty}}</td>
                                     <td class="dt-center">     
-                                        <a href="/list/share/{{r.list_id}}?view=img">Ver lista completa</a>                                   
+                                        <a href="/list/share/{{r.list_id}}?view=img">Ver lista completa</a>  /
+                                        <a href="/list/compare/lista.id/{{r.list_id}}">Ver solo coincidencias</a> 
+                                                                    
                                     </td>
                                 </tr>       
                             {% endfor %}

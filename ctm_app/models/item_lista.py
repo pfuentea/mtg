@@ -11,7 +11,7 @@ class ItemLista(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     observacion= models.TextField(max_length=500,blank=True)
-    es_foil=models.BooleanField(auto_created=False,default=False)
+    es_foil=models.BooleanField(auto_created=False,blank=True, default=False)
     def __str__(self):
-        item=self.carta.nombre+"("+self.carta.Edicion.nombre+"):"+self.lista.nombre+"("+str(self.cantidad)+")"
+        item=self.carta.nombre+"("+self.carta.Edicion.nombre+"):"+self.lista.nombre+"(qty:"+str(self.cantidad)+")"
         return item

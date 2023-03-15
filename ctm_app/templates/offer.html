@@ -20,7 +20,7 @@
         <div class="col">
             <form action="/list/offer/new" method="post">
                 {% csrf_token %}
-                <input type="text" name="new_list" id="new_list">
+                <input type="text" name="new_list" id="new_list" required>
                <button type="submit">Crear</button>
                <button id="cl_btm">Cancelar</button>
             </form>
@@ -51,7 +51,7 @@
                             <a href="/list/edit/{{l.id}}" class="btn btn-sm btn-outline-primary" title="Editar detalles"> 
                                 <i class="bi bi-eye"></i></a>
 
-                                <a href="#"  data-href="/card/remove/{{lista_id}}/{{i.id}}"  class="btn btn-sm btn-outline-danger btn-delete-trv" data-bs-toggle="modal" data-bs-target="#confirm-delete" title="Borrar">
+                                <a href="#"  data-href="/list/remove/{{l.id}}" class="btn btn-sm btn-outline-danger btn-delete-trv" data-bs-toggle="modal" data-bs-target="#confirm-delete" title="Borrar">
                                     <i class="bi bi-trash"></i>
                                 </a>
 
@@ -71,6 +71,25 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="confirm-delete" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Eliminar</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                Esta seguro que desea eliminar esta lista?
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <a class="btn btn-danger btn-ok">Eliminar</a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     $(document).ready(function() {
        $('#new_list').hide();
@@ -98,6 +117,9 @@
    $('#cl_btm').on('click',function(){
        $('#new_list').fadeOut();
    });
+   $('#confirm-delete').on('show.bs.modal', function(e) {
+        $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
+    });
 </script>
 {% endblock %}
 

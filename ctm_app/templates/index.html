@@ -115,6 +115,12 @@
           <p>El usuario <a href="/user/{{act.actor.id}}" class="naranjo">{{act.actor.name}} </a>  {{act.accion}} <a href="/list/share/{{act.lista.id}}" class="naranjo">{{act.lista.nombre}} </a> </p>
          
           {% endfor %}
+
+          {% for l_act in last_act_propia  %}
+          <p>El usuario <a href="/user/{{l_act.actor.id}}" class="naranjo">{{l_act.actor.name}} </a>  {{l_act.accion}} <a href="/list/share/{{l_act.lista.id}}" class="naranjo">{{l_act.lista.nombre}} </a> </p>
+         
+          {% endfor %}
+
           
         </div>
     </div>

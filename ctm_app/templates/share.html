@@ -34,8 +34,8 @@
     </div>
 {% endif %}
 {% if request.session.user %}
-    {% if nickname != '' %}
-        {% if request.session.user.id == usuario_id %}
+    {% if request.session.user.id == usuario_id %}
+        {% if nickname == '' %}
             Usted compartira el siguinte listado, con el nick: {{nickname}}
             <p>Para poder compartir la lista, te solicitamos la creación de un Username 
                 y así resguardar información personal que solo debe ser compartida por miembros registrados.</p>
@@ -47,9 +47,6 @@
                 <button id="send_nick" type="submit">Crear Nick</button>
             </form>
         {% endif %}
-    
-
-        
     {% endif %}
 {% endif %}
 

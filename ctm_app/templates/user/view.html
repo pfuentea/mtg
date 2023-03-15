@@ -4,6 +4,7 @@
 
 {% block contenido %}
 <h1>Usuario: {{user.name}} 
+    <span class="d-none" id="user_check"><i class="bi bi-person-check-fill text-success"></i></span>
     {% if user.nick != '' %} ({{user.nick}}) {% endif %}
 </h1>
 
@@ -11,8 +12,22 @@
 <div>Cantidad de listas: {{user.listas.count}}</div>
 <div>Cantidad de listas de busqueda: {{listas_busqueda.count}}</div>
 <div>Cantidad de listas de cambio/venta: {{listas_venta.count}}</div>
+<div>Cantidad de contactos: {{n_contactos.count}}</div>
 
-
+{% if user_login %}
+    {% if contacto_valido %}
+    <a href="/user/add_contacto/{{user.id}}">Agregar a mis contactos</a>
+    {% else %}
+        {% if user %}
+            Este usuario ya está en sus contactos.
+            <script>
+                $('#user_check').removeClass('d-none')
+            </script>
+        {% endif %}
+    {% endif %}
+{% else %}
+Debe <a href="/registro">registrarse</a>  o <a href="/login">ingresar</a>  para agregar este usuario a sus contactos
+{% endif %}
 
 
 {% endblock %}

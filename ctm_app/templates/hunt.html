@@ -25,7 +25,7 @@
         <div class="col">
             <form action="/list/hunt/new" method="post">
                 {% csrf_token %}
-                <input type="text" name="new_list" id="list" placeholder="Nombre de nuevo listado">
+                <input type="text" name="new_list" id="list" placeholder="Nombre de nuevo listado" required>
                <button type="submit">Crear</button>
             </form>
         </div>
