@@ -15,6 +15,7 @@ from .models.comentario import Comentario
 from .forms.comentarioForm import ComentarioForm
 from .forms.itemListaForm import ItemListaForm
 from .forms.listaForm import ListaForm
+from .models.mensaje import Mensaje
 
 from datetime import datetime, timedelta,timezone
 from django.http import HttpRequest
@@ -35,6 +36,8 @@ def index(request):
 
     last_act=Actividad.objects.filter(objetivo__isnull=True).order_by('-updated_at')[:10]
     last_act_propia=Actividad.objects.filter(objetivo=user).order_by('-updated_at')[:10]
+    
+    recibidos=Mensaje.objects.filter(to_user=user).order_by('-updated_at')[:10]
 
     print(f"u_act:{last_act_propia}")
     context = {
@@ -43,7 +46,8 @@ def index(request):
             "listas_off":listas_off,
             "actividades":last_act,
             "user":user,
-            "last_act_propia":last_act_propia
+            "last_act_propia":last_act_propia,
+            "recibidos":recibidos
         }
     #print (f"USer:{request.session['user']}")
     return render(request, 'index.html', context=context )

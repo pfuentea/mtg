@@ -24,7 +24,7 @@
     {% if lista.referencia_precio != '' %}Valor tipo cambio(USD):{{lista.referencia_precio}} {% endif %}
 </h5>
 
-<a href="/list/share/{{lista.id}}?view=list">Ver listado </a>| 
+<a href="/list/share/{{lista.id}}?view=list">Ver listado con detalles </a>| 
 <a href="/list/share/{{lista.id}}?view=img">Ver Imagenes </a>
 
 {% if request.session.user.id == usuario_id %}
@@ -62,6 +62,8 @@
                             <th>Nombre</th>
                             <th>Edicion</th>
                             <th>Cantidad</th>
+                            <th>Foil?</th>
+                            <th>Observaciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -71,7 +73,9 @@
                                 <a href="https://scryfall.com/card/{{i.carta.Edicion.set_code}}/{{i.carta.number_collector}}"  title="Ver en scryfall">{{i.carta.nombre}}</a>                             
                             </td>
                             <td> {{i.carta.Edicion.nombre}}</td>
-                            <td>{{i.cantidad}}</td>                            
+                            <td>{{i.cantidad}}</td>   
+                            <td>{%if i.es_foi%} Si {% else %} No {% endif %}</td>  
+                            <th>{{i.observacion}}</th>                         
                         </tr>       
                     {% endfor %}
                     </tbody>    
@@ -85,7 +89,7 @@
     {% if items.count > 0 %}
     <div class="row">
         {% for i in items %}
-        <div class="card" style="width: 7rem;">   
+        <div class="card {% if i.es_foil %}foil{% endif %}" style="width: 7rem;">   
             <a href="https://scryfall.com/card/{{i.carta.Edicion.set_code}}/{{i.carta.number_collector}}" target="_blank" title="Ver en scryfall">
             <img src="{{i.carta.small_image}}" style="width: 6rem;">
             </a>

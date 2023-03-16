@@ -45,8 +45,8 @@
 
   <link rel="preload" href='{% static "/fonts/Garde.woff2" %}' as="font" type="font/woff2" crossorigin>
 </head>
-<body {% if user.modo_oscuro  %} class="dark" {% endif %} >
-  <nav class="navbar navbar-expand-md navbar-dark bg-dark" >
+<body  class="{% if user.modo_oscuro  %}dark {% endif %} ">
+  <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top p-0" >
     <div class="container-fluid contenido logo_orange">
       <a class="navbar-brand " href="/">        
           <span  class="garde naranjo">CTM.a.g.i.c.    </span> 
@@ -127,18 +127,20 @@
       
     </div>
   </nav>
+
   {% block css %}
   
   {% endblock %} 
+
   {% if user.modo_oscuro  %} 
-  <div class="container dark">
+    <main class="container dark mt-5">
   {% else %}
-  <div class="container ">
+    <main class="container mt-5">
   {% endif %}
  
     {% block contenido %}
     {% endblock %} 
-  </div>
+    </main>
 
   <script>
     toastr.options = {

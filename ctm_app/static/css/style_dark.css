@@ -352,3 +352,18 @@ table.dataTable {
    color:#fff;
    background-color: #000;
   }
+
+.card-body>a.btn {
+   font-size: 0.6rem;
+   position: absolute;
+   bottom: 0.1em;
+   right: 1em;
+   background-color: #8F0005;
+   border-radius: 1.5em;
+   color: white;
+   text-transform: uppercase;
+}
+
+.foil img{
+   border: solid 2px yellow;
+}
