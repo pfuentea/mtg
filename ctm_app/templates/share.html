@@ -102,7 +102,7 @@
     <div class="row">
         {% for i in items %}
         <div class="card {% if i.es_foil %}foil{% endif %}" style="width: 7rem;">   
-            <a href="https://scryfall.com/card/{{i.carta.Edicion.set_code}}/{{i.carta.number_collector}}" target="_blank" title="Ver en scryfall">
+            <a href="https://scryfall.com/card/{{i.carta.Edicion.set_code}}/{{i.carta.number_collector_txt}}" target="_blank" title="Ver en scryfall">
             <img src="{{i.carta.small_image}}" style="width: 6rem;">
             </a>
             <div class="card-title mb-2 text-muted ">
