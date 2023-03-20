@@ -164,3 +164,11 @@ img.logo_orange {
 .naranjo{
    color: #F77e0d;
  }
+
+ .separador{
+   margin-top:4rem;
+}
+
+.foil img{
+   border: solid 2px yellow;
+}

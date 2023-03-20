@@ -31,8 +31,8 @@ def landing(request):
 def index(request):
 
     user= User.objects.get(id=request.session['user']['id'])
-    listas_hunt= Listados.objects.filter(owner=user,tipo='B')
-    listas_off= Listados.objects.filter(owner=user,tipo='O')
+    listas_hunt= Listados.objects.filter(owner=user,tipo='B').order_by('-updated_at')[:10]
+    listas_off= Listados.objects.filter(owner=user,tipo='O').order_by('-updated_at')[:10]
 
     last_act=Actividad.objects.filter(objetivo__isnull=True).order_by('-updated_at')[:10]
     last_act_propia=Actividad.objects.filter(objetivo=user).order_by('-updated_at')[:10]
@@ -60,7 +60,7 @@ def list_hunt(request):
     
     if request.method == "GET":
         
-        listas= Listados.objects.filter(owner=user,tipo='B')
+        listas= Listados.objects.filter(owner=user,tipo='B').order_by('-updated_at')
         result=[]
         for l in listas:
             estado="Activa"
@@ -127,7 +127,7 @@ def list_offer(request):
     user= User.objects.get(id=user_id)
     if request.method == "GET":
         
-        listas= Listados.objects.filter(owner=user,tipo='O')
+        listas= Listados.objects.filter(owner=user,tipo='O').order_by('-updated_at')
         result=[]
         for l in listas:
             

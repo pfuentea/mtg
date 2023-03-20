@@ -363,6 +363,9 @@ table.dataTable {
    color: white;
    text-transform: uppercase;
 }
+.separador{
+   margin-top:4rem;
+}
 
 .foil img{
    border: solid 2px yellow;

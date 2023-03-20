@@ -4,8 +4,6 @@
 
 {% block contenido %}
 
-
-
 <div class="container contenido">
   <h1 class="garde">Bienvenid@: {{request.session.user.name}}</h1>
     <div class="row">
@@ -88,7 +86,7 @@
 
     <div class="row">        
         <div class="col-sm-6 ">
-          <h5>Listas de cartas que busco (compro/cambio) </h5>
+          <h5>Listas de cartas que busco (compro/cambio) (últimas 10) </h5>
               {% for l1 in listas_hunt %}
               <p > <a href="/list/{{l1.id}}" class="naranjo"> {{l1.nombre}}</a>   </p>
               {% empty %}
@@ -96,7 +94,7 @@
               {% endfor %}   
         </div>
         <div class="col-sm-6  ">
-          <h5>Listas de cartas que ofrezco (vendo/cambio)</h5>
+          <h5>Listas de cartas que ofrezco (vendo/cambio) (últimas 10)</h5>
               {% for l2 in listas_off %}
               <p><a href="/list/{{l2.id}}" class="naranjo"> {{l2.nombre}}</a>   </p>
               {% empty %}
@@ -105,7 +103,7 @@
         </div>
 
         <div class="col-sm-6">
-          <h5><a href="/msg/get">Mesajes Recibidos</a></h5>
+          <h5><a href="/msg/get">Mesajes Recibidos  (últimos 10)</a></h5>
           {% for rec in recibidos  %}
             <p> ({{rec.created_at}}): <a href="/user/{{rec.from_user.id}}">{{rec.from_user.name}}  </a>  </p>
           {% empty %}

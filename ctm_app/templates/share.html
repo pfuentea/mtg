@@ -4,16 +4,28 @@
 
 {% block contenido %}
 
+    <div class="separador"></div>
+    <h2>
+    
+        {{lista.nombre}} by 
+        {% if nickname != '' %}
+            {% if request.session.user %}
+                <a href="/user/{{usuario_id}}">{{nickname}}</a>
+            {% else %}
+                {{nickname}}
+            {% endif %}
+        {% else %}
+        {% if request.session.user %}
+                <a href="/user/{{usuario_id}}">{{usuario}}</a>
+            {% else %}
+                {{usuario}}
+            {% endif %}
+            
+        {% endif %}
+        ( {% if lista.tipo == 'B' %}Busco{% elif lista.tipo == 'O' %}Venta/Cambio{% endif %} )
+    </h2>
 
-<h2>
-    {{lista.nombre}} by 
-    {% if nickname != '' %}
-    {{nickname}}
-    {% else %}
-    {{usuario}} 
-    {% endif %}
-    ( {% if lista.tipo == 'B' %}Busco{% elif lista.tipo == 'O' %}Venta/Cambio{% endif %} )
-</h2>
+
 <h3>
     {% if ubicacion != '' %}Ubicación:{{ubicacion}} {% endif %}
 </h3>
@@ -70,7 +82,7 @@
                         {% for i in items %}
                         <tr>
                             <td> 
-                                <a href="https://scryfall.com/card/{{i.carta.Edicion.set_code}}/{{i.carta.number_collector}}"  title="Ver en scryfall">{{i.carta.nombre}}</a>                             
+                                <a href="https://scryfall.com/card/{{i.carta.Edicion.set_code}}/{{i.carta.number_collector_txt}}"  title="Ver en scryfall">{{i.carta.nombre}}</a>                             
                             </td>
                             <td> {{i.carta.Edicion.nombre}}</td>
                             <td>{{i.cantidad}}</td>   
