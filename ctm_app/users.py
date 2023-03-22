@@ -5,9 +5,9 @@ from .models.user import User
 from .models.listados import Listados
 from .models.contacto import Contacto
 from .models.actividad import Actividad
-
+from datetime import datetime, timedelta
 from .forms.userForm import UserForm
-
+from django.db.models import Q
 import hashlib
 
 @login_required
@@ -34,8 +34,11 @@ def preferencias(request):
 
 def view(request,user_id):
     user= User.objects.get(id=user_id)
-    listas_busqueda=Listados.objects.filter(owner=user, tipo='B')
-    listas_venta=Listados.objects.filter(owner=user, tipo='O')
+    hoy = datetime.now().date()
+    limite = hoy - timedelta(days=14)
+
+    listas_busqueda=Listados.objects.filter(owner=user, tipo='B',expiracion__gt=hoy)
+    listas_venta=Listados.objects.filter(owner=user, tipo='O',expiracion__gt=hoy)
     n_contactos=Contacto.objects.filter(usuario=user)
     user_login=True
     if 'user' in request.session:

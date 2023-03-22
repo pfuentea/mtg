@@ -26,3 +26,11 @@ def ranking(request):
        
     }
     return render(request, 'manage/ranking.html', context=context )
+
+@login_required
+def user_list(request):
+    usuarios=User.objects.all().order_by('-created_at')
+    context={
+       'usuarios':usuarios
+    }
+    return render(request, 'manage/user_list.html', context=context )

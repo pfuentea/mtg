@@ -61,5 +61,6 @@ urlpatterns = [
 
     path('estadisticas', manage.stats), 
     path('ranking', manage.ranking), 
+    path('user_list', manage.user_list),  
 
 ]

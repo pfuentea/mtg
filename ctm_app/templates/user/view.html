@@ -3,6 +3,7 @@
 {% block titulo %}PREFERENCIAS USUARIO{% endblock %}
 
 {% block contenido %}
+<div class="separador"></div>
 <h1>Usuario: {{user.name}} 
     <span class="d-none" id="user_check"><i class="bi bi-person-check-fill text-success"></i></span>
     {% if user.nick != '' %} ({{user.nick}}) {% endif %}
@@ -10,8 +11,43 @@
 
 <h4>Ubicacion: {{user.ubicacion}}</h4>
 <div>Cantidad de listas: {{user.listas.count}}</div>
-<div>Cantidad de listas de busqueda: {{listas_busqueda.count}}</div>
-<div>Cantidad de listas de cambio/venta: {{listas_venta.count}}</div>
+
+<div class="accordion accordion-flush" id="accordionFlushExample">
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="flush-headingOne">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+            listas de busqueda activas: {{listas_busqueda.count}}
+        </button>
+      </h2>
+      <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+        <div class="accordion-body">
+            {% for l in listas_busqueda %}
+            <li>
+                <a href="/list/share/{{l.id}}" target="_blank">  {{l.nombre}} </a> 
+            </li>
+            {% endfor %}
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="flush-headingTwo">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo" aria-expanded="false" aria-controls="flush-collapseTwo">
+            listas de cambio/venta: {{listas_venta.count}}
+        </button>
+      </h2>
+      <div id="flush-collapseTwo" class="accordion-collapse collapse" aria-labelledby="flush-headingTwo" data-bs-parent="#accordionFlushExample">
+        <div class="accordion-body">
+            {% for l2 in listas_venta %}
+            <li>
+                <a href="/list/share/{{l2.id}}" target="_blank">  {{l2.nombre}} </a> 
+            </li>
+            {% endfor %}
+            </div>
+      </div>
+    </div>
+    
+  </div>
+
 <div>Cantidad de contactos: {{n_contactos.count}}</div>
 
 {% if user_login %}
@@ -19,7 +55,7 @@
     <a href="/user/add_contacto/{{user.id}}">Agregar a mis contactos</a>
     {% else %}
         {% if user %}
-            Este usuario ya está en sus contactos.
+            <u class="text-warning">Este usuario ya está en sus contactos.</u> 
             <script>
                 $('#user_check').removeClass('d-none')
             </script>

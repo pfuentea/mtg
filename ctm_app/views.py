@@ -68,6 +68,7 @@ def list_hunt(request):
             fecha_exp=l.expiracion.replace(tzinfo=pytz.UTC)
             diff= fecha_exp - ahora        
             dias=divmod(diff.total_seconds() ,24 * 60 * 60 )[0] 
+            print(f"{l.expiracion},diff:{diff},dias:{dias}")
             if dias < 0:
                 estado="Expirada"
 
@@ -136,6 +137,7 @@ def list_offer(request):
             fecha_exp=l.expiracion.replace(tzinfo=pytz.UTC)
             diff= fecha_exp - ahora        
             dias=divmod(diff.total_seconds() ,24 * 60 * 60 )[0] 
+            print(f"{l.expiracion},diff:{diff},dias:{dias}")
             if dias < 0:
                 estado="Expirada"
 
