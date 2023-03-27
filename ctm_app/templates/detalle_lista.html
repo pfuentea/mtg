@@ -328,11 +328,12 @@
     $('#get_cartas').on("click",function(){
         $('#resultados').empty();
         carton= $('#searching_card').val();
-    console.log(carton);
+    console.log("carton:"+carton);
         carton=carton.replace(" ", "+");
-    console.log(carton);
+    console.log("carton:"+carton);
         urls="https://api.scryfall.com/cards/search?order=released&dir=desc&q="+carton+"&unique=prints";
-    console.log(urls);
+        //urls="https://api.scryfall.com/cards/named?exact="+carton;
+    console.log("URL:"+urls);
         axios.get(urls,{    
                 responseType: 'text'
             })
@@ -342,17 +343,30 @@
                     //console.log(response)
                     response_data=JSON.parse(response.data)
                     //console.log("init")
-                    //console.log(response_data)
+                    console.log(response_data)
+                    //resultado=JSON.parse(response_data)
+                    //console.log("resultado...")
+                    //console.log(resultado)
                     //console.log("end")
                     $.each(response_data.data, function(i,item){
-                        //console.log("item")
-                        console.log(item)
-                        imagen=item.image_uris.small
-                        imagen=imagen.split("?")
+                        console.log("item")
+                        //console.log(item)
+                        if (item.layout =='transform'){
+                            imagen=item.card_faces[0].image_uris.small
+                        
+                        }
+                        else if(item.layout =='normal'){
+                            imagen=item.image_uris.small   
+                            imagen=imagen.split("?") 
+                                               
+                        }
+                        
                         nombre=item.name
+                        console.log("nombre:"+nombre+"imagen:"+imagen)   
                         card_id="`"+item.set+"`,`"+item.collector_number+"`,`"+nombre+"`,`"+item.set_name+"`,`"+imagen+"`"
                         //card_id='"'+item.set+'",'+item.collector_number+',"'+nombre+'","'+item.set_name+'"'
                         console.log("img:"+imagen[0])
+
                         if(item.games.length=1 && item.games[0]=='mtgo' ){
                             return;  
                         }
@@ -382,7 +396,13 @@
                         /*
                         option=option+ "<div class=\"b-container card text-center\" ><div class=\"card-header\">"+titulo+"</div><img src=\""+imagen[0]+"\" id_value=\""+card_id+"\"  class=\"card_result m-1\"  > <div class=\"card-body\"><p>TCGPlayer:"+usd+" usd/"+usd_foil+" usd </p> <button type=\"button\" onclick=\"agregar("+card_id+");\">Añadir </button></div> </div>";
                         */
-                        option=option+ "<div class=\"b-container card text-center\" ><div class=\"card-header\">"+titulo+"</div><img src=\""+imagen[0]+"\" id_value=\""+card_id+"\"  class=\"card_result m-1\"  > <div class=\"card-body\"><p>TCGPlayer:"+usd+" usd/"+usd_foil+" usd </p> ";
+                        if (imagen[0]=='h'){
+                            option=option+ "<div class=\"b-container card text-center\" ><div class=\"card-header\">"+titulo+"</div><img src=\""+imagen+"\" id_value=\""+card_id+"\"  class=\"card_result m-1\"  > <div class=\"card-body\"><p>TCGPlayer:"+usd+" usd/"+usd_foil+" usd </p> ";
+                        }
+                        else{
+                            option=option+ "<div class=\"b-container card text-center\" ><div class=\"card-header\">"+titulo+"</div><img src=\""+imagen[0]+"\" id_value=\""+card_id+"\"  class=\"card_result m-1\"  > <div class=\"card-body\"><p>TCGPlayer:"+usd+" usd/"+usd_foil+" usd </p> ";
+                        }
+                        
                         option=option+"<a href=\"#\" class=\"btn btn-sm btn-outline-dark btn-add-btn\"  data-bs-toggle=\"modal\" data-bs-target=\"#confirm-add\" title=\"Agregar\" data-id=\""+card_id+"\" href=\"#\"> Agregar </a>";
                         option=option+"</div> </div>";
 
