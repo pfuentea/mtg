@@ -23,12 +23,16 @@
             
         {% endif %}
         ( {% if lista.tipo == 'B' %}Busco{% elif lista.tipo == 'O' %}Venta/Cambio{% endif %} )
-    </h2>
 
+    </h2>
+<h6>Última actualización: {{last_act}}</h6>
 
 <h3>
     {% if ubicacion != '' %}Ubicación:{{ubicacion}} {% endif %}
 </h3>
+<h4>
+    {% if lista.descripcion != '' %}Descripcion:{{lista.descripcion}} {% endif %}
+</h4>
 <h5>
     {% if lista.referencia_web != '' %}Precios desde :{{lista.referencia_web}} {% endif %}
 </h5>

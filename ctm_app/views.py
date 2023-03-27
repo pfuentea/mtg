@@ -295,6 +295,12 @@ def share(request,lista_id):
     ubicacion=lista.owner.ubicacion
     vista="imgs"
     user=""
+    fecha1=lista.updated_at
+    iten_newest=lista.items.latest('updated_at')
+    fecha2=iten_newest.updated_at
+    last_act=max(fecha1,fecha2)
+    #print(f"fecha1:{fecha1}, fecha2:{fecha2}, max:{last_act}")
+    
     if 'user' in request.session:
         user= User.objects.get(id=request.session['user']['id'])
     if 'view' in request.GET:
@@ -332,7 +338,8 @@ def share(request,lista_id):
             "vista":vista,
             "nickname":nick,
             "ubicacion":ubicacion,
-            "user":user
+            "user":user,
+            "last_act":last_act
         }
     return render(request, 'share.html', context)
 
