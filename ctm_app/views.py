@@ -290,12 +290,13 @@ def list_detail(request,lista_id):
 def share(request,lista_id):
     try:
         lista=Listados.objects.get(id=lista_id)
-        items= ItemLista.objects.filter(lista=lista)
+        
         usuario=lista.owner.name
         usuario_id=lista.owner.id
         ubicacion=lista.owner.ubicacion
         vista="imgs"
         user=""
+        items= ItemLista.objects.filter(lista=lista)
         fecha1=lista.updated_at
         iten_newest=lista.items.latest('updated_at')
         fecha2=iten_newest.updated_at
@@ -345,8 +346,19 @@ def share(request,lista_id):
 
 
         return render(request, 'share.html', context)
-    except:
-        return render(request, 'share_no_existe.html', context)
+    except ItemLista.DoesNotExist:
+        print("No hay elementos en la lista")
+        error_except="NoItems"
+    except Exception as e:
+        error_except="NoList"
+        usuario_id=""
+        print('%s' % type(e))
+    context = {
+        "error_except":error_except,
+        "usuario_id":usuario_id
+    }
+    return render(request, 'share_no_existe.html', context)
+    
     
 def share_all(request,lista_id):
     lista=Listados.objects.get(id=lista_id)

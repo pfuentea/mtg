@@ -23,7 +23,7 @@
         <div class="accordion-body">
             {% for l in listas_busqueda %}
             <li>
-                <a href="/list/share/{{l.id}}" target="_blank">  {{l.nombre}} ({{l.items.count}})</a> 
+                <a href="/list/share/{{l.id}}" target="_blank">  {{l.nombre}} ( {{l.items.count}} Cartas)</a> 
             </li>
             {% endfor %}
         </div>
@@ -39,7 +39,7 @@
         <div class="accordion-body">
             {% for l2 in listas_venta %}
             <li>
-                <a href="/list/share/{{l2.id}}" target="_blank">  {{l2.nombre}}({{l2.items.count}}) </a> 
+                <a href="/list/share/{{l2.id}}" target="_blank">  {{l2.nombre}}( {{l2.items.count}} Cartas) </a> 
             </li>
             {% endfor %}
             </div>

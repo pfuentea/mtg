@@ -21,7 +21,7 @@
         <div class="col">
             <form action="/list/offer/new" method="post">
                 {% csrf_token %}
-                <input type="text" name="new_list" id="new_list" required>
+                <input type="text" name="new_list" id="list" required>
                <button type="submit">Crear</button>
                <button id="cl_btm">Cancelar</button>
             </form>
@@ -114,6 +114,7 @@
 
    $('#open_search').on('click',function(){
        $('#new_list').fadeIn();
+       $('#list').focus();
    });
    $('#cl_btm').on('click',function(){
        $('#new_list').fadeOut();

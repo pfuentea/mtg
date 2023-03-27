@@ -5,6 +5,7 @@
 {% block contenido %}
 
     <div class="separador"></div>
+    {% if error_except == 'NoList' %}
     <h2>Esta Lista fue eliminada o no existe, te recomendamos consultar nuevamente por el enlace de la lista 
         o si estás registrado, volver a alguna de las secciones:</h2>
     <ul>
@@ -12,6 +13,9 @@
         <li><a href="/list/hunt">Tus Listas de Busquedas</a> </li>
         <li><a href="/list/offer"></a> Tus Listas para Vender/Cambiar</li>
     </ul>
+    {% else %}
+    <h2>Esta Lista no posee cartas. Invita a su <a href="/user/{{usuario_id}}">dueño</a>  a agregar nuevas cartas.</h2>
+    {% endif %}
 {% endblock %}
 
 {% block libreria %}
