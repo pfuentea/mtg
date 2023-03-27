@@ -288,61 +288,66 @@ def list_detail(request,lista_id):
         return redirect('/list/offer')
 
 def share(request,lista_id):
-    lista=Listados.objects.get(id=lista_id)
-    items= ItemLista.objects.filter(lista=lista)
-    usuario=lista.owner.name
-    usuario_id=lista.owner.id
-    ubicacion=lista.owner.ubicacion
-    vista="imgs"
-    user=""
-    fecha1=lista.updated_at
-    iten_newest=lista.items.latest('updated_at')
-    fecha2=iten_newest.updated_at
-    last_act=max(fecha1,fecha2)
-    #print(f"fecha1:{fecha1}, fecha2:{fecha2}, max:{last_act}")
-    
-    if 'user' in request.session:
-        user= User.objects.get(id=request.session['user']['id'])
-    if 'view' in request.GET:
-        if request.GET['view'] == 'list' :
-            vista="lista"
-
-    nick=lista.owner.nick
-
-    if request.method == "POST": #esta creando el nick en este caso
-        nick_avail=User.objects.filter(nick=request.POST['nick']) 
+    try:
+        lista=Listados.objects.get(id=lista_id)
+        items= ItemLista.objects.filter(lista=lista)
+        usuario=lista.owner.name
+        usuario_id=lista.owner.id
+        ubicacion=lista.owner.ubicacion
+        vista="imgs"
+        user=""
+        fecha1=lista.updated_at
+        iten_newest=lista.items.latest('updated_at')
+        fecha2=iten_newest.updated_at
+        last_act=max(fecha1,fecha2)
+        #print(f"fecha1:{fecha1}, fecha2:{fecha2}, max:{last_act}")
         
-        print(f"nick_avail:{nick_avail}")
-        if nick_avail.count() == 0:
-            print("no existe el nick y podemos crearlo")
-            user.nick=request.POST['nick']
-            user.save()
-            nick=request.POST['nick']
-            request.session['user']['nick']=nick
+        if 'user' in request.session:
+            user= User.objects.get(id=request.session['user']['id'])
+        if 'view' in request.GET:
+            if request.GET['view'] == 'list' :
+                vista="lista"
 
-            #print( request.session['user']['nick'])
-           
-            messages.success(request, "Nick seteado con exito!")
-        else :
-            messages.warning(request, "Este Nick ya está siendo usado por otro usuario. Favor elija uno nuevo")
+        nick=lista.owner.nick
 
-    #print(lista.owner.nick)
+        if request.method == "POST": #esta creando el nick en este caso
+            nick_avail=User.objects.filter(nick=request.POST['nick']) 
+            
+            print(f"nick_avail:{nick_avail}")
+            if nick_avail.count() == 0:
+                print("no existe el nick y podemos crearlo")
+                user.nick=request.POST['nick']
+                user.save()
+                nick=request.POST['nick']
+                request.session['user']['nick']=nick
 
-    context = {
-            'saludo': 'Hola',
-            "items":items,
-            "lista_id":lista_id,
-            "lista":lista,
-            "usuario":usuario,
-            "usuario_id":usuario_id,
-            "vista":vista,
-            "nickname":nick,
-            "ubicacion":ubicacion,
-            "user":user,
-            "last_act":last_act
-        }
-    return render(request, 'share.html', context)
+                #print( request.session['user']['nick'])
+            
+                messages.success(request, "Nick seteado con exito!")
+            else :
+                messages.warning(request, "Este Nick ya está siendo usado por otro usuario. Favor elija uno nuevo")
 
+        #print(lista.owner.nick)
+
+        context = {
+                'saludo': 'Hola',
+                "items":items,
+                "lista_id":lista_id,
+                "lista":lista,
+                "usuario":usuario,
+                "usuario_id":usuario_id,
+                "vista":vista,
+                "nickname":nick,
+                "ubicacion":ubicacion,
+                "user":user,
+                "last_act":last_act
+            }
+
+
+        return render(request, 'share.html', context)
+    except:
+        return render(request, 'share_no_existe.html', context)
+    
 def share_all(request,lista_id):
     lista=Listados.objects.get(id=lista_id)
     items= ItemLista.objects.filter(lista=lista)

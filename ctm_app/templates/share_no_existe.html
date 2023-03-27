@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block titulo %} {% if lista.tipo == 'B' %}Lista de busqueda de{% elif lista.tipo == 'O' %}Lista para ofrecer de{% endif %}  {{usuario}} {% endblock %}
+
+{% block contenido %}
+
+    <div class="separador"></div>
+    <h2>Esta Lista fue eliminada o no existe, te recomendamos consultar nuevamente por el enlace de la lista 
+        o si estás registrado, volver a alguna de las secciones:</h2>
+    <ul>
+        <li><a href="/index">Home</a>   </li>
+        <li><a href="/list/hunt">Tus Listas de Busquedas</a> </li>
+        <li><a href="/list/offer"></a> Tus Listas para Vender/Cambiar</li>
+    </ul>
+{% endblock %}
+
+{% block libreria %}
+
+{% endblock %}
