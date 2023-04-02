@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block titulo %} Coincidencias de listas {% endblock %}
+
+{% block contenido %}
+
+<div class="separador"></div>
+<a href="/list/compare/{{lista_origen.id}}/{{lista_destino.id}}/lista">Ver listado con detalles </a>| 
+<a href="/list/compare/{{lista_origen.id}}/{{lista_destino.id}}/imgs">Ver Imagenes </a>
+<p><a href="/list/share/{{lista_destino.id}}?view=img">Ver lista completa</a></p>
+{% if vista == 'lista' %}
+<div class="container">
+    <div class="row">
+        <div class="col-10">
+            <p class="d-none">Cartas en la lista : ({{items.count}})</p> 
+            <div class="table-responsive">
+                <table id="lista_cartas" class="table table-striped table-bordered" width="100%" >
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Edicion</th>
+                            <th>Cantidad</th>
+                            <th>Foil?</th>
+                            <th>Observaciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in items %}
+                        <tr>
+                            <td> 
+                                <a href="https://scryfall.com/card/{{i.carta.Edicion.set_code}}/{{i.carta.number_collector_txt}}"  title="Ver en scryfall">{{i.carta.nombre}}</a>                             
+                            </td>
+                            <td> {{i.carta.Edicion.nombre}}</td>
+                            <td>{{i.cantidad}}</td>   
+                            <td>{%if i.es_foi%} Si {% else %} No {% endif %}</td>  
+                            <th>{{i.observacion}}</th>                         
+                        </tr>       
+                    {% endfor %}
+                    </tbody>    
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% elif vista == 'imgs' %}
+    {% if total_coincidencias > 0 %}
+    <div class="row">
+        {% for i in items %}
+        <div class="card {% if i.es_foil %}foil{% endif %}" style="width: 7rem;">   
+            <a href="https://scryfall.com/card/{{i.carta.Edicion.set_code}}/{{i.carta.number_collector_txt}}" target="_blank" title="Ver en scryfall">
+            <img src="{{i.carta.small_image}}" style="width: 6rem;">
+            </a>
+            <div class="card-title mb-2 text-muted ">
+                {{i.carta.nombre}} x <b>{{i.cantidad}} ({{i.carta.Edicion.set_code}})</b>
+            </div>   
+          
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>No existen elementos para esta lista</p>
+        
+    {% endif %}
+{% endif %}
+
+{% endblock %}
+
+{% block libreria %}
+
+{% endblock %}

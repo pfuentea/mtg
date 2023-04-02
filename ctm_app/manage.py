@@ -39,7 +39,7 @@ def user_list(request):
     registrations_by_month = User.objects \
         .annotate(month=Count('created_at', distinct=True)) \
         .values_list('month', flat=True)
-
+    print(registrations_by_day)
     # Generar los gráficos
     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(10, 5))
     ax[0].plot(registrations_by_day)

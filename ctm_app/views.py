@@ -20,6 +20,11 @@ from .models.mensaje import Mensaje
 from datetime import datetime, timedelta,timezone
 from django.http import HttpRequest
 import pytz
+from itertools import groupby
+
+def group_func(item):
+    return item['name'], item['lname'], item['list_id'], item['owner_id']
+
 
 def landing(request):
     context = {
@@ -196,20 +201,19 @@ def list_detail(request,lista_id):
         #aca hacemos la busqueda en otras listas
         #obtenemos las cartas de la lista
         items= ItemLista.objects.filter(lista=lista) 
-        lstdict=[]
-        lstdict2=[]
-        cartaslist=[]
+        lstdict=[] # donde se guardan las cartas que estan en la lista exacta 
+        lstdict2=[] # donde se guardan las cartas por nombre
+        cartaslist=[] #donde se guardan las cartas por nombre
         #para cada carta buscaremos otras listas (de cambio/venta) donde aparece
-        for elemento in items:
-            print(f"carta_id:{elemento.carta.id}/{elemento.carta.nombre}")
+        for card_in_list in items:
+            print(f"carta_id:{card_in_list.carta.id}/{card_in_list.carta.nombre}")
             #buscamos por la misma carta (mismo nombre, misma edicion, mismo tipo de borde)
-            resultado1=ItemLista.objects.filter(carta=elemento.carta,lista__tipo='O').exclude(lista__owner=elemento.lista.owner)
+            resultado_exacto=ItemLista.objects.filter(carta=card_in_list.carta,lista__tipo='O').exclude(lista__owner=card_in_list.lista.owner)
             #aca debemos buscar por nombre en caso de que este activado esto
-            resultado_por_nombre=ItemLista.objects.filter(carta__nombre=elemento.carta.nombre,lista__tipo='O').exclude(lista__owner=elemento.lista.owner)
-            #print(resultado_por_nombre)
-            if len(resultado1) >0:
+            resultado_por_nombre=ItemLista.objects.filter(carta__nombre=card_in_list.carta.nombre,lista__tipo='O').exclude(lista__owner=card_in_list.lista.owner)
+            if len(resultado_exacto) >0:
                 #print("Encontre la carta en otra lista!")
-                for r in resultado1:
+                for r in resultado_exacto:
                     #print(f"lista:{r.lista.nombre},dueño:{r.lista.owner.name}")
                     #busco el indice donde exista un dict con name= r.lista.owner.name y lname=r.lista.nombre, si no existe: creo el dict y lo agrego
                     indice=next((i for i, x in enumerate(lstdict) if x["name"] == r.lista.owner.name and  x["lname"] ==r.lista.nombre), None)
@@ -224,12 +228,13 @@ def list_detail(request,lista_id):
                         lstdict.append(new_elem)
                     else:
                         lstdict[indice]['qty']+=1
-            if len(resultado_por_nombre)>1:
+            
+            if len(resultado_por_nombre)>0:
                 sumar=True
-                if elemento.carta.nombre in cartaslist:
+                if card_in_list.carta.nombre in cartaslist:
                     sumar=False
                 else:
-                    cartaslist.append(elemento.carta.nombre)
+                    cartaslist.append(card_in_list.carta.nombre)
                 for r2 in resultado_por_nombre:
                     
                     #print(f"itemlista.carta.nombre:{r2.carta.nombre}")
@@ -238,7 +243,7 @@ def list_detail(request,lista_id):
                     #busco el indice donde exista un dict con name= r.lista.owner.name y lname=r.lista.nombre, si no existe: creo el dict y lo agrego
                     indice2=next((i for i, x in enumerate(lstdict2) if x["name"] == r2.lista.owner.name and  x["lname"] ==r2.lista.nombre and x["cname"] == r2.carta.nombre), None)
                     
-
+                    print(f"indice2:{indice2}")
                     #print(f"carta:{elemento.carta.nombre} la sumo?:{sumar} ")    
                     if indice2 is None:
                         new_elem2={
@@ -256,7 +261,21 @@ def list_detail(request,lista_id):
                         #considerar no repetir si ya esta otra carta con mismo nombre en la lista
                             lstdict2[indice2]['qty']+=1
                     
-        #print(lstdict)
+        print(lstdict2)
+        # Ordenar la lista por los campos de agrupación
+        lstdict2.sort(key=group_func)
+
+        # Lista para almacenar los resultados
+        resultados = []
+
+        # Iterar sobre los grupos y obtener el total de cada uno
+        for group, items in groupby(lstdict2, key=group_func):
+            total = sum(item['qty'] for item in items)
+            resultados.append({'name': group[0], 'lname': group[1], 'list_id': group[2], 'owner_id': group[3], 'qty': total})
+
+        # Imprimir los resultados
+        print(resultados)
+
         context = {
             'saludo': 'Hola',
             "items":items,
@@ -264,7 +283,7 @@ def list_detail(request,lista_id):
             "lista":lista,
             "duracion":dias,
             "resultado":lstdict,
-            "resultado_por_nombre":lstdict2,
+            "resultado_por_nombre":resultados,
             "user":user
         }
         return render(request, 'detalle_lista.html', context)
@@ -286,6 +305,37 @@ def list_detail(request,lista_id):
 
         nueva_lista=Listados.objects.create(owner=user,nombre=new_list,tipo='O')
         return redirect('/list/offer')
+
+def compare(request,lista_origen,lista_destino,view='imgs'):
+    resultado=[]
+    if 'user' in request.session:
+        user= User.objects.get(id=request.session['user']['id'])
+    else:
+        user=""
+    origen=Listados.objects.get(id=lista_origen)
+    destino=Listados.objects.get(id=lista_destino)
+    items_origen= ItemLista.objects.filter(lista=origen) 
+    items_destino= ItemLista.objects.filter(lista=destino) 
+    nombres_destino = [item.carta.nombre for item in items_destino]
+    #print(nombres_destino)
+    nombres_comunes = [carta_or.carta.nombre for carta_or in items_origen if any(carta_or.carta.nombre == nombre for nombre in nombres_destino)]
+    for carton in items_origen:
+        if carton.carta.nombre in nombres_comunes:
+            resultado.append(carton)
+    
+    total_coincidencias=len(resultado)
+    request.session['view_compare']=view
+    vista=request.session['view_compare']
+    
+    context={
+        "user":user,
+        "items":resultado,
+        "vista":vista,
+        "total_coincidencias":total_coincidencias,
+        "lista_origen":origen,
+        "lista_destino":destino
+    }
+    return render(request, 'compare.html', context)
 
 def share(request,lista_id):
     try:

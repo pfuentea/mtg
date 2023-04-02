@@ -35,6 +35,9 @@ urlpatterns = [
     path('list/activar/<int:lista_id>', views.activar),
     path('list/desactivar/<int:lista_id>', views.desactivar),
 
+    path('list/compare/<int:lista_origen>/<int:lista_destino>', views.compare),
+    path('list/compare/<int:lista_origen>/<int:lista_destino>/<view>', views.compare),
+
     path('card/<int:item_id>/', views.card_detail),
     path('card/update/<int:item_id>', views.card_detail), 
     
