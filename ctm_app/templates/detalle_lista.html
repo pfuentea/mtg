@@ -84,17 +84,17 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for i in items %}
+                        {% for cartaitem in items %}
                         <tr>
                             <td> 
-                                <a href="/card/{{i.id}}">{{i.carta.nombre}} {% if i.es_foil %}(Foil){% endif %}</a>                             
+                                <a href="/card/{{cartaitem.id}}">{{cartaitem.carta.nombre}} {% if cartaitem.es_foil %}(Foil){% endif %}</a>                             
                             </td>
-                            <td> {{i.carta.Edicion.nombre}}</td>
-                            <td>{{i.cantidad}}</td>
-                            <td> <img src="{{i.carta.small_image}}" alt="" class="carta_tumb"></td>
+                            <td> {{cartaitem.carta.Edicion.nombre}}</td>
+                            <td>{{cartaitem.cantidad}}</td>
+                            <td> <img src="{{cartaitem.carta.small_image}}" alt="" class="carta_tumb"></td>
                             <td class="dt-center"> 
                                     
-                                    <a href="#"  data-href="/card/remove/{{lista_id}}/{{i.id}}"  class="btn btn-sm btn-outline-danger btn-delete-trv" data-bs-toggle="modal" data-bs-target="#confirm-delete" title="Borrar">
+                                    <a href="#"  data-href="/card/remove/{{lista_id}}/{{cartaitem.id}}"  class="btn btn-sm btn-outline-danger btn-delete-trv" data-bs-toggle="modal" data-bs-target="#confirm-delete" title="Borrar">
                                         <i class="bi bi-trash"></i>
                                     </a>
                                    

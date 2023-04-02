@@ -173,6 +173,7 @@ def list_offer(request):
 
 @login_required
 def list_detail(request,lista_id):
+    print("Inicio:list_detail")
     user_id=request.session['user']['id']
     #print (f"User_id:{user_id}")
     user= User.objects.get(id=user_id)
@@ -269,13 +270,13 @@ def list_detail(request,lista_id):
         resultados = []
 
         # Iterar sobre los grupos y obtener el total de cada uno
-        for group, items in groupby(lstdict2, key=group_func):
-            total = sum(item['qty'] for item in items)
+        for group, items2 in groupby(lstdict2, key=group_func):
+            total = sum(item['qty'] for item in items2)
             resultados.append({'name': group[0], 'lname': group[1], 'list_id': group[2], 'owner_id': group[3], 'qty': total})
 
         # Imprimir los resultados
-        print(resultados)
-
+        #print(resultados)
+        #print(f"lista:{lista}")
         context = {
             'saludo': 'Hola',
             "items":items,
@@ -565,6 +566,7 @@ def add_to_list(request,lista_id):
 
 @login_required
 def card_detail(request,item_id):
+    print("Inicio:card_detail")
     #item=ItemLista.objects.get(id=item_id)
     item_lista = get_object_or_404(ItemLista, pk=item_id)
     user= User.objects.get(id=request.session['user']['id'])
