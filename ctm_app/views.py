@@ -347,7 +347,7 @@ def share(request,lista_id):
         ubicacion=lista.owner.ubicacion
         vista="imgs"
         user=""
-        items= ItemLista.objects.filter(lista=lista)
+        items= ItemLista.objects.filter(lista=lista).order_by('carta__nombre')
         fecha1=lista.updated_at
         iten_newest=lista.items.latest('updated_at')
         fecha2=iten_newest.updated_at
