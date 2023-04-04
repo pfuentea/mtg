@@ -9,6 +9,20 @@ from datetime import datetime, timedelta
 from .forms.userForm import UserForm
 from django.db.models import Q
 import hashlib
+import bcrypt
+from django.core.mail import send_mail,EmailMultiAlternatives
+from django.http import HttpResponse
+
+def enviar_correo(request,token,correo):
+    subject = 'Solicitud de cambio de clave CTMAGIC.CL'
+    token_link='www.ctmagic.cl/user/password/new/1/'+token
+    message = 'Pincha el siguiente link para cambiar tu contraseña:\n'+token_link
+    email_from = 'contacto.ctmagic@gmail.com'
+    destinatario=correo #'patricio.fuentealba.feliu@gmail.com'
+    recipient_list = [destinatario]
+    send_mail(subject, message, email_from, recipient_list)
+    messages.success(request, "Revise cu correo para cambiar la clave")
+    return HttpResponse('OK')
 
 @login_required
 def preferencias(request):
@@ -82,7 +96,7 @@ def add_contacto(request,contacto_id):
     return redirect(previous_url)
 
 def password_change_request(request): #cuando el cambio en via correo
-    
+    resultado=''
     token=''
     if request.method == "POST":
         user=User.objects.filter(email=request.POST['email'])[0]
@@ -92,16 +106,22 @@ def password_change_request(request): #cuando el cambio en via correo
             email=user.email
             #envio de mail con token            
             token=hashlib.md5(email.encode('utf-8')).hexdigest()
+            resultado=enviar_correo(request,token,email)
             
         else:
             messages.warning(request, "Este correo no existe para ningun usuario!")
-    
+    else:
+        email=""
+        user=""
     context={
         'email':email,
         'token':token,
-        'user':user
+        'user':user,
+        "envio":resultado
     }
     return render(request, 'user/password_reset_request.html',context=context )
+
+
 
 def password_new(request,user_id,token):
     usuario=User.objects.get(id=user_id)
@@ -125,9 +145,31 @@ def password_new(request,user_id,token):
     
 
 def password_change(request):#cuando el cambio es por las pref
-    
-            
-    return render(request, 'password_reset_request.html')
+    estado=""
+    if request.method == "POST":
+        usuario=User.objects.get(id=request.POST['user_id'])
+        print(request.POST)
+        #como ya pasó todas las otras validaciones, solo basta con que ambas claves sean iguales
+        if request.POST['new_password'] == request.POST['new_password_confirm']:
+            #cambiamos la clave
+            password_encryp = bcrypt.hashpw(request.POST['new_password'].encode(), bcrypt.gensalt()).decode() 
+            usuario.password=password_encryp
+            messages.success(request, "Su contraseña ha sido cambiada con exito")
+            estado="success"
+        else:
+            #repetimos l intento
+            is_valid=True
+            messages.warning(request, "Las claves no coinciden!")
+            context={
+                'is_valid':is_valid,  
+                'user':usuario
+            }
+            return render(request, 'user/password_reset_email.html',context=context )
+        context={            
+            'user':usuario,
+            "estado":estado
+        }  
+    return render(request, 'user/password_reset_email.html',context=context )
 
 
 '''
