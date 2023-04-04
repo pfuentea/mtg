@@ -106,8 +106,8 @@ def password_change_request(request): #cuando el cambio en via correo
             email=user.email
             #envio de mail con token            
             token=hashlib.md5(email.encode('utf-8')).hexdigest()
-            resultado=enviar_correo(request,token,email)
-            
+            result=enviar_correo(request,token,email)
+            resultado='OK'
         else:
             messages.warning(request, "Este correo no existe para ningun usuario!")
     else:
