@@ -13,9 +13,9 @@ import bcrypt
 from django.core.mail import send_mail,EmailMultiAlternatives
 from django.http import HttpResponse
 
-def enviar_correo(request,token,correo):
+def enviar_correo(request,token,correo,user_id):
     subject = 'Solicitud de cambio de clave CTMAGIC.CL'
-    token_link='www.ctmagic.cl/user/password/new/1/'+token
+    token_link='www.ctmagic.cl/user/password/new/'+user_id+'/'+token
     message = 'Pincha el siguiente link para cambiar tu contraseña:\n'+token_link
     email_from = 'contacto.ctmagic@gmail.com'
     destinatario=correo #'patricio.fuentealba.feliu@gmail.com'
@@ -106,7 +106,7 @@ def password_change_request(request): #cuando el cambio en via correo
             email=user.email
             #envio de mail con token            
             token=hashlib.md5(email.encode('utf-8')).hexdigest()
-            result=enviar_correo(request,token,email)
+            result=enviar_correo(request,token,email,user.id)
             resultado='OK'
         else:
             messages.warning(request, "Este correo no existe para ningun usuario!")
