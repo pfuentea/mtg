@@ -15,13 +15,13 @@ from django.http import HttpResponse
 
 def enviar_correo(request,token,correo,user_id):
     subject = 'Solicitud de cambio de clave CTMAGIC.CL'
-    token_link='www.ctmagic.cl/user/password/new/'+user_id+'/'+token
+    token_link='www.ctmagic.cl/user/password/new/'+str(user_id)+'/'+token
     message = 'Pincha el siguiente link para cambiar tu contraseña:\n'+token_link
     email_from = 'contacto.ctmagic@gmail.com'
     destinatario=correo #'patricio.fuentealba.feliu@gmail.com'
     recipient_list = [destinatario]
     send_mail(subject, message, email_from, recipient_list)
-    messages.success(request, "Revise cu correo para cambiar la clave")
+    messages.success(request, "Revise su correo para cambiar la clave")
     return HttpResponse('OK')
 
 @login_required
@@ -98,10 +98,14 @@ def add_contacto(request,contacto_id):
 def password_change_request(request): #cuando el cambio en via correo
     resultado=''
     token=''
+    email=""
+    user=""
     if request.method == "POST":
-        user=User.objects.filter(email=request.POST['email'])[0]
+        users=User.objects.filter(email=request.POST['email'])
         
-        if user:
+        #print(f"qty_users:{len(users)}")
+        if len(users)>0 :
+            user=users[0]
             messages.success(request, "Contacto encontrado!")
             email=user.email
             #envio de mail con token            
@@ -110,9 +114,7 @@ def password_change_request(request): #cuando el cambio en via correo
             resultado='OK'
         else:
             messages.warning(request, "Este correo no existe para ningun usuario!")
-    else:
-        email=""
-        user=""
+        
     context={
         'email':email,
         'token':token,
@@ -120,8 +122,6 @@ def password_change_request(request): #cuando el cambio en via correo
         "envio":resultado
     }
     return render(request, 'user/password_reset_request.html',context=context )
-
-
 
 def password_new(request,user_id,token):
     usuario=User.objects.get(id=user_id)

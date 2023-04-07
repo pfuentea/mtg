@@ -2,3 +2,4 @@
 **/*/migrations
 db.sqlite3
 ctm/settings.py
+descripcion.txt

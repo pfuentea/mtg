@@ -51,6 +51,11 @@ def login(request):
 def registro(request):
     if request.method == "POST":
 
+        existe_email=User.objects.filter(email=request.POST['email'])
+        print(f"correos_iguales:{len(existe_email)}" )
+        if len(existe_email) > 0: #correo ya existe!
+            messages.warning(request, "Este correo ya existe! Ingrese por Login.")
+            return redirect("/registro")
         errors = User.objects.validador_basico(request.POST)
         # print(errors)
         if len(errors) > 0:
