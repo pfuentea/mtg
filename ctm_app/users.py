@@ -152,8 +152,16 @@ def password_change(request):#cuando el cambio es por las pref
         #como ya pasó todas las otras validaciones, solo basta con que ambas claves sean iguales
         if request.POST['new_password'] == request.POST['new_password_confirm']:
             #cambiamos la clave
+            '''
             password_encryp = bcrypt.hashpw(request.POST['new_password'].encode(), bcrypt.gensalt()).decode() 
+            print(f"E:{request.POST['new_password'].encode()}")
+            print(f"BC:{bcrypt.hashpw(request.POST['new_password'].encode(), bcrypt.gensalt())}")
+            print(password_encryp)
             usuario.password=password_encryp
+            '''
+            nueva_contraseña = request.POST['new_password']
+            usuario.set_password(nueva_contraseña)
+            usuario.save()
             messages.success(request, "Su contraseña ha sido cambiada con exito")
             estado="success"
         else:

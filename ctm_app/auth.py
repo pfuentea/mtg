@@ -3,7 +3,6 @@ from django.shortcuts import redirect, render
 import bcrypt
 from .models.user import User
 
-
 def logout(request):
     if 'user' in request.session:
         del request.session['user']
@@ -16,7 +15,7 @@ def login(request):
         user = User.objects.filter(email=request.POST['email'])
         if user:
             log_user = user[0]
-            print(f"DM:{log_user.modo_oscuro}")
+            print(f"DarkMode:{log_user.modo_oscuro}")
 
             if bcrypt.checkpw(request.POST['password'].encode(), log_user.password.encode()):
 

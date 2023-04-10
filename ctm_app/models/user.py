@@ -1,5 +1,6 @@
 from django.db import models
 import re
+import bcrypt
 
 # Create your models here.
 class UserManager(models.Manager):
@@ -49,3 +50,7 @@ class User(models.Model):
 
     def __repr__(self):
         return f"{self.name}"
+    
+    def set_password(self, password):
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        self.password = hashed_password.decode('utf-8')
