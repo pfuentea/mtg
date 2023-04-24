@@ -50,6 +50,7 @@ def last_update(listas_b,listas_o,usuario):
     elif len(listas_b)>0 :
         lista_mas_actual_b=listas_b.latest('updated_at')
         fecha1=lista_mas_actual_b.updated_at
+        objetos_lista=lista_mas_actual_b.items
         if len(lista_mas_actual_b.items)>0:
             item_mas_nuevo_b=lista_mas_actual_b.items.latest('updated_at')
             fecha2=item_mas_nuevo_b.updated_at
