@@ -26,20 +26,20 @@ def enviar_correo(request,token,correo,user_id):
 
 def last_update(listas_b,listas_o,usuario):
     if len(listas_b)>0 and len(listas_o)>0:
-
+        #primero quiero comprar la fecha entre la lista y su item mas nuevo
         lista_mas_actual_b=listas_b.latest('updated_at')
         fecha1=lista_mas_actual_b.updated_at
-        if listas_b.items.count()>0:
-            item_mas_nuevo_b=listas_b.items.latest('updated_at')
+        if lista_mas_actual_b.items.count()>0:
+            item_mas_nuevo_b=lista_mas_actual_b.items.latest('updated_at')
             fecha2=item_mas_nuevo_b.updated_at
             last_act1=max(fecha1,fecha2)
         else:
             last_act1=fecha1
-
+        #primero quiero comprar la fecha entre la lista y su item mas nuevo
         lista_mas_actual_o=listas_o.latest('updated_at')
         fecha1=lista_mas_actual_o.updated_at
-        if listas_o.items.count()>0:
-            item_mas_nuevo_o=listas_o.items.latest('updated_at')
+        if lista_mas_actual_o.items.count()>0:
+            item_mas_nuevo_o=lista_mas_actual_o.items.latest('updated_at')
             fecha2=item_mas_nuevo_o.updated_at
             last_act2=max(fecha1,fecha2)
         else:
