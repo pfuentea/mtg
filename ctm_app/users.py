@@ -215,9 +215,11 @@ def contactos(request):
     contactos=[]
     for c in contactos_de_user:
         #print(c.contacto)
-        listas_busqueda=Listados.objects.filter(owner=c.contacto, tipo='B',expiracion__gt=hoy)
-        listas_venta=Listados.objects.filter(owner=c.contacto, tipo='O',expiracion__gt=hoy)
-        ultima_act=last_update(listas_busqueda,listas_venta,user)
+        contacto=c.contacto
+        listas_busqueda=Listados.objects.filter(owner=contacto, tipo='B',expiracion__gt=hoy)
+        listas_venta=Listados.objects.filter(owner=contacto, tipo='O',expiracion__gt=hoy)
+        
+        ultima_act=last_update(listas_busqueda,listas_venta,contacto)
 
 
 
