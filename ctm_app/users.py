@@ -44,14 +44,15 @@ def last_update(listas_b,listas_o,usuario):
     elif len(listas_b)>0 :
         lista_mas_actual_b=listas_b.latest('updated_at')
         fecha1=lista_mas_actual_b.updated_at
-        item_mas_nuevo_b=listas_b.items.latest('updated_at')
+
+        item_mas_nuevo_b=lista_mas_actual_b.items.latest('updated_at')
         fecha2=item_mas_nuevo_b.updated_at
         last_act1=max(fecha1,fecha2)
         return max(fecha1,fecha2)
     elif len(listas_o)>0 :
         lista_mas_actual_o=listas_b.latest('updated_at')
         fecha1=lista_mas_actual_o.updated_at
-        item_mas_nuevo_o=listas_o.items.latest('updated_at')
+        item_mas_nuevo_o=lista_mas_actual_o.items.latest('updated_at')
         fecha2=item_mas_nuevo_o.updated_at
         last_act1=max(fecha1,fecha2)
         return max(fecha1,fecha2)
