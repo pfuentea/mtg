@@ -3,6 +3,7 @@
 {% block titulo %}Detalle Carta{% endblock %}
 
 {% block contenido %}
+<div class="separador"></div>
 <h1>
     Agregar detalles 
 </h1>
@@ -12,17 +13,17 @@
         <div class="row">
             <div class="col">
 
-                <div class="row">
+                <div class="row my-strip">
                     <div class="col">
                         Nombre: {{carta.carta.nombre}}
                     </div>
                 </div>
-                <div class="row">
+                <div class="row my-strip">
                     <div class="col">
                         Edición: {{carta.carta.Edicion.nombre}}
                     </div>
                 </div>
-                <div class="row">
+                <div class="row my-strip">
                     <div class="col">Pertece a la lista:</div>
                     <div class="col">{{carta.lista.nombre}}
                         {% if carta.lista.tipo == 'O' %}
@@ -34,7 +35,7 @@
                 </div>
 
                 {% for field in form %}
-                <div class="row">
+                <div class="row my-strip">
                     <div class='form-group col'>
                         <label for="{{ field.name }}">{{ field.label }}:</label>
                     </div>

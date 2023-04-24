@@ -8,7 +8,7 @@
 
 {% block contenido %}
 <div class="separador"></div>
-<div class="container ">
+<div class="container">
     <div class="row">
         <div class="col-12">
             <h1>Listas de busquedas</h1>
@@ -111,7 +111,7 @@
                 }
             },
             "aLengthMenu":[[5,10,20,40,-1],[5,10,20,40,"Todos"]],
-            "iDisplayLength":20
+            "iDisplayLength":{{user.largo_despliegue}}
         });
     });
 

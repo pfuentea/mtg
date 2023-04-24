@@ -35,10 +35,12 @@
 
 <div class="row">
     <div class="col">
-      <h2>Registro</h2>
-      {% load static %}
-      <img src="{% static 'user_registrations.png' %}" alt="User registrations by day">
-      
+        <h2>Registro</h2>
+        {% load static %}
+        <img src="data:image/png;base64,{{ image_base64_dia }}" alt="Gráfico usuarios por día" >
+    </div>
+    <div class="col">
+        <img src="data:image/png;base64,{{ image_base64_mes }}" alt="Gráfico usuarios por mes"  class="grafico">
     </div>
     
 </div>

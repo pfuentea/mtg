@@ -43,6 +43,7 @@ class User(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     modo_oscuro=models.BooleanField(auto_created=False,default=False)
+    largo_despliegue = models.IntegerField (default=20)
     objects = UserManager()
 
     def __str__(self):

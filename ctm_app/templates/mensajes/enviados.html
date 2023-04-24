@@ -6,54 +6,55 @@
 <div class="separador"></div>
 <h1>Mensajes Enviados</h1>
 <a href="/msg/get">Ir a Recibidos</a>
-<div class="row">
-    {% if mensajes.count > 0 %}
-    <div class="col-10">
-        <div class="table-responsive" id="main_table">
-            <table id="lista_mensajes" class="table table-striped table-bordered" width="100%" >
-                <thead>
-                    <tr>
-                        <th>Para</th>
-                        <th>Fecha</th>
-                        <th class="d-none">Estado</th>
-                        <th class="dt-center">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for m in mensajes %}
-                    <tr>
-                        <td class="dt-center"> 
-                            <a href="/user/{{m.to_user.id}}">{{m.to_user.name}}  </a>                          
-                        </td>
-                        <td> {{m.created_at}}</td>
-                        <td  class="d-none">{{m.estado}}</td>
-                        <td class="dt-center"> 
-                            <a href="{% url 'mostrar_modal' m.id %}"  data-href="{% url 'mostrar_modal' m.id %}"  class="btn btn-sm btn-outline-primary btn-read-trv" data-toggle="modal" data-target="#confirm-read" title="Leer">
-                                <i class="bi bi-eye-fill"></i>
-                            </a>                                 
-                               
-                                
-                        </td>
-                    </tr>      
-                {% endfor %}
-                </tbody>    
-            </table>
-        </div>
-    </div>
-    {% else %}
+<div class="container">
     <div class="row">
-        <div class="col">
-            No tiene mensajes enviados 
+        {% if mensajes.count > 0 %}
+        <div class="col-12">
+            <div class="table-responsive" id="main_table">
+                <table id="lista_mensajes" class="table table-striped table-bordered" width="100%" >
+                    <thead>
+                        <tr>
+                            <th>Para</th>
+                            <th>Fecha</th>
+                            <th class="d-none">Estado</th>
+                            <th class="dt-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for m in mensajes %}
+                        <tr>
+                            <td class="dt-center"> 
+                                <a href="/user/{{m.to_user.id}}">{{m.to_user.name}}  </a>                          
+                            </td>
+                            <td> {{m.created_at}}</td>
+                            <td  class="d-none">{{m.estado}}</td>
+                            <td class="dt-center"> 
+                                <a href="{% url 'mostrar_modal' m.id %}"  data-href="{% url 'mostrar_modal' m.id %}"  class="btn btn-sm btn-outline-primary btn-read-trv" data-toggle="modal" data-target="#confirm-read" title="Leer">
+                                    <i class="bi bi-eye-fill"></i>
+                                </a>                                 
+                                
+                                    
+                            </td>
+                        </tr>      
+                    {% endfor %}
+                    </tbody>    
+                </table>
+            </div>
         </div>
-    </div>            
-    {% endif %}    
-    <div class="col-5">
-        <div class="lector" id="msg_text"></div>        
+        {% else %}
+        <div class="row">
+            <div class="col">
+                No tiene mensajes enviados 
+            </div>
+        </div>            
+        {% endif %}    
+        <div class="col-5">
+            <div class="lector" id="msg_text"></div>        
+        </div>
     </div>
 </div>
-
-<div class="row mt-4">
-    <div class="col-6 border border-light">
+<div class="row mt-4 ">
+    <div class="col-6 border border-light mx-auto">
         <div class="row b">
             <div class="col">
                 <h3>Enviar Mensaje</h3>

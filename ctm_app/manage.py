@@ -6,9 +6,13 @@ from .decorators import login_required
 from .models import *
 from datetime import datetime, timedelta
 
+from django.db.models.functions import TruncDate,TruncMonth
 import matplotlib.pyplot as plt
 from django.db.models import Count
 
+from io import BytesIO
+import base64
+import calendar
 
 @login_required
 def stats(request):
@@ -33,34 +37,50 @@ def ranking(request):
 def user_list(request):
     usuarios=User.objects.all().order_by('-created_at')
 
-    registrations_by_day = User.objects \
-        .annotate(day=Count('created_at', distinct=True)) \
-        .values_list('day', flat=True)
-    registrations_by_month = User.objects \
-        .annotate(month=Count('created_at', distinct=True)) \
-        .values_list('month', flat=True)
-    print(registrations_by_day)
-    # Generar los gráficos
-    fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(10, 5))
-    ax[0].plot(registrations_by_day)
-    ax[0].set_ylabel('N° de usuarios registrados')
-    ax[0].set_xlabel('Days since the first registration')
-    ax[0].set_title('Usuarios registrados por dia')
-    ax[0].grid(True)
-    ax[1].plot(registrations_by_month)
-    ax[1].set_ylabel('N° de usuarios registrados')
-    ax[1].set_xlabel('Months since the first registration')
-    ax[1].set_title('Usuarios registrados por mes')
-    ax[1].grid(True)
+    #usuarios por día
+    usuarios_por_dia = User.objects.annotate(fecha=TruncDate('created_at')).values('fecha').annotate(cantidad=Count('id'))
+    fechas = []
+    cantidades = []
+    for registro in usuarios_por_dia: 
+        #print(registro['fecha'])
+        fechas.append(registro['fecha'])
+        cantidades.append(registro['cantidad'])
 
-    # Guardar el gráfico como un archivo PNG
-    plt.savefig('./ctm_app/static/user_registrations.png')
+
+    plt.bar(fechas, cantidades)
+    plt.xticks(fechas, [fecha.strftime('%Y-%m-%d') for fecha in fechas], rotation=45)
+    buf = BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    image_base64_dia = base64.b64encode(buf.getvalue()).decode('utf-8')
+
+
+    #usuarios por mes
+    usuarios_por_mes = User.objects.annotate(fecha=TruncMonth('created_at')).values('fecha').annotate(cantidad=Count('id'))
+    meses = []
+    cantidades2 = []
+    for registro2 in usuarios_por_mes:
+        mes = registro2['fecha'].strftime('%Y-%m')
+        meses.append(mes)
+        cantidades2.append(registro2['cantidad'])
+
+    fig2 = plt.figure()
+
+    plt.bar(meses, cantidades2)
+    nombres_meses = [datetime.strptime(m, '%Y-%m').strftime('%m/%y') for m in meses]
+    plt.xticks(meses, nombres_meses, rotation=45)
+
+    buf = BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    image_base64_mes = base64.b64encode(buf.getvalue()).decode('utf-8')
+
 
     context={
+        'image_base64_dia': image_base64_dia,
+        'image_base64_mes': image_base64_mes,
         'usuarios':usuarios,
-        'registrations_by_day': registrations_by_day,
-        'registrations_by_month': registrations_by_month,
-        'total_users': User.objects.count(),
+        
     }
     return render(request, 'manage/user_list.html', context=context )
 

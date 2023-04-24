@@ -24,14 +24,38 @@ def enviar_correo(request,token,correo,user_id):
     messages.success(request, "Revise su correo para cambiar la clave")
     return HttpResponse('OK')
 
+def last_update(listas_b,listas_o,usuario):
+    if len(listas_b)>0 and len(listas_o)>0:
+        fecha1=listas_b.updated_at
+        iten_newest=listas_b.items.latest('updated_at')
+        fecha2=iten_newest.updated_at
+        last_act1=max(fecha1,fecha2)
+        fecha1=listas_o.updated_at
+        iten_newest=listas_o.items.latest('updated_at')
+        fecha2=iten_newest.updated_at
+        last_act2=max(fecha1,fecha2)
+        return max(last_act1,last_act2)
+    elif len(listas_b)>0 :
+        fecha1=listas_b.updated_at
+        iten_newest=listas_b.items.latest('updated_at')
+        fecha2=iten_newest.updated_at
+        last_act1=max(fecha1,fecha2)
+        return max(fecha1,fecha2)
+    elif len(listas_o)>0 :
+        fecha1=listas_o.updated_at
+        iten_newest=listas_o.items.latest('updated_at')
+        fecha2=iten_newest.updated_at
+        last_act1=max(fecha1,fecha2)
+        return max(fecha1,fecha2)
+    else:
+        return usuario.updated_at
+
+
 @login_required
-def preferencias(request):
-    
+def preferencias(request):    
     user_id=request.session['user']['id']
-    
-        #print (f"User_id:{user_id}")
     user= User.objects.get(id=user_id)
-   
+
     if request.method == "POST":
         form=UserForm(request.POST,instance=user)
         if form.is_valid():
@@ -44,7 +68,6 @@ def preferencias(request):
         'form':form
     }
     return render(request, 'user/preferencias.html', context=context )
-
 
 def view(request,user_id):
     user= User.objects.get(id=user_id)
@@ -86,9 +109,7 @@ def view(request,user_id):
 @login_required
 def add_contacto(request,contacto_id):
     contacto= User.objects.get(id=contacto_id)    
-        #print (f"User_id:{user_id}")
     user= User.objects.get(id=request.session['user']['id'])
-
     new_contacto=Contacto.objects.create(usuario=user,contacto=contacto)
     new_actividad=Actividad.objects.create(actor=user,accion="te ha agregado a sus contactos.",objetivo=contacto)
     messages.success(request, "Contacto agregado con éxito!")
@@ -141,9 +162,6 @@ def password_new(request,user_id,token):
     else:
         return redirect('/inicio')
     
-
-    
-
 def password_change(request):#cuando el cambio es por las pref
     estado=""
     if request.method == "POST":
@@ -179,6 +197,36 @@ def password_change(request):#cuando el cambio es por las pref
         }  
     return render(request, 'user/password_reset_email.html',context=context )
 
+@login_required
+def contactos(request):
+    user= User.objects.get(id=request.session['user']['id'])
+    contactos_de_user=Contacto.objects.filter(usuario=user)
+    hoy = datetime.now().date()
+    #limite = hoy - timedelta(days=14)
+    contactos=[]
+    for c in contactos_de_user:
+        #print(c.contacto)
+        listas_busqueda=Listados.objects.filter(owner=c.contacto, tipo='B',expiracion__gt=hoy)
+        listas_venta=Listados.objects.filter(owner=c.contacto, tipo='O',expiracion__gt=hoy)
+        ultima_act=last_update(listas_busqueda,listas_venta,user)
+
+
+
+        new_contact={
+            "usuario":c.usuario,
+            "contacto":c.contacto,
+            "listas_busqueda":len(listas_busqueda),
+            "listas_venta":len(listas_venta),
+            "ultima_act":ultima_act,
+        }
+        contactos.append(new_contact)
+
+    #print(contactos)
+    context={
+        'user':user,
+        'contactos':contactos
+    }
+    return render(request, 'user/contactos.html', context=context )
 
 '''
 def cambiar_contraseña(request):

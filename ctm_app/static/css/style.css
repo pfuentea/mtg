@@ -172,3 +172,18 @@ img.logo_orange {
 .foil img{
    border: solid 2px yellow;
 }
+
+@media (max-width: 768px) {
+   .container {
+     width: 100%;
+     max-width: none;
+   }
+ }
+
+ .my-strip:nth-child(odd) {
+   background-color: #211e1e;
+ }
+
+ .my-strip:nth-child(even) {
+   background-color: #4a3838;
+ }

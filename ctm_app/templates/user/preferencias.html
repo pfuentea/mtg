@@ -4,15 +4,15 @@
 
 {% block contenido %}
 <h1>Preferencias de {{user.name}}</h1>
-<form action="/user/preferencias" method="post">
+<form action="/user/preferencias" method="post" class="mx-2">
     {% csrf_token %}
 
     {% for field in form %}
-    <div class="row">
-        <div class='form-group col-2'>
+    <div class="row  my-strip">
+        <div class='form-group col'>
             <label for="{{ field.name }}">{{ field.label }}:</label>
         </div>
-        <div class="col-4">{{ field }}</div>
+        <div class="col text-center">{{ field }}</div>
     </div>
         {% endfor %}
     <button type="submit">Guardar</button>

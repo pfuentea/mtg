@@ -19,7 +19,12 @@ from django.urls import path
 from django.urls import include
 from django.contrib.auth.models import User
 
+from django.views.generic.base import RedirectView
+
+favicon_view = RedirectView.as_view(url='/static/favicon.ico', permanent=True)
+
 urlpatterns = [
     path('', include('ctm_app.urls')),
     path('admin/', admin.site.urls),
+    path('favicon.ico', favicon_view),
 ]

@@ -7,48 +7,67 @@
 <h1>Mensajes Recibidos</h1>
 <a href="/msg/send">Ir a Enviados</a>
 
-
-<div class="row">
-    {% if mensajes.count > 0 %}
-    <div class="col-8">
-        <div class="table-responsive" id="main_table">
-                <table id="lista_mensajes" class="table table-striped table-bordered" width="100%" >
-                    <thead>
-                        <tr>
-                            <th>Desde</th>
-                            <th>Fecha</th>
-                            <th class="d-none">Estado</th>
-                            <th class="dt-center">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for m in mensajes %}
-                        <tr>
-                            <td> <a href="/user/{{m.from_user.id}}">{{m.from_user.name}}  </a>
-                            </td>
-                            <td> {{m.created_at}}</td>
-                            <td  class="d-none">{{m.estado}}</td>
-                            <td class="dt-center"> 
-                                <a href="{% url 'mostrar_modal' m.id %}"  data-href="{% url 'mostrar_modal' m.id %}"  class="btn btn-sm btn-outline-primary btn-read-trv" data-toggle="modal" data-target="#confirm-read" title="Leer">
-                                    <i class="bi bi-eye-fill"></i>
-                                </a>
-                                <a href="#"  data-href="#"  class="btn btn-sm btn-outline-primary btn-new-trv" data-bs-toggle="modal" data-bs-target="#confirm-new" title="Responder" data-id-user="{{m.from_user.id}}" data-name-user="{{m.from_user.name}}">
-                                    <i class="bi bi-arrow-90deg-left"></i>
-                                </a>
-                                
-                            </td>
-                        </tr>      
-                    {% endfor %}
-                    </tbody>    
-                </table>
-            </div>
-            {% else %}
-                    No ha recibido mensajes
-            {% endif %}
-    </div>
-    <!-- Modal -->
-    <div class="modal fade" id="confirm-read" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-       
+<div class="container">
+    <div class="row">
+        {% if mensajes.count > 0 %}
+        <div class="col-12">
+            <div class="table-responsive" id="main_table">
+                    <table id="lista_mensajes" class="table table-striped table-bordered" width="100%" >
+                        <thead>
+                            <tr>
+                                <th>Desde</th>
+                                <th>Fecha</th>
+                                <th class="d-none">Estado</th>
+                                <th class="dt-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for m in mensajes %}
+                            <tr>
+                                <td> <a href="/user/{{m.from_user.id}}">{{m.from_user.name}}  </a>
+                                </td>
+                                <td> {{m.created_at}}</td>
+                                <td  class="d-none">{{m.estado}}</td>
+                                <td class="dt-center"> 
+                                    <a href="{% url 'mostrar_modal' m.id %}"  data-href="{% url 'mostrar_modal' m.id %}"  class="btn btn-sm btn-outline-primary btn-read-trv" data-toggle="modal" data-target="#confirm-read" title="Leer">
+                                        <i class="bi bi-eye-fill"></i>
+                                    </a>
+                                    <a href="#"  data-href="#"  class="btn btn-sm btn-outline-primary btn-new-trv" data-bs-toggle="modal" data-bs-target="#confirm-new" title="Responder" data-id-user="{{m.from_user.id}}" data-name-user="{{m.from_user.name}}">
+                                        <i class="bi bi-arrow-90deg-left"></i>
+                                    </a>
+                                    
+                                </td>
+                            </tr>      
+                        {% endfor %}
+                        </tbody>    
+                    </table>
+                </div>
+                {% else %}
+                        No ha recibido mensajes
+                {% endif %}
+        </div>
+        <!-- Modal -->
+        <div class="modal fade" id="confirm-read" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+           
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Mensaje</h4>
+                        </div>
+                        <div class="modal-body">
+                        <p class="text-warning">{{ mensaje.contenido }}</p>
+                        </div>
+                        <div class="modal-footer">
+                        <a href="/msg/get" class="btn btn-danger text-light" >Cerrar</a>
+                        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#confirm-new" title="Responder">Responder</button>
+                        </div>
+                    </div>
+                </div>       
+        </div>
+        <!-- Modal Respuesta-->
+        <div class="modal fade" id="confirm-new" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+           
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -56,59 +75,42 @@
                     <h4 class="modal-title" id="myModalLabel">Mensaje</h4>
                     </div>
                     <div class="modal-body">
-                    <p class="text-warning">{{ mensaje.contenido }}</p>
-                    </div>
-                    <div class="modal-footer">
-                    <a href="/msg/get" class="btn btn-danger text-light" >Cerrar</a>
-                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#confirm-new" title="Responder">Responder</button>
-                    </div>
-                </div>
-            </div>       
-    </div>
-    <!-- Modal Respuesta-->
-    <div class="modal fade" id="confirm-new" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-       
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="myModalLabel">Mensaje</h4>
-                </div>
-                <div class="modal-body">
-                <p>{{ mensaje.contenido }}</p>
-                <h2>Respuesta:</h2>
-                <form action="/msg/send" method="POST">
-                    {% csrf_token %}
-                    <div class="row ">
-                        <div class="col">
-                            <div class="row">
-                                <div class="col">
-                                    Para: <span id="contact_name">{{mensaje.from_user.name}}</span>
-                                    <input type="hidden" name="destinatario_id" value="{{mensaje.from_user.id}}" id="destinatario_id">
-        
+                    <p>{{ mensaje.contenido }}</p>
+                    <h2>Respuesta:</h2>
+                    <form action="/msg/send" method="POST">
+                        {% csrf_token %}
+                        <div class="row ">
+                            <div class="col">
+                                <div class="row">
+                                    <div class="col">
+                                        Para: <span id="contact_name">{{mensaje.from_user.name}}</span>
+                                        <input type="hidden" name="destinatario_id" value="{{mensaje.from_user.id}}" id="destinatario_id">
+            
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="row">
-                                <div class="col">
-                                    <label for="mensaje"  class="form-label">Mensaje:</label>
-                                    <textarea name="mensaje" id="mensaje"  rows="6" class="form-control"> </textarea>
+                                <div class="row">
+                                    <div class="col">
+                                        <label for="mensaje"  class="form-label">Mensaje:</label>
+                                        <textarea name="mensaje" id="mensaje"  rows="6" class="form-control"> </textarea>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="row">
-                                <div class="col d-grid gap-2 d-md-flex justify-content-md-end">
-                                    <button type="button" class="btn btn-outline-danger btn-sm my-2" data-dismiss="modal" data-bs-dismiss="modal">Cancelar</button>
-                                    <button type="submit" class="btn btn-outline-success btn-sm my-2">Enviar</button>
+                                <div class="row">
+                                    <div class="col d-grid gap-2 d-md-flex justify-content-md-end">
+                                        <button type="button" class="btn btn-outline-danger btn-sm my-2" data-dismiss="modal" data-bs-dismiss="modal">Cancelar</button>
+                                        <button type="submit" class="btn btn-outline-success btn-sm my-2">Enviar</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                    </form>
                     </div>
-                </form>
+    
+                    
                 </div>
+            </div>       
+    </div>
+    </div>
 
-                
-            </div>
-        </div>       
-</div>
 </div>
 
 <script>

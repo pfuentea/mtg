@@ -280,7 +280,7 @@
                 }
             },
             "aLengthMenu":[[5,10,20,40,-1],[5,10,20,40,"Todos"]],
-            "iDisplayLength":20
+            "iDisplayLength":{{user.largo_despliegue}}
         });
     });
 
@@ -357,8 +357,7 @@
                         }
                         else if(item.layout =='normal'){
                             imagen=item.image_uris.small   
-                            imagen=imagen.split("?") 
-                                               
+                            imagen=imagen.split("?")                                                
                         }
                         
                         nombre=item.name
@@ -374,8 +373,7 @@
                         titulo=item.set_name;
                         if(item.border_color=="borderless"){
                             titulo=titulo+" ("+item.border_color+")";
-                        }
-                        
+                        }                        
                         
                         if (item.finishes.length==1){
                             if (item.finishes[0]=='etched'){
@@ -433,7 +431,6 @@
                             //console.log("ID:"+id); // Imprime el id en la consola
                         });
                     });
-
                 }
             })
             .catch(function(error){
@@ -447,18 +444,14 @@
     ) ;
 
     function agregar(set,id,nombre,set_name,img_small){
-
-
         $('#set').val(set);
         $('#card_id').val(id);
         $('#nombre').val(nombre);
         $('#set_name').val(set_name);
         $('#img_small').val(img_small);
-
         $('#qty').val($('#qty_to_add').val());
         //console.log("qty:"+$('#qty').val() )
         //console.log(set+";"+id+";"+nombre+";"+set_name+";"+img_small)
-        
         $('#form_agregar').submit();
         /*
         console.log("set:",set);
@@ -481,9 +474,7 @@
         $('#new_search').fadeIn();
         $('#searching_card').focus();
     })
-    
         //card_id=$this.getAttr('id_value')
-    
     $('#confirm-delete').on('show.bs.modal', function(e) {
         $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
     }); 

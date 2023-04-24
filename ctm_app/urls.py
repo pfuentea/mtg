@@ -50,6 +50,7 @@ urlpatterns = [
     path('manage/type', views.list_offer),
 
     path('user/preferencias', users.preferencias),
+    path('user/contactos', users.contactos),
     path('user/<int:user_id>', users.view),
     path('user/add_contacto/<contacto_id>', users.add_contacto),
     path('user/password/request', users.password_change_request),
