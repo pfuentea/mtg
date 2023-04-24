@@ -29,7 +29,7 @@ def last_update(listas_b,listas_o,usuario):
 
         lista_mas_actual_b=listas_b.latest('updated_at')
         fecha1=lista_mas_actual_b.updated_at
-        if len(listas_b.items)>0:
+        if listas_b.items.count()>0:
             item_mas_nuevo_b=listas_b.items.latest('updated_at')
             fecha2=item_mas_nuevo_b.updated_at
             last_act1=max(fecha1,fecha2)
@@ -38,7 +38,7 @@ def last_update(listas_b,listas_o,usuario):
 
         lista_mas_actual_o=listas_o.latest('updated_at')
         fecha1=lista_mas_actual_o.updated_at
-        if len(listas_o.items)>0:
+        if listas_o.items.count()>0:
             item_mas_nuevo_o=listas_o.items.latest('updated_at')
             fecha2=item_mas_nuevo_o.updated_at
             last_act2=max(fecha1,fecha2)
@@ -50,8 +50,7 @@ def last_update(listas_b,listas_o,usuario):
     elif len(listas_b)>0 :
         lista_mas_actual_b=listas_b.latest('updated_at')
         fecha1=lista_mas_actual_b.updated_at
-        objetos_lista=lista_mas_actual_b.items
-        if len(lista_mas_actual_b.items)>0:
+        if lista_mas_actual_b.items.count() >0:
             item_mas_nuevo_b=lista_mas_actual_b.items.latest('updated_at')
             fecha2=item_mas_nuevo_b.updated_at
             last_act1=max(fecha1,fecha2)
@@ -59,9 +58,9 @@ def last_update(listas_b,listas_o,usuario):
             last_act1=fecha1
         return last_act1
     elif len(listas_o)>0 :
-        lista_mas_actual_o=listas_b.latest('updated_at')
+        lista_mas_actual_o=listas_o.latest('updated_at')       
         fecha1=lista_mas_actual_o.updated_at
-        if len(item_mas_nuevo_o.items)>0:
+        if lista_mas_actual_o.items.count() > 0:
             item_mas_nuevo_o=lista_mas_actual_o.items.latest('updated_at')
             fecha2=item_mas_nuevo_o.updated_at
             last_act1=max(fecha1,fecha2)
