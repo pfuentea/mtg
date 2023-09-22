@@ -1,7 +1,7 @@
-from django.urls import path
+from django.urls import path, include
 from . import views, auth , manage  ,users, mensajes
-from .models import user
-
+#rom .models import user
+from django.views.generic import TemplateView
 
 urlpatterns = [
     path('', views.landing),
@@ -12,6 +12,8 @@ urlpatterns = [
     path('registro', auth.registro),
     path('login', auth.login),
     path('logout', auth.logout),
+
+    
 
     path('list/hunt', views.list_hunt),
     path('list/offer', views.list_offer),
@@ -66,5 +68,8 @@ urlpatterns = [
     path('estadisticas', manage.stats), 
     path('ranking', manage.ranking), 
     path('user_list', manage.user_list),  
+
+    path('accounts/login', TemplateView.as_view(template_name="accounts/login.html")),
+    path('accounts/', include('allauth.urls')),
     
 ]

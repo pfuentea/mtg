@@ -27,4 +27,6 @@ urlpatterns = [
     path('', include('ctm_app.urls')),
     path('admin/', admin.site.urls),
     path('favicon.ico', favicon_view),
+    path('accounts/', include('allauth.urls')),
+    
 ]

@@ -1,0 +1,22 @@
+{% load socialaccount %}
+<html>
+
+<head>
+    <title>Google Registration</title>
+</head>
+
+<body>
+    <h1>My Google Login Project</h1>
+    {% if user.is_authenticated %}
+    <script>
+        // location.href ='/index';
+        
+    </script>
+
+    {% else %}
+        <a href="{% provider_login_url 'google' %}">Login with Google</a>
+    {% endif %}
+
+</body>
+
+</html>

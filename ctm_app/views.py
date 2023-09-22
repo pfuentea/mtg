@@ -34,8 +34,14 @@ def landing(request):
 
 @login_required
 def index(request):
+    if 'user' in request.session:
+        user= User.objects.get(id=request.session['user']['id'])
+    else:
+        print(request.user.email)
+        user= User.objects.filter(email=request.user.email)
+        print(len(user))
+        return redirect('/login')
 
-    user= User.objects.get(id=request.session['user']['id'])
     listas_hunt= Listados.objects.filter(owner=user,tipo='B').order_by('-updated_at')[:10]
     listas_off= Listados.objects.filter(owner=user,tipo='O').order_by('-updated_at')[:10]
 
