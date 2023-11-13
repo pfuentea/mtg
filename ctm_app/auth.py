@@ -55,8 +55,10 @@ def registro(request):
         if len(existe_email) > 0: #correo ya existe!
             messages.warning(request, "Este correo ya existe! Ingrese por Login.")
             return redirect("/registro")
-        errors = User.objects.validador_basico(request.POST)
+        #errors = User.objects.validador_basico(request.POST)
         # print(errors)
+        
+        '''
         if len(errors) > 0:
             for key, value in errors.items():
                 messages.error(request, value)
@@ -65,29 +67,30 @@ def registro(request):
             request.session['register_email'] =  request.POST['email']
 
         else:
-            request.session['register_name'] = ""
-            request.session['register_email'] = ""
+        '''
+        request.session['register_name'] = ""
+        request.session['register_email'] = ""
 
-            password_encryp = bcrypt.hashpw(request.POST['password'].encode(), bcrypt.gensalt()).decode() 
+        password_encryp = bcrypt.hashpw(request.POST['password'].encode(), bcrypt.gensalt()).decode() 
 
-            usuario_nuevo = User.objects.create(
-                name = request.POST['name'],
-                email=request.POST['email'],
-                password=password_encryp,
-                role=request.POST['role']
-            )
+        usuario_nuevo = User.objects.create(
+            name = request.POST['name'],
+            email=request.POST['email'],
+            password=password_encryp,
+            role=request.POST['role']
+        )
 
-            messages.success(request, "El usuario fue agregado con exito.")
-            
+        messages.success(request, "El usuario fue agregado con exito.")
+        
 
-            request.session['user'] = {
-                "id" : usuario_nuevo.id,
-                "name": f"{usuario_nuevo.name}",
-                "email": usuario_nuevo.email,
-                "modo_oscuro":usuario_nuevo.modo_oscuro
-            }
-            return redirect("/index")
+        request.session['user'] = {
+            "id" : usuario_nuevo.id,
+            "name": f"{usuario_nuevo.name}",
+            "email": usuario_nuevo.email,
+            "modo_oscuro":usuario_nuevo.modo_oscuro
+        }
+        return redirect("/index")
 
-        return redirect("/registro")
+        #return redirect("/registro")
     else:
         return render(request, 'registro.html')

@@ -27,6 +27,17 @@ def group_func(item):
 
 
 def landing(request):
+    referer = request.META.get('HTTP_REFERER', None)
+    if referer:
+        print(f"Ref:{referer}")
+
+    if request.user.is_authenticated:
+        user_data = request.user.__dict__
+        print(type(user_data))
+        keys = user_data.keys()
+        print(f"is_authenticated:{keys}")
+        #print(request.user['_setupfunc'])
+
     context = {
                
             }
@@ -34,6 +45,7 @@ def landing(request):
 
 @login_required
 def index(request):
+    print("INDEX:init")
     if 'user' in request.session:
         user= User.objects.get(id=request.session['user']['id'])
     else:

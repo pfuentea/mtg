@@ -6,6 +6,11 @@ from .customusermanager import CustomUserManager
 
 
 class User(AbstractUser):
+    CHOICES = (
+        ("user", 'User'),
+        ("admin", 'Admin')
+    )
+     
     username = None
     email = models.EmailField(_("email address"), unique=True)
     nick = models.CharField(max_length=70,blank=True) 
@@ -13,6 +18,7 @@ class User(AbstractUser):
     modo_oscuro=models.BooleanField(auto_created=False,default=False)
     largo_despliegue = models.IntegerField (default=20)
     name = models.CharField(max_length=255,blank=True)
+    role = models.CharField(max_length=255, choices=CHOICES)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
@@ -20,4 +26,4 @@ class User(AbstractUser):
     objects = CustomUserManager()
 
     def __str__(self):
-        return self.email
+        return f'{self.email}/{self.username}[{self.nick}]/({self.name})'

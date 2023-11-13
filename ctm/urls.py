@@ -26,7 +26,7 @@ favicon_view = RedirectView.as_view(url='/static/favicon.ico', permanent=True)
 urlpatterns = [
     path('', include('ctm_app.urls')),
     path('admin/', admin.site.urls),
-    path('favicon.ico', favicon_view),
-    path('accounts/', include('allauth.urls')),
+    #path('favicon.ico', favicon_view),
+    #path('accounts/', include('allauth.urls')),
     
 ]
