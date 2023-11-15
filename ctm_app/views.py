@@ -21,6 +21,7 @@ from datetime import datetime, timedelta,timezone
 from django.http import HttpRequest
 import pytz
 from itertools import groupby
+from django.contrib.auth import logout
 
 def group_func(item):
     return item['name'], item['lname'], item['list_id'], item['owner_id']
@@ -28,15 +29,24 @@ def group_func(item):
 
 def landing(request):
     referer = request.META.get('HTTP_REFERER', None)
+
     if referer:
         print(f"Ref:{referer}")
 
     if request.user.is_authenticated:
-        user_data = request.user.__dict__
-        print(type(user_data))
-        keys = user_data.keys()
-        print(f"is_authenticated:{keys}")
-        #print(request.user['_setupfunc'])
+        print(request.user.first_name)
+        
+        if len(request.user.name) == 0:
+            print("Nombre vacio...actualizando!")
+            usuario = User.objects.get(pk=request.user.id)
+            usuario.name=request.user.first_name+' '+request.user.last_name
+            usuario.save()
+        else:
+            print("Ya tiene")
+        return redirect('/index')
+
+        #usuario=User.get_user(email=request.user['email'])
+        #print(f"U:{usuario.first_name}")
 
     context = {
                
@@ -49,14 +59,18 @@ def index(request):
     if 'user' in request.session:
         user= User.objects.get(id=request.session['user']['id'])
     else:
-        print(request.user.email)
-        user= User.objects.filter(email=request.user.email)
-        print(len(user))
-        return redirect('/login')
+        #print(request.user.email)
+        user= User.objects.filter(email=request.user.email)[0]
+        request.session['user'] = {
+            "id" : user.id,
+            "name": f"{user.name}",
+            "email": user.email,
+            "modo_oscuro":user.modo_oscuro
+        }
+
 
     listas_hunt= Listados.objects.filter(owner=user,tipo='B').order_by('-updated_at')[:10]
     listas_off= Listados.objects.filter(owner=user,tipo='O').order_by('-updated_at')[:10]
-
     last_act=Actividad.objects.filter(objetivo__isnull=True).order_by('-updated_at')[:10]
     last_act_propia=Actividad.objects.filter(objetivo=user).order_by('-updated_at')[:10]
     
@@ -674,4 +688,10 @@ def contacto(request):
         'form':form,
     }
     return render(request, 'contacto.html', context)
+
+def custom_logout(request):
+    logout(request)
+    messages.success(request, "Sessión finalizada correctamente.")
+    # Renderiza tu template personalizado
+    return render(request, 'accounts/logged_out.html')
 

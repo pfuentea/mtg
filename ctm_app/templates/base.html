@@ -120,13 +120,20 @@
           </li>
           {% endif %}
         </ul>
-        
-        {% if request.session.user %}
+        {% if request.user.is_authenticated %}
         <div class="d-flex">
-          <a class="btn btn-outline-warning" href="/logout">Logout</a>
+          <a class="btn btn-outline-warning" href="/accounts/logout">Logout</a>
          
         </div>
+        {% else %}
+          {% if request.session.user %}
+          <div class="d-flex">
+            <a class="btn btn-outline-warning" href="/logout">Logout</a>
+          
+          </div>
+          {% endif %}
         {% endif %}
+        
       </div>
       
     </div>

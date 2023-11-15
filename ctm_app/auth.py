@@ -21,7 +21,7 @@ def login(request):
 
                 user = {
                     "id" : log_user.id,
-                    "name": f"{log_user}",
+                    "name": log_user.name,
                     "email": log_user.email,
                     "role": log_user.role,
                     "nick":log_user.nick,

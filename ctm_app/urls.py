@@ -10,7 +10,7 @@ urlpatterns = [
     path('contacto', views.contacto),
 
     path('registro', auth.registro),
-    path('login', auth.login),
+    path('login', auth.login, name='login'),
     path('logout', auth.logout),
 
     
@@ -70,6 +70,7 @@ urlpatterns = [
     path('user_list', manage.user_list),  
 
     path('accounts/login', TemplateView.as_view(template_name="accounts/login.html")),
+    path('accounts/logout/', views.custom_logout, name='custom_logout'),
     path('accounts/', include('allauth.urls')),
     
 ]
