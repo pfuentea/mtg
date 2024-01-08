@@ -60,7 +60,7 @@
 
             </div>
             <div class="col">
-                <img src="{{carta.carta.small_image}}" alt="">
+                <img src="{{carta.carta.small_image}}" alt="" class="carta_tumb{% if carta.es_foil  %}_foil{% endif %}">
                 <p>
                     <a href="https://scryfall.com/card/{{carta.carta.Edicion.set_code}}/{{carta.carta.number_collector_txt}}" target="_blank">
                         Ver en Scryfall

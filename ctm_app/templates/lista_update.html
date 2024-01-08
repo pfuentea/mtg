@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block titulo %} {% if lista.tipo == 'B' %}Lista de busqueda de{% elif lista.tipo == 'O' %}Lista para ofrecer de{% endif %}  {{usuario}} {% endblock %}
+
+{% block contenido %}
+
+<div class="separador"></div>
+<h2>
+    {{lista.nombre}} by {{usuario}} ( {% if lista.tipo == 'B' %}Busco{% elif lista.tipo == 'O' %}Dispone{% endif %} )
+</h2>
+
+<div class="container">
+    <form action="/list/edit/{{lista.id}}" method="post" id="form_edit" name="form_edit">
+        {% csrf_token %}
+    
+        {% for field in form %}
+        <div class="row mb-1  my-strip">
+            <div class='form-group col-3'>
+                <label for="{{ field.name }}">{{ field.label }}:</label>
+            </div>
+            <div class="col-4">{{ field }}</div>
+        </div>
+        {% endfor %}
+   
+    <div class="row">
+        <div class="col-2"></div>
+        <div class="col-2">
+            <button id="guardar" class="btn btn-sm btn-primary m-2 p-2">
+                Guardar
+            </button>
+        </form>        
+        </div>
+        <div class="col">           
+                <a href="/list/{% if lista.tipo == 'B' %}hunt{% else %}offer{% endif %}" class="btn btn-sm btn-outline-success p-2"> 
+                    A Listas 
+            </a>          
+        </div>
+    </div>
+
+    <div class="row  mt-3" >
+        <div class="col-8">
+            Otros datos:
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-3">
+            Cantidad de cartas:
+        </div>
+        <div class="col-3">
+            {{lista.items.count}}
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+<div class=" mt-3" >URL para compartir:
+    <span id="url" ></span>
+    <button onclick="copy('#url')" id="to_copy">Copiar enlace al clipboard</button>
+</div>
+
+
+<script>
+    $( document ).ready(function() {
+
+        url= document.location.hostname
+        if(url=='localhost'){
+            url=url+':8000'
+        }
+        url2=url+'/list/share/{{lista.id}}?view=img'
+        console.log(url2)
+        $("#url").text(url2)
+
+        $('#id_tipo').on('click',function(){
+            toastr.warning("Cambiar esto hara que la lista cambie de tipo y por tanto de lugar")           
+        });
+        $('#id_referencia_web').on('focus',function(){
+            toastr.success("Página con los precios de referencia de la lista (EJ: CK,SCG,TCG) ")           
+        });
+        $('#id_referencia_precio').on('focus',function(){
+            toastr.success("Precio de dolar para intercambio o venta de las cartas de la lista")           
+        });
+
+//send form with button id guardar in jquery?
+        $('#guardar').on('click',function () {
+            console.log("press")
+            $('#form_edit').submit();
+            
+        });
+    });
+
+    function copy(selector){
+        var $temp = $("<div>");
+        $("body").append($temp);
+        $temp.attr("contenteditable", true)
+            .html($(selector).html()).select()
+            .on("focus", function() { document.execCommand('selectAll',false,null); })
+            .focus();
+        document.execCommand("copy");
+        $temp.remove();
+        toastr.success("Url copiada con exito!")
+        }
+   
+</script>
+{% endblock %}
+
+{% block libreria %}
+
+{% endblock %}

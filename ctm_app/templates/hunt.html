@@ -16,7 +16,7 @@
     </div>
     <div class="row mb-2">
         <div class="col-12">
-            <button id="open_search">
+            <button id="open_search" class="m-0">
                 Crear nueva lista
             </button>
             <a href="/list/view_all_hunt" ><button>Ver todas las cartas buscadas</button></a>
@@ -26,7 +26,7 @@
         <div class="col">
             <form action="/list/hunt/new" method="post">
                 {% csrf_token %}
-                <input type="text" name="new_list" id="list" placeholder="Nombre de nuevo listado" required>
+                <input type="text" name="new_list" id="list" placeholder="Nombre de nuevo listado" required class="col-10">
                <button type="submit">Crear</button>
             </form>
         </div>
