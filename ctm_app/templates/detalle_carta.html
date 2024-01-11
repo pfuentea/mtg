@@ -11,7 +11,7 @@
     {% csrf_token %}
     <div class="container">
         <div class="row">
-            <div class="col">
+            <div class="col ">
 
                 <div class="row my-strip">
                     <div class="col">
@@ -60,7 +60,7 @@
 
             </div>
             <div class="col">
-                <img src="{{carta.carta.small_image}}" alt="" class="carta_tumb{% if carta.es_foil  %}_foil{% endif %}">
+                <img src="{{carta.carta.small_image}}" alt="" class="carta_tumb{% if carta.es_foil  %}_foil{% endif %}" id="card_img">
                 <p>
                     <a href="https://scryfall.com/card/{{carta.carta.Edicion.set_code}}/{{carta.carta.number_collector_txt}}" target="_blank">
                         Ver en Scryfall
@@ -77,7 +77,18 @@
     </div>
 </form>
 
-
+<script>
+    $(document).ready(function() {
+        $("#card_img").click(function() {
+            if ( $(this).hasClass('open') ) {
+			$(this).removeClass('open');
+		} else {
+			$('.element-card').removeClass('open');
+			$(this).addClass('open');
+		}
+        });
+    });
+</script>
 
 
 

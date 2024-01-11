@@ -319,7 +319,7 @@ def list_detail(request,lista_id):
             "resultado_por_nombre":resultados,
             "user":user
         }
-        return render(request, 'detalle_lista.html', context)
+        return render(request, 'lista_detalle.html', context)
     if request.method == "POST":
         if request.POST['action'] == 'search':
             
@@ -333,7 +333,7 @@ def list_detail(request,lista_id):
                 "search":"",
                 "duracion":dias
             }
-        return render(request, 'detalle_lista.html', context)
+        return render(request, 'lista_detalle.html', context)
         new_carta=request.POST['new_card']
 
         nueva_lista=Listados.objects.create(owner=user,nombre=new_list,tipo='O')
@@ -502,7 +502,7 @@ def list_edit(request,list_id):
         "user":user,
         "form":form
         }
-    return render(request, 'update_lista.html', context)
+    return render(request, 'lista_update.html', context)
 
 @login_required
 def add_to_list(request,lista_id):
@@ -594,7 +594,7 @@ def add_to_list(request,lista_id):
                 "user":user,
                 "duracion":dias,
             }
-    return render(request, 'detalle_lista.html', context)
+    return render(request, 'lista_detalle.html', context)
 
 @login_required
 def card_detail(request,item_id):

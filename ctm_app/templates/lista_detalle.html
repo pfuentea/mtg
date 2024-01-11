@@ -76,9 +76,9 @@
                 <table id="lista_cartas" class="table " width="99%" >
                     <thead>
                         <tr>
-                            <th class="">Imagen</th>
                             <th>Nombre</th>
                             <th>Edicion</th>
+                            <th class="">Imagen</th>
                             <th class="text-center">Cantidad</th>
                             <th class="dt-center">Actions</th>
                         </tr>
@@ -86,11 +86,11 @@
                     <tbody>
                         {% for cartaitem in items %}
                         <tr>
-                            <td class="text-center"> <img src="{{cartaitem.carta.small_image}}" alt="" class="carta_tumb{% if cartaitem.es_foil  %}_foil{% endif %}"></td>
                             <td> 
                                 <a href="/card/{{cartaitem.id}}">{{cartaitem.carta.nombre}} {% if cartaitem.es_foil %}(Foil){% endif %}</a>                             
                             </td>
                             <td> {{cartaitem.carta.Edicion.nombre}}</td>
+                            <td class="text-center"> <img src="{{cartaitem.carta.small_image}}" alt="" class="carta_tumb{% if cartaitem.es_foil  %}_foil{% endif %}"></td>
                             <td class="text-center">{{cartaitem.cantidad}}</td>
                             <td class="dt-center"> 
                                     
@@ -499,6 +499,40 @@
         $('#main_table').removeClass('d-none')
     });
 
+    function esperar(){
+        setTimeout(function (){ //something you want delayed }, 5000);
+            }, 5000);
+        
+    }
+
+    $(document).ready(function() {
+        anterior=""
+        $("img").click(function() {           
+            fuente=$(this).attr('src')
+            if(anterior!=""){                
+                if(anterior.attr('src')!=$(this).attr('src') && anterior !=""){                    
+                    anterior.removeClass('open');
+                }
+                else{
+                    console.log("misma")
+                }
+            }           
+                       
+            if ( $(this).hasClass('open') ) {
+                $(this).removeClass('open');
+                new_fuente=fuente.replace('large','small')
+            } else {
+                $('.element-card').removeClass('open');                
+                $(this).addClass('open');
+                new_fuente=fuente.replace('small','large')
+            }
+            
+            $(this).attr('src',new_fuente)
+        
+            anterior=$(this)
+
+        });
+    });
 </script>
 
 {% endblock %}

@@ -3,20 +3,31 @@
 {% block titulo %}PREFERENCIAS USUARIO{% endblock %}
 
 {% block contenido %}
+<div class="separador"></div>
 <h1>Preferencias de {{user.name}}</h1>
 <form action="/user/preferencias" method="post" class="mx-2">
     {% csrf_token %}
+        <div class="container  ">
+            <div class="row">
+                <div class="col-6 mx-auto">
+                    {% for field in form %}
+                        <div class="row  my-strip">
+                            <div class='form-group col'>
+                                <label for="{{ field.name }}">{{ field.label }}:</label>
+                            </div>
+                            <div class="col text-center">{{ field }}</div>
+                        </div>
+                    {% endfor %}
+                    <button type="submit">Guardar</button>
 
-    {% for field in form %}
-    <div class="row  my-strip">
-        <div class='form-group col'>
-            <label for="{{ field.name }}">{{ field.label }}:</label>
+                </div>
+            </div>
+            
+    
+
         </div>
-        <div class="col text-center">{{ field }}</div>
-    </div>
-        {% endfor %}
-    <button type="submit">Guardar</button>
 </form>
+
 
 
 {% endblock %}
