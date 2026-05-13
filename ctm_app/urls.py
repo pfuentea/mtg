@@ -26,6 +26,9 @@ urlpatterns = [
     path('list/<int:lista_id>', views.list_detail),
     path('list/add/<int:lista_id>', views.add_to_list),
     path('list/remove/<int:lista_id>', views.delete_list),
+    path('list/import/<int:lista_id>', views.import_list),
+    path('list/transfer', views.transfer_cards),
+    path('list/api/items/<int:lista_id>', views.api_get_list_items),
     path('list/search/', views.list_detail),
 
     path('list/view_all_hunt', views.view_all_hunt),
@@ -51,6 +54,10 @@ urlpatterns = [
     path('manage/color', views.list_hunt),
     path('manage/type', views.list_offer),
 
+    path('tiers', views.tiers_info),
+    path('about', views.about_view),
+    path('changelog', views.changelog_view),
+
     path('user/preferencias', users.preferencias),
     path('user/contactos', users.contactos),
     path('user/<int:user_id>', users.view),
@@ -68,6 +75,7 @@ urlpatterns = [
     path('estadisticas', manage.stats), 
     path('ranking', manage.ranking), 
     path('user_list', manage.user_list),  
+    path('grupos', views.grupos),
 
     path('accounts/login', TemplateView.as_view(template_name="accounts/login.html")),
     path('accounts/logout/', views.custom_logout, name='custom_logout'),

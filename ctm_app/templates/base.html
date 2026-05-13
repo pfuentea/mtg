@@ -40,104 +40,103 @@
   {% load static %}
   <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}">
   {% if user.modo_oscuro  %}
-  <link rel="stylesheet" type="text/css" href='{% static "/css/style_dark.css" %}'>
+  <link rel="stylesheet" type="text/css" href='{% static "/css/style_dark.css" %}?v=2.001'>
   {% else %}
-  <link rel="stylesheet" type="text/css" href='{% static "/css/style.css" %}'>
+  <link rel="stylesheet" type="text/css" href='{% static "/css/style.css" %}?v=2.001'>
   {% endif %}
 
   <link rel="preload" href='{% static "/fonts/Garde.woff2" %}' as="font" type="font/woff2" crossorigin>
 </head>
 <body  class="{% if user.modo_oscuro  %}dark {% endif %} ">
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top p-0" >
-    <div class="container-fluid contenido logo_orange">
-      <a class="navbar-brand " href="/">        
-          <span  class="garde naranjo">CTM.a.g.i.c.    </span> 
-      </a>
-
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top p-0 border-bottom border-secondary" style="z-index:1030; height: 56px;">
+      <!-- Custom Sidebar Toggle Button Aligned with Sidebar -->
+      <button class="btn btn-dark border-0 rounded-0 m-0 p-0" type="button" id="sidebarToggle" title="Abrir Menú" style="width: 60px; height: 100%; display: flex; justify-content: center; align-items: center; border-right: 1px solid #2A2A2E !important; background-color: #1A1A1D;">
+        <i class="bi bi-list fs-3"></i>
       </button>
-      
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="/index">Home</a>
-          </li>
-          {% if request.session.user %}
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="true">
-            Listas
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <li><a class="dropdown-item" href="/list/hunt">Busco</a></li>
-              <li><a class="dropdown-item" href="/list/offer">Ofrezco</a></li>
 
-            </ul>
-          </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="true">
-            Mensajes
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <li><a class="dropdown-item" href="/msg/send">Enviados</a></li>
-              <li><a class="dropdown-item" href="/msg/get">Recibidos</a></li>
-
-            </ul>
-          </li>
-          
-          {% if request.session.user.role == 'admin' %} 
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="true">
-              Mantenedores
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <li><a class="dropdown-item" href="/manage/card">Cartas</a></li>
-              <li><a class="dropdown-item" href="/manage/set">Ediciones</a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="/manage/color">Colores</a></li>
-              <li><a class="dropdown-item" href="/manage/type">Tipo</a></li>
-            </ul>
-          </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="true">
-              Estadisticas
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <li><a class="dropdown-item" href="/estadisticas">Usuarios</a></li>
-              <li><a class="dropdown-item" href="/ranking">Ranking</a></li>
-            </ul>
-          </li>
-          {% endif %}
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="true">
-              Usuario
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <li><a class="dropdown-item" href="/user/preferencias">Preferencias</a></li>
-              <li><a class="dropdown-item" href="/user/contactos">Contactos</a></li>
-
-            </ul>
-          </li>
-          {% endif %}
-        </ul>
-        {% if request.user.is_authenticated %}
-        <div class="d-flex">
-          <a class="btn btn-outline-warning" href="/accounts/logout">Logout</a>
-         
-        </div>
-        {% else %}
-          {% if request.session.user %}
-          <div class="d-flex">
-            <a class="btn btn-outline-warning" href="/logout">Logout</a>
-          
-          </div>
-          {% endif %}
-        {% endif %}
-        
-      </div>
-      
+    <div class="container-fluid contenido logo_orange d-flex align-items-center h-100" style="border-radius: 0;">
+      <a class="navbar-brand ms-2" href="/">        
+          <span class="garde naranjo">CTM.a.g.i.c.</span> 
+      </a>
     </div>
   </nav>
+
+  <!-- Custom Fixed Sidebar -->
+  <aside class="custom-sidebar d-flex flex-column" id="sidebar">
+      <ul class="navbar-nav w-100 flex-column mt-2">
+        <li class="nav-item">
+          <a class="nav-link fs-5 {% if request.path == '/index' or request.path == '/' %}active{% endif %}" href="/index"><i class="bi bi-house-door fs-4"></i> <span class="sidebar-text">Home</span></a>
+        </li>
+        {% if request.session.user %}
+        <li class="nav-item dropdown dropend">
+          <a class="nav-link fs-5 dropdown-toggle {% if '/list/' in request.path %}active{% endif %}" href="#" id="sidebarListas" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-card-list fs-4"></i> <span class="sidebar-text">Listas</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-dark shadow" aria-labelledby="sidebarListas">
+            <li><a class="dropdown-item" href="/list/hunt">Busco</a></li>
+            <li><a class="dropdown-item" href="/list/offer">Ofrezco</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown dropend">
+          <a class="nav-link fs-5 dropdown-toggle {% if '/msg/' in request.path %}active{% endif %}" href="#" id="sidebarMsg" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-envelope fs-4"></i> <span class="sidebar-text">Mensajes</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-dark shadow" aria-labelledby="sidebarMsg">
+            <li><a class="dropdown-item" href="/msg/send">Enviados</a></li>
+            <li><a class="dropdown-item" href="/msg/get">Recibidos</a></li>
+          </ul>
+        </li>
+        {% if request.session.user.role == 'admin' %} 
+        <li class="nav-item dropdown dropend">
+          <a class="nav-link fs-5 dropdown-toggle {% if '/manage/' in request.path %}active{% endif %}" href="#" id="sidebarManage" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-tools fs-4"></i> <span class="sidebar-text">Mantenedores</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-dark shadow" aria-labelledby="sidebarManage">
+            <li><a class="dropdown-item" href="/manage/card">Cartas</a></li>
+            <li><a class="dropdown-item" href="/manage/set">Ediciones</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="/manage/color">Colores</a></li>
+            <li><a class="dropdown-item" href="/manage/type">Tipo</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown dropend">
+          <a class="nav-link fs-5 dropdown-toggle {% if '/estadisticas' in request.path or '/ranking' in request.path %}active{% endif %}" href="#" id="sidebarStats" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-bar-chart-line fs-4"></i> <span class="sidebar-text">Estadísticas</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-dark shadow" aria-labelledby="sidebarStats">
+            <li><a class="dropdown-item" href="/estadisticas">Usuarios</a></li>
+            <li><a class="dropdown-item" href="/ranking">Ranking</a></li>
+          </ul>
+        </li>
+        {% endif %}
+        <li class="nav-item dropdown dropend">
+          <a class="nav-link fs-5 dropdown-toggle {% if '/user/' in request.path or '/grupos' in request.path %}active{% endif %}" href="#" id="sidebarUser" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-person-circle fs-4"></i> <span class="sidebar-text">Usuario</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-dark shadow" aria-labelledby="sidebarUser">
+            <li><a class="dropdown-item" href="/user/preferencias">Preferencias</a></li>
+            <li><a class="dropdown-item" href="/user/contactos">Contactos</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="/grupos">Mis Comunidades</a></li>
+          </ul>
+        </li>
+        <li class="nav-item mt-2 border-top border-secondary pt-2">
+          <a class="nav-link fs-5 text-warning {% if '/about' in request.path %}active{% endif %}" href="/about"><i class="bi bi-info-circle fs-4"></i> <span class="sidebar-text">¿Qué es CTMagic?</span></a>
+        </li>
+        <li class="nav-item mt-2">
+          <a class="nav-link fs-5 text-warning {% if '/tiers' in request.path %}active{% endif %}" href="/tiers"><i class="bi bi-star fs-4"></i> <span class="sidebar-text">Tiers/Niveles</span></a>
+        </li>
+        {% endif %}
+      </ul>
+      
+      {% if request.user.is_authenticated or request.session.user %}
+      <div class="mt-auto border-top border-secondary w-100">
+         <a class="nav-link fs-5 text-danger" href="{% if request.user.is_authenticated %}/accounts/logout{% else %}/logout{% endif %}">
+           <i class="bi bi-box-arrow-left fs-4"></i> <span class="sidebar-text">Logout</span>
+         </a>
+      </div>
+      {% endif %}
+  </aside>
 
   {% block css %}
   
@@ -153,6 +152,38 @@
     {% endblock %} 
     </main>
 
+  <!-- Smart Footer -->
+  <footer class="smart-footer" id="mainFooter">
+    <div class="smart-footer-content">
+      <!-- Minimal state (always visible) -->
+      <div class="footer-min-bar" id="footerMinBar">
+        <span class="small fw-bold">© 2026 CTM.a.g.i.c.</span>
+        <span class="badge bg-secondary">Ver. 2.001</span>
+      </div>
+      
+      <!-- Expanded content -->
+      <div class="container p-3 pt-0">
+        <div class="row">
+          <div class="col-lg-6 col-md-6 mb-2 text-start">
+            <h6 class="text-uppercase text-warning mb-2">Nosotros</h6>
+            <ul class="list-unstyled mb-0 small">
+              <li><a href="/about" class="text-light text-decoration-none hover-warning">¿Quiénes somos?</a></li>
+              <li><a href="/about" class="text-light text-decoration-none hover-warning">¿Qué hace la APP?</a></li>
+              <li><a href="/about" class="text-light text-decoration-none hover-warning">¿Cómo funciona?</a></li>
+            </ul>
+          </div>
+          <div class="col-lg-6 col-md-6 mb-2 text-start">
+            <h6 class="text-uppercase text-warning mb-2">Enlaces Útiles</h6>
+            <ul class="list-unstyled mb-0 small">
+              <li><a href="/tiers" class="text-light text-decoration-none hover-warning">Planes y Tiers</a></li>
+              <li><a href="/changelog" class="text-light text-decoration-none hover-warning">Actualizaciones</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
   <script>
     toastr.options = {
       "closeButton": true,
@@ -161,9 +192,33 @@
 
     {% if messages %}
       {% for message in messages %}
-        toastr.{{message.tags}}("{{message}}")
+        {% if 'import_summary' not in message.tags %}
+          toastr.{{message.tags}}("{{message}}")
+        {% endif %}
       {% endfor %}
     {% endif %}
+
+    // Custom sidebar toggle
+    document.getElementById('sidebarToggle').addEventListener('click', function() {
+        document.getElementById('sidebar').classList.toggle('expanded');
+        document.body.classList.toggle('sidebar-expanded');
+        document.querySelector('main.container').classList.toggle('sidebar-expanded-main');
+    });
+
+    // Smart Footer toggle on scroll to bottom
+    window.addEventListener('scroll', function() {
+        const footer = document.getElementById('mainFooter');
+        if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 10) {
+            footer.classList.add('expanded');
+        } else {
+            footer.classList.remove('expanded');
+        }
+    });
+
+    // Expand footer manually when clicking min-bar
+    document.getElementById('footerMinBar').addEventListener('click', function() {
+        document.getElementById('mainFooter').classList.toggle('expanded');
+    });
   </script>
 
 {% block libreria %}

@@ -12,19 +12,9 @@
     </div>
     <div class="row mb-2">
         <div class="col-12">
-            <button id="open_search">
-                Crear nueva lista
+            <button class="btn btn-warning btn-shine m-0 fw-bold text-dark border-0 rounded-pill px-4 py-2" data-bs-toggle="modal" data-bs-target="#createListModal">
+                <i class="bi bi-plus-circle me-1"></i> Crear nueva lista
             </button>
-        </div>
-    </div>
-    <div  class="row mb-2" id="new_list">
-        <div class="col">
-            <form action="/list/offer/new" method="post">
-                {% csrf_token %}
-                <input type="text" name="new_list" id="list" required>
-               <button type="submit">Crear</button>
-               <button id="cl_btm">Cancelar</button>
-            </form>
         </div>
     </div>
     <div class="row">
@@ -35,6 +25,7 @@
                 <thead>
                     <tr>
                         <th>Nombre</th>
+                        <th>Privacidad</th>
                         <th>Cantidad de cartas</th>
                         <th>Estado</th>
                         <th class="dt-center">Actions</th>
@@ -45,6 +36,13 @@
                     <tr>
                         <td> 
                             <a href="/list/{{l.id}}">{{l.nombre}}</a>                      
+                        </td>
+                        <td>
+                            {% if l.privacidad == 'PUBLIC' %} <span class="badge bg-success">🌍 Público</span>
+                            {% elif l.privacidad == 'PRIVATE' %} <span class="badge bg-secondary">🔒 Privado</span>
+                            {% elif l.privacidad == 'SHARED' %} <span class="badge bg-info">👤 Compartido</span>
+                            {% elif l.privacidad == 'GROUP' %} <span class="badge bg-primary">👥 Grupo</span>
+                            {% else %} <span class="badge bg-secondary">{{l.privacidad}}</span> {% endif %}
                         </td>
                         <td> {{l.items.count}}</td>
                         <td class="{%if l.estado == 'Activa' %}text-success {% else %}text-warning{% endif %}">{{l.estado}}</td>
@@ -91,17 +89,50 @@
     </div>
 </div>
 
+</div>
+
+<!-- Modal para crear lista -->
+<div class="modal fade" id="createListModal" tabindex="-1" aria-labelledby="createListModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form action="/list/offer/new" method="post">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title" id="createListModalLabel">Crear Nueva Lista para Ofrecer</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="mb-3">
+                <label for="listName" class="form-label">Nombre del listado</label>
+                <input type="text" name="new_list" id="listName" class="form-control" placeholder="Nombre de nuevo listado" required>
+            </div>
+            <div class="mb-3">
+                <label for="privacySelect" class="form-label">Privacidad</label>
+                <select name="privacidad" id="privacySelect" class="form-select">
+                    <option value="PUBLIC">Público (Visible para todos)</option>
+                    <option value="PRIVATE">Privado (Solo para ti)</option>
+                    <option value="SHARED">Compartido (Usuarios específicos)</option>
+                    <option value="GROUP">Grupo (Tus comunidades)</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Crear Lista</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <script>
     $(document).ready(function() {
-       $('#new_list').hide();
-
        var oTblReport = $('#listas')
 
        oTblReport.DataTable({
            "language": { 
                "search": 'Buscar',
                "lengthMenu": "Mostrar _MENU_ registros por página",
-               //"info": "Mostrando _ENTRIES_ página _PAGE_ de _PAGES_",
                "paginate":{
                    previous: '‹',
                    next:     '›'
@@ -112,13 +143,6 @@
        });
    });
 
-   $('#open_search').on('click',function(){
-       $('#new_list').fadeIn();
-       $('#list').focus();
-   });
-   $('#cl_btm').on('click',function(){
-       $('#new_list').fadeOut();
-   });
    $('#confirm-delete').on('show.bs.modal', function(e) {
         $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
     });

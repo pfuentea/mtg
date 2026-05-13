@@ -3,6 +3,11 @@ from django.contrib import messages
 from django.shortcuts import redirect, render,get_object_or_404
 import bcrypt
 from .decorators import login_required
+from operator import itemgetter
+from django.contrib import messages
+from django.shortcuts import redirect, render,get_object_or_404
+import bcrypt
+from .decorators import login_required, tier_required
 #importacion de clases
 from .models.user import User
 from .models.listados import Listados
@@ -10,6 +15,9 @@ from .models.item_lista import ItemLista
 from .models.carta import Carta
 from .models.edicion import Edicion
 from .models.actividad import Actividad
+from .models.grupo import Grupo
+from django.db.models import Q
+from .utils.parser import import_list_from_file
 
 from .models.comentario import Comentario
 from .forms.comentarioForm import ComentarioForm
@@ -114,7 +122,8 @@ def list_hunt(request):
                             'nombre':l.nombre,
                             'id':l.id,
                             'items':l.items,
-                            'estado':estado
+                            'estado':estado,
+                            'privacidad': l.privacidad
                         }
             result.append(new_elem)       
 
@@ -125,9 +134,10 @@ def list_hunt(request):
         }
         return render(request, 'hunt.html', context)
     if request.method == "POST": #creacion de nueva lista
-        new_list=request.POST['new_list']
+        new_list=request.POST.get('new_list', 'Lista sin nombre')
+        privacidad=request.POST.get('privacidad', 'PUBLIC')
         dos_semanas= datetime.now(timezone.utc) + timedelta(days=14)
-        nueva_lista=Listados.objects.create(owner=user,nombre=new_list,tipo='B',referencia_web='',referencia_precio=0,expiracion=dos_semanas)
+        nueva_lista=Listados.objects.create(owner=user,nombre=new_list,tipo='B',referencia_web='',referencia_precio=0,expiracion=dos_semanas, privacidad=privacidad)
         # esta accion registra una actividad
 
         mensaje=f" ha creado la lista de busqueda"
@@ -183,7 +193,8 @@ def list_offer(request):
                             'nombre':l.nombre,
                             'id':l.id,
                             'items':l.items,
-                            'estado':estado
+                            'estado':estado,
+                            'privacidad': l.privacidad
                         }
             result.append(new_elem)  
         context = {
@@ -193,15 +204,26 @@ def list_offer(request):
         }
         return render(request, 'offer.html', context)
     if request.method == "POST":
-        new_list=request.POST['new_list']
+        new_list=request.POST.get('new_list', 'Lista sin nombre')
+        privacidad=request.POST.get('privacidad', 'PUBLIC')
         dos_semanas= datetime.now(timezone.utc) + timedelta(days=14)
         print(f"2sem:{dos_semanas}")
-        nueva_lista=Listados.objects.create(owner=user,nombre=new_list,tipo='O',referencia_web='',referencia_precio=0,expiracion=dos_semanas)
+        nueva_lista=Listados.objects.create(owner=user,nombre=new_list,tipo='O',referencia_web='',referencia_precio=0,expiracion=dos_semanas, privacidad=privacidad)
         # esta accion registra una actividad
         mensaje=f" ha creado la lista para ofrecer"
         new_act=Actividad.objects.create(actor=user,accion=mensaje,lista=nueva_lista)       
 
         return redirect('/list/offer')
+
+def get_privacy_q(user):
+    from django.db.models import Q
+    if hasattr(user, 'id'):
+        return Q(lista__privacidad='PUBLIC') | \
+               Q(lista__owner=user) | \
+               Q(lista__shared_with_users=user) | \
+               Q(lista__shared_with_groups__miembros=user)
+    else:
+        return Q(lista__privacidad='PUBLIC')
 
 @login_required
 def list_detail(request,lista_id):
@@ -241,9 +263,9 @@ def list_detail(request,lista_id):
         for card_in_list in items:
             print(f"carta_id:{card_in_list.carta.id}/{card_in_list.carta.nombre}")
             #buscamos por la misma carta (mismo nombre, misma edicion, mismo tipo de borde)
-            resultado_exacto=ItemLista.objects.filter(carta=card_in_list.carta,lista__tipo='O').exclude(lista__owner=card_in_list.lista.owner)
+            resultado_exacto=ItemLista.objects.filter(carta=card_in_list.carta,lista__tipo='O').filter(get_privacy_q(user)).exclude(lista__owner=card_in_list.lista.owner)
             #aca debemos buscar por nombre en caso de que este activado esto
-            resultado_por_nombre=ItemLista.objects.filter(carta__nombre=card_in_list.carta.nombre,lista__tipo='O').exclude(lista__owner=card_in_list.lista.owner)
+            resultado_por_nombre=ItemLista.objects.filter(carta__nombre=card_in_list.carta.nombre,lista__tipo='O').filter(get_privacy_q(user)).exclude(lista__owner=card_in_list.lista.owner)
             if len(resultado_exacto) >0:
                 #print("Encontre la carta en otra lista!")
                 for r in resultado_exacto:
@@ -347,6 +369,9 @@ def compare(request,lista_origen,lista_destino,view='imgs'):
         user=""
     origen=Listados.objects.get(id=lista_origen)
     destino=Listados.objects.get(id=lista_destino)
+    if not Listados.objects.filter(id=lista_destino).filter(get_privacy_q(user)).exists():
+        messages.warning(request, "No tienes permiso para comparar con esta lista.")
+        return redirect('/index')
     items_origen= ItemLista.objects.filter(lista=origen) 
     items_destino= ItemLista.objects.filter(lista=destino) 
     nombres_destino = [item.carta.nombre for item in items_destino]
@@ -695,3 +720,149 @@ def custom_logout(request):
     # Renderiza tu template personalizado
     return render(request, 'accounts/logged_out.html')
 
+
+@login_required
+def grupos(request):
+    user_id=request.session['user']['id']
+    user= User.objects.get(id=user_id)
+    if request.method == "GET":
+        mis_grupos = Grupo.objects.filter(Q(owner=user) | Q(miembros=user)).distinct()
+        context = {
+            "grupos": mis_grupos,
+            "user": user
+        }
+        return render(request, 'grupos.html', context)
+    if request.method == "POST":
+        nombre = request.POST.get('nombre')
+        descripcion = request.POST.get('descripcion', '')
+        if nombre:
+            nuevo_grupo = Grupo.objects.create(owner=user, nombre=nombre, descripcion=descripcion)
+            nuevo_grupo.miembros.add(user)
+        return redirect('/grupos')
+
+@login_required
+def import_list(request, lista_id):
+    lista = Listados.objects.get(id=lista_id)
+    user_id = request.session['user']['id']
+    user = User.objects.get(id=user_id)
+    
+    if lista.owner != user:
+        messages.error(request, "No tienes permiso para modificar esta lista.")
+        return redirect('/index')
+        
+    if request.method == 'POST' and request.FILES.get('csv_file'):
+        csv_file = request.FILES['csv_file']
+        format_choice = request.POST.get('format_choice', 'moxfield_csv')
+        truncate_limit = request.POST.get('truncate_limit') == 'on'
+        
+        # Validar extension
+        if format_choice == 'manabox_txt' and not csv_file.name.endswith('.txt'):
+            messages.error(request, "El archivo debe ser un TXT para este formato.")
+            return redirect(f'/list/{lista.id}')
+        elif format_choice in ['moxfield_csv', 'manabox_csv'] and not csv_file.name.endswith('.csv'):
+            messages.error(request, "El archivo debe ser un CSV para este formato.")
+            return redirect(f'/list/{lista.id}')
+            
+        try:
+            content = csv_file.read().decode('utf-8')
+            lines = content.splitlines()
+            
+            # Verificar limite FREE
+            limit = None
+            if user.tier == 'FREE':
+                if len(lines) > 300:
+                    if not truncate_limit:
+                        messages.error(request, "Tu archivo tiene más de 300 cartas. Usuarios FREE pueden subir máximo 300. Selecciona 'Truncar a 300' para subir solo las primeras 300 o mejora tu plan a PRO/PREMIUM.")
+                        return redirect(f'/list/{lista.id}')
+                    else:
+                        limit = 300
+                        messages.warning(request, "Importando solo las primeras 300 cartas debido a límite de cuenta FREE.")
+
+            success, result = import_list_from_file(content, lista, format_choice, limit=limit)
+            if success:
+                messages.success(request, "Proceso de importación finalizado con éxito.")
+                messages.add_message(request, messages.SUCCESS, f"Se cargaron {result['success_count']} cartas en la lista.", extra_tags='import_summary')
+                if result['errors']:
+                    for err in result['errors'][:5]: 
+                        messages.warning(request, err)
+                    if len(result['errors']) > 5:
+                        messages.warning(request, f"...y {len(result['errors']) - 5} errores más.")
+            else:
+                messages.error(request, f"Error al importar: {result}")
+        except Exception as e:
+            messages.error(request, f"Error procesando archivo: {str(e)}")
+            
+    return redirect(f'/list/{lista.id}')
+
+def tiers_info(request):
+    if 'user' in request.session:
+        user = User.objects.get(id=request.session['user']['id'])
+    else:
+        user = ""
+    return render(request, 'tiers.html', {'user': user})
+
+def about_view(request):
+    if 'user' in request.session:
+        user = User.objects.get(id=request.session['user']['id'])
+    else:
+        user = ""
+    return render(request, 'about.html', {'user': user})
+
+def changelog_view(request):
+    if 'user' in request.session:
+        user = User.objects.get(id=request.session['user']['id'])
+    else:
+        user = ""
+    return render(request, 'changelog.html', {'user': user})
+
+@login_required
+def api_get_list_items(request, lista_id):
+    user = User.objects.get(id=request.session['user']['id'])
+    try:
+        lista = Listados.objects.get(id=lista_id, owner=user)
+    except Listados.DoesNotExist:
+        return JsonResponse({'error': 'Lista no encontrada o sin acceso'}, status=403)
+        
+    items = ItemLista.objects.filter(lista=lista).select_related('carta', 'carta__Edicion')
+    data = []
+    for item in items:
+        text = f"{item.carta.nombre} ({item.carta.Edicion.set_code.upper()}) #{item.carta.number_collector_txt} - Qty: {item.cantidad}"
+        if item.es_foil:
+            text += " [Foil]"
+        data.append({'id': item.id, 'text': text})
+        
+    return JsonResponse({'items': data})
+
+@login_required
+def transfer_cards(request):
+    user = User.objects.get(id=request.session['user']['id'])
+    
+    if request.method == 'POST':
+        items_to_move = request.POST.getlist('moved_items')
+        target_list_id = request.POST.get('target_list')
+        source_list_id = request.POST.get('source_list')
+        
+        try:
+            target_list = Listados.objects.get(id=target_list_id, owner=user)
+            source_list = Listados.objects.get(id=source_list_id, owner=user)
+            
+            moved_count = 0
+            for item_id in items_to_move:
+                item = ItemLista.objects.filter(id=item_id, lista=source_list).first()
+                if item:
+                    item.lista = target_list
+                    item.save()
+                    moved_count += 1
+            
+            messages.success(request, f"Se movieron {moved_count} cartas exitosamente a {target_list.nombre}.")
+        except Exception as e:
+            messages.error(request, f"Error al mover cartas: {str(e)}")
+            
+        return redirect('/list/transfer')
+
+    listas = Listados.objects.filter(owner=user).order_by('tipo', 'nombre')
+    context = {
+        'user': user,
+        'listas': listas
+    }
+    return render(request, 'transfer_cards.html', context)

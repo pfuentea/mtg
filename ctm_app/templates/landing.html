@@ -1,70 +1,81 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CTM.a.g.i.c.</title>
-    <!--BOOTSTRAP-->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-    {% load static %}
-    <link rel="stylesheet" type="text/css" href='{% static "/css/style.css" %}'>
-    <link rel="preload" href='{% static "/fonts/Garde.woff2" %}' as="font" type="font/woff2" crossorigin>
-</head>
-<body>
-    <div class="container contenido logo_orange mt-5 p-5">
-        <h1 class="garde d-none d-sm-block d-xl-none ">
-            CTM.a.g.i.c.
-        </h1>
+{% extends "public.html" %}
+{% load static %}
 
-        <h2 class="garde  d-xs-block d-sm-none naranjo">
-            CTM.a.g.i.c.
-        </h2>
-        <img src='{% static "/imgs/logo_02.png" %}' alt="" class="logo_orange">
+{% block titulo %}CTM.a.g.i.c. - Intercambio de cartas Magic{% endblock %}
 
+{% block contenido %}
+<div class="container py-4">
+
+  <!-- Hero -->
+  <div class="text-center py-5">
+    <h1 class="garde mb-2">CTM.a.g.i.c.</h1>
+    <img src='{% static "/imgs/logo_02.png" %}' alt="CTM.a.g.i.c." style="max-height: 120px;" class="mb-4">
+    <p class="lead" style="color: #C0C0C0; max-width: 560px; margin: 0 auto 2rem;">
+      La plataforma para intercambiar cartas <strong style="color:#F77e0d;">Magic: The Gathering</strong> con otros jugadores.
+    </p>
+    <div class="d-flex justify-content-center gap-3 flex-wrap">
+      <a href="/registro" class="btn btn-primary btn-shine px-4 py-2">
+        <i class="bi bi-person-plus me-2"></i>Comenzar ahora
+      </a>
+      <a href="/login" class="btn btn-outline-warning px-4 py-2">
+        <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar sesión
+      </a>
     </div>
-    <div id="#quees"></div>
-    <div class="container contenido mt-2 p-3">
-        <h4 class="garde">Que es CTM.a.g.i.c.?</h4>
-        <p>
-            Fue pensado como una herramienta para facilitar el intercambio de cartas coleccionables MAGIC, en donde los usuarios podrán generar listas de cartas que buscan, las cuales serán comparadas con listas de cartas de otros usuarios que las ofrecen.
-        </p> 
-        <p>En la aplicación podrás compartir tus listas, ya sea si buscas u ofreces alguna carta.</p>
+  </div>
 
-    </div>
-    <div id="#como"></div>
-    <div class="container contenido mt-2 p-3">
-        <h4 class="garde">Como funciona CTM.a.g.i.c.?</h4>
-        <p>
-            <span class="garde"> CTM.a.g.i.c. </span> utiliza información pública disponible desde la API de <a href="https://www.scryfall.com" target="_blank" class="naranjo">Scryfall</a>, por esto mismo, los listados se generan con los nombres de las cartas en inglés.           
+  <!-- Info cards -->
+  <div id="quees" class="row g-4 mt-2">
+
+    <div class="col-md-4">
+      <div class="public-card h-100">
+        <div class="mb-3">
+          <i class="bi bi-question-circle naranjo" style="font-size: 2rem;"></i>
+        </div>
+        <h5 class="garde naranjo mb-3">¿Qué es CTM.a.g.i.c.?</h5>
+        <p style="color: #C0C0C0; font-size: 0.92rem;">
+          Una herramienta para facilitar el intercambio de cartas coleccionables Magic, donde los usuarios generan listas de cartas que buscan y se comparan con listas de cartas que otros ofrecen.
         </p>
-
+      </div>
     </div>
-    <div id="#join"></div>
-    <div class="container contenido mt-2 p-3">
-        <h4 class="garde">Como me uno a CTM.a.g.i.c.?</h4>
-        <p>
-            <a href="/registro" class="naranjo">Registrate</a> o 
-            <a href="/login" class="naranjo">inicia sesión</a>
-             en <span class="garde"> CTM.a.g.i.c. </span> y empieza a crear tus listas y compartirlas.          
+
+    <div id="como" class="col-md-4">
+      <div class="public-card h-100">
+        <div class="mb-3">
+          <i class="bi bi-gear naranjo" style="font-size: 2rem;"></i>
+        </div>
+        <h5 class="garde naranjo mb-3">¿Cómo funciona?</h5>
+        <p style="color: #C0C0C0; font-size: 0.92rem;">
+          <span class="garde">CTM.a.g.i.c.</span> usa información pública de la API de
+          <a href="https://www.scryfall.com" target="_blank" class="naranjo">Scryfall</a>.
+          Los listados se generan con los nombres de las cartas en inglés y puedes compartir tus listas con otros jugadores.
         </p>
-
+      </div>
     </div>
-    <div class="container contenido mt-2 p-3">
-        <h4 class="garde">Quieres opinar sobre CTM.a.g.i.c.?</h4>
-        <p>
-            En <span class="garde"> CTM.a.g.i.c. </span> estamos atentos a tus comentarios, favor hazlos llegar en este 
-            <a href="/contacto" class="naranjo">formulario</a>.    
+
+    <div id="join" class="col-md-4">
+      <div class="public-card h-100">
+        <div class="mb-3">
+          <i class="bi bi-person-check naranjo" style="font-size: 2rem;"></i>
+        </div>
+        <h5 class="garde naranjo mb-3">¿Cómo me uno?</h5>
+        <p style="color: #C0C0C0; font-size: 0.92rem;">
+          <a href="/registro" class="naranjo">Regístrate</a> o
+          <a href="/login" class="naranjo">inicia sesión</a>
+          en <span class="garde">CTM.a.g.i.c.</span> y empieza a crear tus listas y compartirlas con la comunidad.
         </p>
-
+      </div>
     </div>
-    <!--
-        Aca la idea es mostrar:
-        1.- objetivo de la pagina
-        2.- ultimas 10 listas de busquedas
-        3.- ultimas 10 listas de ofrecimiento
 
-    -->
-</body>
-</html>
+  </div>
+
+  <!-- Contacto -->
+  <div class="public-card mt-4 text-center" style="border-color: rgba(247,126,13,0.2);">
+    <i class="bi bi-chat-dots naranjo" style="font-size: 1.5rem;"></i>
+    <p class="mt-2 mb-0" style="color: #C0C0C0;">
+      ¿Quieres opinar sobre <span class="garde">CTM.a.g.i.c.</span>?
+      Envíanos tus comentarios en este <a href="/contacto" class="naranjo">formulario</a>.
+    </p>
+  </div>
+
+</div>
+{% endblock %}

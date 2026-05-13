@@ -9,6 +9,7 @@ from .mensaje import Mensaje
 from .tipo import Tipo
 from .user import User
 from .comentario import Comentario
+from .grupo import Grupo
 
 
 __all__ = [
@@ -22,4 +23,5 @@ __all__ = [
     'Tipo',
     'User',
     'Comentario',
+    'Grupo',
 ]

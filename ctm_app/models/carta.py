@@ -7,6 +7,10 @@ class Carta(models.Model):
     number_collector =models.IntegerField()
     number_collector_txt =models.CharField(max_length=10)
     small_image=models.CharField(max_length=255)
+    scryfall_id = models.UUIDField(null=True, blank=True)
+    mana_cost = models.CharField(max_length=50, blank=True)
+    type_line = models.CharField(max_length=100, blank=True)
+    oracle_text = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):

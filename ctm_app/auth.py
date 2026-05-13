@@ -17,7 +17,19 @@ def login(request):
             log_user = user[0]
             print(f"DarkMode:{log_user.modo_oscuro}")
 
-            if bcrypt.checkpw(request.POST['password'].encode(), log_user.password.encode()):
+            valid = False
+            if log_user.check_password(request.POST['password']):
+                valid = True
+            else:
+                try:
+                    if bcrypt.checkpw(request.POST['password'].encode(), log_user.password.encode()):
+                        log_user.set_password(request.POST['password'])
+                        log_user.save()
+                        valid = True
+                except ValueError:
+                    pass
+
+            if valid:
 
                 user = {
                     "id" : log_user.id,
@@ -71,12 +83,10 @@ def registro(request):
         request.session['register_name'] = ""
         request.session['register_email'] = ""
 
-        password_encryp = bcrypt.hashpw(request.POST['password'].encode(), bcrypt.gensalt()).decode() 
-
-        usuario_nuevo = User.objects.create(
+        usuario_nuevo = User.objects.create_user(
             name = request.POST['name'],
             email=request.POST['email'],
-            password=password_encryp,
+            password=request.POST['password'],
             role=request.POST['role']
         )
 

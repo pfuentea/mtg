@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block titulo %}¿Qué es CTMagic?{% endblock %}
+
+{% block contenido %}
+<div class="container mt-5">
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h1 class="display-4 font-weight-bold text-warning">¿Qué es CTMagic?</h1>
+            <p class="lead text-muted">Tu herramienta definitiva para buscar e intercambiar cartas.</p>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card bg-dark text-light border-secondary mb-4 shadow-sm">
+                <div class="card-header border-secondary text-warning">
+                    <h4 class="mb-0"><i class="bi bi-question-circle me-2"></i> ¿Qué es esta aplicación?</h4>
+                </div>
+                <div class="card-body">
+                    <p>Esta App fue creada para mejorar la busqueda y el intercambio de cartas a través de la creación de listas, las cuales pueden ser para ofrecer en cambio y/o venta (Ofrezco) o de cartas que buscamos (Busco). Para el caso de busquedas, un algoritmo realiza un rastreo entre todas las cartas que se ofrecen y así ver si alguien más la tiene y poder contactar a su dueño.</p>
+                </div>
+            </div>
+
+            <div class="card bg-dark text-light border-secondary mb-4 shadow-sm">
+                <div class="card-header border-secondary text-warning">
+                    <h4 class="mb-0"><i class="bi bi-gear me-2"></i> ¿Cómo funciona la App?</h4>
+                </div>
+                <div class="card-body">
+                    <p>Si eres una persona que <strong>ofrece sus cartas para venta y/o cambio</strong>, debes ir al menú <a href="/list/offer" class="text-warning text-decoration-none">Listas -> Ofrezco</a> y crear un listado, presionando el botón [Crear nueva lista] y luego que aparezca en la tabla de listados, debes pinchar su nombre y agregar cartas.</p>
+                    <p>Si eres una persona que <strong>busca cartas para comprar o cambiar</strong>, debes ir al menú <a href="/list/hunt" class="text-warning text-decoration-none">Listas -> Busco</a> y crear un listado, presionando el botón [Crear nueva lista] y luego que aparezca en la tabla de listados, debes pinchar su nombre y agregar cartas.</p>
+                    <p>Para agregar una carta: Presiona el botón [Agregar nueva carta] y escribe el nombre de la carta en inglés. Al ir escribiendo, se realizará una búsqueda por nombre que podrás seleccionar. Luego debes presionar [Buscar Versiones] para mostrar todas las versiones de esa carta, si es que tiene más de una, y finalmente presionar el botón [Añadir] para agregarla al listado.</p>
+                    <p>Ya en el listado podrás modificar la cantidad, poner un precio y alguna observación de la carta (si está firmada; condición: nueva, jugada, etc.; si es proxy). Cuando modifiques algo debes presionar [Guardar] antes de volver al listado.</p>
+                </div>
+            </div>
+
+            <div class="card bg-dark text-light border-secondary mb-4 shadow-sm">
+                <div class="card-header border-secondary text-warning">
+                    <h4 class="mb-0"><i class="bi bi-clock-history me-2"></i> Duración de listados</h4>
+                </div>
+                <div class="card-body">
+                    <p>Para realizar una búsqueda más óptima, se ha definido que una lista tenga 2 semanas de vigencia desde que se crea o modifica. Esto no significa que tus listas desaparezcan, solo no serán consideradas en el rastreo, ya sean cartas que se ofrezcan o se busquen.</p>
+                </div>
+            </div>
+
+            <div class="card bg-dark text-light border-secondary mb-4 shadow-sm">
+                <div class="card-header border-secondary text-warning">
+                    <h4 class="mb-0"><i class="bi bi-translate me-2"></i> ¿Por qué solo cartas en Inglés?</h4>
+                </div>
+                <div class="card-body">
+                    <p>La búsqueda de cartas es solo en inglés debido a que la API que utilizamos está disponible en <a href="http://scryfall.com/" target="_blank" class="text-warning text-decoration-none">www.scryfall.com/</a>, y solo soporta búsquedas rápidas universales en este idioma. Si en algún futuro podemos utilizar otra herramienta, haremos los esfuerzos para integrarla a nuestra APP.</p>
+                    <p>Por otro lado, el procedimiento para juntar cartas buscadas con cartas ofrecidas por el nombre es más simple al usar un solo idioma base.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

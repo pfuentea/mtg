@@ -10,6 +10,11 @@ class User(AbstractUser):
         ("user", 'User'),
         ("admin", 'Admin')
     )
+    TIER_CHOICES = (
+        ("FREE", 'Free'),
+        ("PRO", 'Pro'),
+        ("PREMIUM", 'Premium')
+    )
      
     username = None
     email = models.EmailField(_("email address"), unique=True)
@@ -19,6 +24,7 @@ class User(AbstractUser):
     largo_despliegue = models.IntegerField (default=20)
     name = models.CharField(max_length=255,blank=True)
     role = models.CharField(max_length=255, choices=CHOICES)
+    tier = models.CharField(max_length=20, choices=TIER_CHOICES, default="FREE")
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ['first_name','last_name']

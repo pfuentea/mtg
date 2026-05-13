@@ -1,5 +1,77 @@
-**/*/__pycache__
-**/*/migrations
-db.sqlite3
-ctm/settings.py
+# Archivos de la versión anterior
+
 descripcion.txt
+
+# Directorios de migraciones y caché locales
+**/*/migrations
+**/*/__pycache__
+
+# Django #
+##########
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Entornos Virtuales #
+######################
+.env
+.venv
+venv/
+env/
+ENV/
+
+# Python #
+##########
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Instaladores #
+################
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Reportes de Tests #
+#####################
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.sved
+.hypothesis/
+.pytest_cache/
+cover/
+
+# IDEs y Editores #
+###################
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store

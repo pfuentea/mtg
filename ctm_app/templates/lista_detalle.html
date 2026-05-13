@@ -26,22 +26,41 @@
     </div>
     <div class="row ">
         
-        <div class="col-12 {% if duracion > 0 %} bg-info {% else %} bg-warning {% endif  %}">
-            Duración : 
-            {% if duracion > 0 %}
-                {{duracion}} 
-                días
-            {% else %}
-            Expirada! (Puedes volver a activar la lista pinchando AQUI <a href="/list/activar/{{lista.id}}" class="btn btn-sm btn-outline-primary" title="Activar"> <i class="bi bi-play"></i></a>
-            )
-            {% endif %}
+        <div class="col-12">
+            <span class="badge rounded-pill px-3 py-2 fs-6 {% if duracion > 0 %}text-dark{% else %}text-white{% endif %}" style="background-color: {% if duracion > 0 %}#F77e0d{% else %}#dc3545{% endif %};">
+                <i class="bi bi-clock me-1"></i> Duración:
+                {% if duracion > 0 %}
+                    {{duracion}} días restantes
+                {% else %}
+                    ¡Expirada! <a href="/list/activar/{{lista.id}}" class="text-white ms-2" title="Activar"><i class="bi bi-play-circle-fill"></i> Reactivar</a>
+                {% endif %}
+            </span>
         </div>
         <div class="col"></div>
     </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            {% if 'import_summary' in message.tags %}
+            <div class="row mt-3">
+                <div class="col-12">
+                    <div class="alert alert-success alert-dismissible fade show shadow-sm" style="border-left: 5px solid #198754;" role="alert">
+                        <h5 class="alert-heading text-success mb-2"><i class="bi bi-check-circle-fill me-2"></i>¡Importación Exitosa!</h5>
+                        <p class="mb-0 fs-6">{{ message }}</p>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
     <div class="row my-3">
-        <div class="col-12 ">
-            <button id="open_search">
-                Agregar nueva carta
+        <div class="col-12 d-flex align-items-center gap-2">
+            <button id="open_search" class="btn btn-warning btn-shine fw-bold text-dark border-0 rounded-pill px-4 py-2">
+                <i class="bi bi-plus-circle me-1"></i> Agregar nueva carta
+            </button>
+            <button class="btn btn-outline-warning rounded-pill px-4 py-2" data-bs-toggle="modal" data-bs-target="#importModal">
+                <i class="bi bi-upload me-1"></i> Importar CSV
             </button>
         </div>
     </div>
@@ -68,9 +87,15 @@
         </div>
     </div>
 
-    <div class="row">
+    <div class="row mt-2">
         <div class="col-12">
-            <p>Cartas en la lista : ({{items.count}}) <span Id="span_hidden">Ocultar</span><span Id="span_show" class="d-none">Mostrar</span></p> 
+            <div class="d-flex justify-content-between align-items-center mb-2 bg-dark p-3 rounded-3 shadow-sm border border-secondary">
+                <p class="mb-0 fs-5 text-light fw-bold"><i class="bi bi-list-task me-2 text-warning"></i>Cartas en la lista: <span class="badge bg-warning text-dark ms-2">{{items.count}}</span></p> 
+                <div class="form-check form-switch fs-5 mb-0">
+                    <input class="form-check-input bg-secondary border-secondary" type="checkbox" id="toggleImages" checked style="cursor: pointer;">
+                    <label class="form-check-label text-warning" for="toggleImages" style="cursor: pointer;"><i class="bi bi-image me-1"></i> Imágenes</label>
+                </div>
+            </div>
 
             <div class="table-responsive" id="main_table">
                 <table id="lista_cartas" class="table " width="99%" >
@@ -262,6 +287,55 @@
     </div>
 </div>
 
+<!-- Modal Importar CSV -->
+<div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form action="/list/import/{{lista_id}}" method="post" enctype="multipart/form-data" id="importForm">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title" id="importModalLabel">Importar Cartas desde CSV</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <p>Sube un archivo exportado de Manabox o Moxfield para agregar automáticamente las cartas a tu lista.</p>
+            
+            <div class="mb-3">
+                <label class="form-label">Formato de Exportación:</label>
+                <select name="format_choice" class="form-select" required>
+                    <option value="moxfield_csv">Moxfield (CSV)</option>
+                    <option value="manabox_csv">Manabox (CSV)</option>
+                    <option value="manabox_txt">Manabox (Texto Plain / TXT)</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Archivo:</label>
+                <input type="file" name="csv_file" class="form-control" accept=".csv,.txt" required>
+            </div>
+
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" name="truncate_limit" id="truncate_limit">
+                <label class="form-check-label text-warning" for="truncate_limit">
+                    <strong>Usuarios FREE:</strong> Truncar a 300 cartas si mi archivo excede el límite. <br>
+                    <small class="text-muted">(Si no marcas esto y excedes el límite, se cancelará la subida. <a href="/tiers" target="_blank">Mejorar Plan</a>)</small>
+                </label>
+            </div>
+
+            <p class="text-muted small">Nota: Puede demorar unos segundos si tiene que buscar las cartas en Scryfall por primera vez.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-success" id="btnImportar">
+              <span class="spinner-border spinner-border-sm d-none me-1" id="importSpinner" role="status" aria-hidden="true"></span>
+              <span id="importText">Importar</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <script>
     $(document).ready(function() {
         $('#new_search').hide();
@@ -270,6 +344,9 @@
         
 
         oTblReport.DataTable({
+            "dom": "<'row mb-2 align-items-center'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-4'f><'col-sm-12 col-md-4 d-flex justify-content-end'p>>" +
+                   "<'row'<'col-sm-12'tr>>" +
+                   "<'row mt-2'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7 d-flex justify-content-end'p>>",
             "language": { 
                 "search": 'Buscar',
                 "lengthMenu": "Mostrar _MENU_ registros por página",
@@ -488,15 +565,18 @@
     });
     */
 
-    $('#span_hidden').on('click',function(){
-        $('#span_show').removeClass('d-none')
-        $('#span_hidden').addClass('d-none')
-        $('#main_table').addClass('d-none')
+    // Ocultar/Mostrar imágenes de la tabla principal
+    $('#toggleImages').on('change', function() {
+        var table = $('#lista_cartas').DataTable();
+        var isVisible = $(this).is(':checked');
+        table.column(2).visible(isVisible);
     });
-    $('#span_show').on('click',function(){
-        $('#span_hidden').removeClass('d-none')
-        $('#span_show').addClass('d-none')
-        $('#main_table').removeClass('d-none')
+
+    // Spinner para botón de Importación Masiva
+    $('#importForm').on('submit', function() {
+        $('#btnImportar').prop('disabled', true);
+        $('#importSpinner').removeClass('d-none');
+        $('#importText').text('Importando...');
     });
 
     function esperar(){

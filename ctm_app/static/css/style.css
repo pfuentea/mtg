@@ -1,7 +1,118 @@
-
 body{
-   /* font-family: 'Amatic SC', cursive;*/
    font-family: 'Montserrat', sans-serif;
+   background-color: #161623;
+   color: #E0E0E0;
+   transition: margin-left 0.3s ease;
+   padding-bottom: 220px; /* Space for expanded smart footer */
+}
+
+/* SMART FOOTER */
+.smart-footer {
+   position: fixed;
+   bottom: 0;
+   left: 0;
+   width: 100%;
+   background-color: rgba(26, 26, 29, 0.95) !important;
+   backdrop-filter: blur(5px);
+   z-index: 999;
+   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+   transform: translateY(calc(100% - 40px));
+   border-top: 1px solid #F77e0d !important;
+   margin-top: 0 !important;
+}
+
+.smart-footer:hover, .smart-footer.expanded {
+   transform: translateY(0);
+}
+
+.smart-footer-content {
+   margin-left: 70px;
+   transition: margin-left 0.3s ease;
+}
+
+.footer-min-bar {
+   height: 40px;
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   cursor: pointer;
+   color: #E0E0E0;
+   padding: 0 20px;
+}
+
+.footer-min-bar:hover {
+   color: #F77e0d;
+}
+
+@media (min-width: 992px) {
+   body.sidebar-expanded .smart-footer-content {
+      margin-left: 260px;
+   }
+}
+
+/* CUSTOM SIDEBAR */
+.custom-sidebar {
+   position: fixed;
+   top: 56px; /* below navbar */
+   left: 0;
+   height: calc(100vh - 56px);
+   width: 60px; /* collapsed width */
+   background-color: #1A1A1D;
+   border-right: 1px solid #2A2A2E;
+   overflow: visible;
+   transition: width 0.3s ease;
+   z-index: 1000;
+   padding-top: 10px;
+}
+
+.custom-sidebar:hover, .custom-sidebar.expanded {
+   width: 250px;
+}
+
+.custom-sidebar .nav-link {
+   color: #E0E0E0 !important;
+   white-space: nowrap;
+   padding: 15px 20px;
+   display: flex;
+   align-items: center;
+}
+
+.custom-sidebar .nav-link:hover {
+   background-color: #2A2A2E;
+   color: #F77e0d !important;
+}
+
+.custom-sidebar .nav-link.active {
+   background-color: #2A2A2E;
+   color: #F77e0d !important;
+   border-left: 3px solid #F77e0d;
+}
+
+.custom-sidebar .sidebar-text {
+   margin-left: 15px;
+   opacity: 0;
+   max-width: 0;
+   overflow: hidden;
+   white-space: nowrap;
+   transition: max-width 0.3s ease, opacity 0.3s ease;
+   display: inline-block;
+   vertical-align: middle;
+}
+
+.custom-sidebar:hover .sidebar-text, .custom-sidebar.expanded .sidebar-text {
+   opacity: 1;
+   max-width: 200px;
+}
+
+/* MAIN CONTENT OFFSET */
+main.container {
+   margin-left: 70px; /* space for collapsed sidebar */
+   transition: margin-left 0.3s ease;
+}
+@media (min-width: 992px) {
+   .sidebar-expanded-main {
+      margin-left: 260px !important;
+   }
 }
 
 /*PARA LAS CARTAS*/
@@ -115,16 +226,14 @@ a.button.lined.thick{
 }
 
 .contenido{
-  
-   background: rgb(54,79,107);
-   background: linear-gradient(45deg, rgba(54,79,107,1) 0%, rgba(103,122,143,1) 100%);
+   background: #161623;
+   background: linear-gradient(45deg, #161623 0%, #1A1A1D 100%);
    border-radius: 10px;
-   color: #abc9fe;
-   
+   color: #E0E0E0;
 }
 .contenido::after{
-   opacity: 0.25;
-   background: radial-gradient(circle, rgb(255, 255, 255) 0%, rgba(255, 255, 255, 0) 100%);
+   opacity: 0.15;
+   background: radial-gradient(circle, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 100%);
 }
 
 .garde {
@@ -187,3 +296,125 @@ img.logo_orange {
  .my-strip:nth-child(even) {
    background-color: #4a3838;
  }
+
+/* EFECTO BRILLO BOTONES */
+.btn-shine {
+    position: relative;
+    overflow: hidden;
+}
+.btn-shine::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
+    transform: skewX(-20deg);
+    animation: shine 8s infinite;
+}
+@keyframes shine {
+    0% { left: -100%; }
+    20% { left: 200%; }
+    100% { left: 200%; }
+}
+
+/* ===== TABLA DE LISTA DE CARTAS ===== */
+#lista_cartas {
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #2e2e45;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+}
+
+#lista_cartas thead tr th {
+    background-color: #1a1a2e;
+    color: #F77e0d;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    border-bottom: 2px solid #F77e0d !important;
+    border-top: none;
+    padding: 10px 14px;
+    white-space: nowrap;
+}
+
+#lista_cartas tbody tr {
+    background-color: #2e2e45;
+    transition: background-color 0.18s ease, transform 0.1s ease;
+}
+
+#lista_cartas tbody tr:nth-child(even) {
+    background-color: #38385a;
+}
+
+#lista_cartas tbody tr:hover {
+    background-color: rgba(247, 126, 13, 0.18);
+    transform: scale(1.001);
+}
+
+#lista_cartas tbody td {
+    color: #F0F0FF;
+    border-color: rgba(255,255,255,0.08) !important;
+    padding: 8px 14px;
+    vertical-align: middle;
+}
+
+#lista_cartas tbody td a {
+    color: #f0c060;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+#lista_cartas tbody td a:hover {
+    color: #F77e0d;
+    text-decoration: underline;
+}
+
+/* DataTables controls */
+#lista_cartas_wrapper .dataTables_length select,
+#lista_cartas_wrapper .dataTables_filter input {
+    background-color: #252538;
+    color: #E0E0E0;
+    border: 1px solid rgba(247, 126, 13, 0.4);
+    border-radius: 6px;
+    padding: 4px 8px;
+}
+
+#lista_cartas_wrapper .dataTables_info {
+    color: #888aaa;
+    font-size: 0.82rem;
+}
+
+#lista_cartas_wrapper .paginate_button {
+    background-color: #252538 !important;
+    color: #E0E0E0 !important;
+    border: 1px solid rgba(247, 126, 13, 0.3) !important;
+    border-radius: 6px !important;
+    margin: 0 2px;
+    transition: background-color 0.2s !important;
+}
+
+#lista_cartas_wrapper .paginate_button:hover {
+    background: rgba(247, 126, 13, 0.25) !important;
+    color: #F77e0d !important;
+    border-color: #F77e0d !important;
+}
+
+#lista_cartas_wrapper .paginate_button.current,
+#lista_cartas_wrapper .paginate_button.current:hover {
+    background: #F77e0d !important;
+    color: #111 !important;
+    border-color: #F77e0d !important;
+    font-weight: 700;
+}
+
+#lista_cartas_wrapper .dataTables_length label,
+#lista_cartas_wrapper .dataTables_filter label {
+    color: #aaa;
+    font-size: 0.85rem;
+}

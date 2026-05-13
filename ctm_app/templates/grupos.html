@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block titulo %}Mis Comunidades{% endblock %}
+
+{% block contenido %}
+<div class="separador"></div>
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1>Mis Comunidades</h1>
+        </div>
+    </div>
+    <div class="row mb-2">
+        <div class="col-12">
+            <button class="m-0" data-bs-toggle="modal" data-bs-target="#createGroupModal">
+                Crear nueva comunidad
+            </button>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-12">
+           <div class="table-responsive">
+            <table id="grupos" class="table table-striped table-bordered" width="100%" >
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Miembros</th>
+                        <th>Dueño</th>
+                        <th class="dt-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for g in grupos %}
+                    <tr>
+                        <td>{{g.nombre}}</td>
+                        <td>{{g.descripcion}}</td>
+                        <td>{{g.miembros.count}}</td>
+                        <td>{{g.owner.email}}</td>
+                        <td class="dt-center"> 
+                            <a href="#" class="btn btn-sm btn-outline-primary" title="Ver detalles"> 
+                                <i class="bi bi-eye"></i></a>
+                        </td>
+                    </tr>       
+                {% endfor %}
+                </tbody>    
+            </table>
+        </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para crear grupo -->
+<div class="modal fade" id="createGroupModal" tabindex="-1" aria-labelledby="createGroupModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form action="/grupos" method="post">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title" id="createGroupModalLabel">Crear Nueva Comunidad</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="mb-3">
+                <label for="nombre" class="form-label">Nombre del grupo</label>
+                <input type="text" name="nombre" id="nombre" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="descripcion" class="form-label">Descripción</label>
+                <textarea name="descripcion" id="descripcion" class="form-control"></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Crear</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+       $('#grupos').DataTable({
+           "language": { 
+               "search": 'Buscar',
+               "lengthMenu": "Mostrar _MENU_ registros por página",
+               "paginate":{
+                   previous: '‹',
+                   next:     '›'
+               }
+           }
+       });
+   });
+</script>
+{% endblock %}

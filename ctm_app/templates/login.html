@@ -1,40 +1,74 @@
 {% extends "public.html" %}
+{% load static %}
 
-{% block titulo %}Login CTMagic{% endblock %}
+{% block titulo %}Login — CTM.a.g.i.c.{% endblock %}
 
 {% block contenido %}
-  <div class="container contenido logo_orange mt-5 p-5">
-    <div class="mt-3">
-      <div class="row">
-        <div class="col-sm-6 logo_orange ">
-          <h1>Login <span class="garde">CTM.a.g.i.c.</span></h1>
-          {% load static %}
-          <img src='{% static "/imgs/logo_01.png" %}' alt="" class="logo_orange">
-        
-        </div>
-        <div class="col-sm-6 ">
-          <form method="POST">
-            {% csrf_token %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8 col-xl-7">
+
+      <div class="public-card">
+        <div class="row align-items-center g-4">
+
+          <!-- Logo -->
+          <div class="col-12 col-md-6 text-center logo-divider">
+            <h2 class="garde naranjo mb-2">CTM.a.g.i.c.</h2>
+            <img src='{% static "/imgs/logo_02.png" %}' alt="CTM Logo" style="max-height: 90px; max-width: 100%;">
+          </div>
+
+          <!-- Formulario -->
+          <div class="col-12 col-md-6">
+            <h5 class="mb-4" style="color: #E0E0E0;">
+              <i class="bi bi-box-arrow-in-right naranjo me-2"></i>Iniciar sesión
+            </h5>
+
+            <form method="POST">
+              {% csrf_token %}
+
               <div class="mb-3">
                 <label for="email" class="form-label">Email</label>
-                <input type="text" class="form-control" id="email" name="email" value="{{request.session.login_email}}">
-            </div>
-            <div class="mb-3">
+                <input type="text" class="form-control" id="email" name="email"
+                  value="{{ request.session.login_email }}" placeholder="tu@email.com" autocomplete="email">
+              </div>
+
+              <div class="mb-4">
                 <label for="password" class="form-label">Contraseña</label>
-                <input type="password" class="form-control" id="password" name="password">
+                <input type="password" class="form-control" id="password" name="password" placeholder="••••••••"
+                  autocomplete="current-password">
+              </div>
+
+              <div class="d-grid mb-3">
+                <button type="submit" class="btn btn-primary btn-shine">
+                  <i class="bi bi-box-arrow-in-right me-1"></i>Ingresar
+                </button>
+              </div>
+            </form>
+
+            <div class="text-center mb-2">
+              <a href="/accounts/google/login/" style="color: #C0C0C0; font-size: 0.88rem; text-decoration: none;">
+                <i class="bi bi-google me-1 naranjo"></i>Ingresar con Google
+              </a>
             </div>
-            <button type="submit" class="btn btn-primary">Ingresar</button>
-          </form>
-          <p><a href="/accounts/google/login/">Ingresar con Google</a></p>
-          Olvidaste tu clave? <a href="/user/password/request">recuperar aquí</a>
+
+            <div class="text-center mb-3" style="font-size: 0.85rem;">
+              <a href="/user/password/request" class="naranjo text-decoration-none">
+                <i class="bi bi-key me-1"></i>¿Olvidaste tu clave?
+              </a>
+            </div>
+
+            <hr class="form-divider">
+
+            <p class="text-center mb-0" style="font-size: 0.85rem; color: #888;">
+              ¿No tienes cuenta?
+              <a href="/registro" class="naranjo text-decoration-none ms-1">Registrarse</a>
+            </p>
+          </div>
+
         </div>
-        
       </div>
-      <div>
-        Si aun no tienes una cuenta, ve a <a href="/registro" class="naranjo">Registrarse</a>
-      </div>
+
     </div>
   </div>
-
-
-  {% endblock %}
+</div>
+{% endblock %}

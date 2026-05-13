@@ -1,59 +1,76 @@
 {% extends "public.html" %}
+{% load static %}
 
-{% block titulo %}Registro CTMagic{% endblock %}
+{% block titulo %}Registro — CTM.a.g.i.c.{% endblock %}
 
 {% block contenido %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8 col-xl-7">
 
-  <div class="container contenido logo_orange mt-5 p-5">
-    <div class="mt-3">
-      <div class="row">
-        <div class="col-sm-6 logo_orange">
-          <h1>Registro <span class="garde">CTM.a.g.i.c.</span></h1>
-          {% load static %}
-          <img src='{% static "/imgs/logo_01.png" %}' alt="" class="logo_orange">
-        </div>
+      <div class="public-card">
+        <div class="row align-items-center g-4">
 
-        <div class="col-sm-6">
-          <form method="POST">
-            {% csrf_token %}
-            <div class="mb-3">
-              <label for="nombre" class="form-label">Nombre</label>
-              <input type="text" class="form-control" id="name" name="name" value="{{request.session.register_name}}">
-            </div>
-    
-            <div class="mb-3">
-              <label for="email" class="form-label">Email</label>
-              <input type="text" class="form-control" id="email" name="email" value="{{request.session.register_email}}">
-            </div>
-            <div class="mb-3">
-              <label for="password" class="form-label">Contraseña</label>
-              <input type="password" class="form-control" id="password" name="password">
-            </div>
-            <div class="mb-3">
-              <label for="password_confirm" class="form-label">Confirmar Contraseña</label>
-              <input type="password" class="form-control" id="password_confirm" name="password_confirm">
-            </div>
-            <input type="hidden" name="role" value="user">
-            <!--
-            <div class="mb-3">
-              <label for="role" class="form-label">Rol</label>
-              <select name="role" id="role">
-                <option value="user">Usuario Normal</option>
-                <option value="admin">Administrador</option>
-              </select>
-            </div>
-            -->
-    
-            <button type="submit" class="btn btn-primary">Registrar</button>
-          </form>
+          <!-- Logo -->
+          <div class="col-12 col-md-6 text-center logo-divider">
+            <h2 class="garde naranjo mb-2">CTM.a.g.i.c.</h2>
+            <img src='{% static "/imgs/logo_02.png" %}' alt="CTM Logo" style="max-height: 90px; max-width: 100%;">
+          </div>
+
+          <!-- Formulario -->
+          <div class="col-12 col-md-6">
+            <h5 class="mb-4" style="color: #E0E0E0;">
+              <i class="bi bi-person-plus naranjo me-2"></i>Crear cuenta
+            </h5>
+
+            <form method="POST">
+              {% csrf_token %}
+
+              <div class="mb-3">
+                <label for="name" class="form-label">Nombre</label>
+                <input type="text" class="form-control" id="name" name="name"
+                  value="{{ request.session.register_name }}" placeholder="Tu nombre" autocomplete="name">
+              </div>
+
+              <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="text" class="form-control" id="email" name="email"
+                  value="{{ request.session.register_email }}" placeholder="tu@email.com" autocomplete="email">
+              </div>
+
+              <div class="mb-3">
+                <label for="password" class="form-label">Contraseña</label>
+                <input type="password" class="form-control" id="password" name="password" placeholder="••••••••"
+                  autocomplete="new-password">
+              </div>
+
+              <div class="mb-4">
+                <label for="password_confirm" class="form-label">Confirmar Contraseña</label>
+                <input type="password" class="form-control" id="password_confirm" name="password_confirm"
+                  placeholder="••••••••" autocomplete="new-password">
+              </div>
+
+              <input type="hidden" name="role" value="user">
+
+              <div class="d-grid mb-3">
+                <button type="submit" class="btn btn-primary btn-shine">
+                  <i class="bi bi-person-check me-1"></i>Registrar
+                </button>
+              </div>
+            </form>
+
+            <hr class="form-divider">
+
+            <p class="text-center mb-0" style="font-size: 0.85rem; color: #888;">
+              ¿Ya tienes cuenta?
+              <a href="/login" class="naranjo text-decoration-none ms-1">Iniciar sesión</a>
+            </p>
+          </div>
+
         </div>
-    
-        
       </div>
-      <div>
-        <a href="/login" class="naranjo">Ingresar con usuario ya registrado</a>
-      </div>
+
     </div>
-    
   </div>
-  {% endblock %}
+</div>
+{% endblock %}

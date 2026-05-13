@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block titulo %}Actualizaciones (Changelog){% endblock %}
+
+{% block contenido %}
+<div class="container mt-5">
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h1 class="display-4 font-weight-bold text-warning">Actualizaciones y Novedades</h1>
+            <p class="lead text-muted">Mantente al tanto de todo lo nuevo en CTM.a.g.i.c.</p>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="timeline">
+
+                <!-- Versión 2.001 -->
+                <div class="card bg-dark text-light border-secondary mb-4 shadow-sm">
+                    <div class="card-header border-secondary d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0 text-warning">Versión 2.001</h4>
+                        <span class="badge bg-secondary">Mayo 2026</span>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="bi bi-star-fill text-warning me-2"></i><strong>Parser Inteligente de Texto Plano:</strong> Ahora puedes pegar e importar tus listas directamente desde los archivos de texto nativos de Manabox.</li>
+                            <li class="mb-2"><i class="bi bi-star-fill text-warning me-2"></i><strong>Límites Flexibles de Importación:</strong> Se eliminó el bloqueo duro. Usuarios FREE ahora pueden subir listas truncadas automáticamente a 300 cartas. Los usuarios PRO/PREMIUM mantienen descargas ilimitadas.</li>
+                            <li class="mb-2"><i class="bi bi-star-fill text-warning me-2"></i><strong>Rediseño Visual Mágico:</strong> Nueva paleta de colores oscura optimizada (Mítico) para descansar la vista.</li>
+                            <li class="mb-2"><i class="bi bi-star-fill text-warning me-2"></i><strong>Sidebar Colapsable:</strong> La navegación superior se movió a un moderno panel lateral interactivo, dejando más espacio para visualizar tus cartas.</li>
+                            <li class="mb-2"><i class="bi bi-star-fill text-warning me-2"></i><strong>Páginas Informativas Independientes:</strong> Separación de las páginas 'Acerca de', 'Actualizaciones' y 'Niveles de cuenta'.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Versión 1.X -->
+                <div class="card bg-dark text-light border-secondary mb-4 shadow-sm opacity-75">
+                    <div class="card-header border-secondary d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0 text-muted">Versión 1.X (Legacy)</h4>
+                        <span class="badge bg-secondary">Versiones Anteriores</span>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled text-muted">
+                            <li>- Sistema base de búsqueda y matching.</li>
+                            <li>- Integración con Scryfall API.</li>
+                            <li>- Niveles de privacidad básicos y grupos.</li>
+                            <li>- Importación por archivos CSV básicos.</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

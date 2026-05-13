@@ -1,72 +1,150 @@
 {% extends "../base.html" %}
 
-{% block titulo %}PREFERENCIAS USUARIO{% endblock %}
+{% block titulo %}Perfil de {{ user.name }} - CTMagic{% endblock %}
 
 {% block contenido %}
 <div class="separador"></div>
-<h1>Usuario: {{user.name}} 
-    <span class="d-none" id="user_check"><i class="bi bi-person-check-fill text-success"></i></span>
-    {% if user.nick != '' %} ({{user.nick}}) {% endif %}
-</h1>
+<div class="container my-4">
 
-<h4>Ubicacion: {{user.ubicacion}}</h4>
-<div>Cantidad de listas: {{user.listas.count}}</div>
-
-<div class="accordion accordion-flush" id="accordionFlushExample">
-    <div class="accordion-item">
-      <h2 class="accordion-header" id="flush-headingOne">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
-            listas de busqueda activas: {{listas_busqueda.count}}
-        </button>
-      </h2>
-      <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
-        <div class="accordion-body">
-            {% for l in listas_busqueda %}
-            <li>
-                <a href="/list/share/{{l.id}}" target="_blank">  {{l.nombre}} ( {{l.items.count}} Cartas)</a> 
-            </li>
-            {% endfor %}
+    <!-- Header de perfil -->
+    <div class="row mb-4 align-items-center">
+        <div class="col">
+            <h1 class="garde">
+                <i class="bi bi-person-circle text-warning me-2"></i>
+                {{ user.name }}
+                <span class="d-none" id="user_check"><i class="bi bi-patch-check-fill text-warning ms-1" title="Ya en tus contactos"></i></span>
+                {% if user.nick != '' %}
+                <small class="text-muted fs-5">({{ user.nick }})</small>
+                {% endif %}
+            </h1>
+            {% if user.ubicacion %}
+            <p class="text-muted mb-0"><i class="bi bi-geo-alt-fill text-warning me-1"></i> {{ user.ubicacion }}</p>
+            {% endif %}
         </div>
-      </div>
+        <div class="col-auto">
+            {% if user_login %}
+                {% if contacto_valido %}
+                <a href="/user/add_contacto/{{ user.id }}" class="btn btn-warning btn-shine text-dark fw-bold rounded-pill px-4">
+                    <i class="bi bi-person-plus-fill me-1"></i> Agregar a mis contactos
+                </a>
+                {% else %}
+                <span class="badge rounded-pill px-3 py-2 fs-6" style="background-color: rgba(247,126,13,0.2); color: #F77e0d; border: 1px solid rgba(247,126,13,0.4);">
+                    <i class="bi bi-person-check-fill me-1"></i> Ya en tus contactos
+                </span>
+                <script>$('#user_check').removeClass('d-none')</script>
+                {% endif %}
+            {% else %}
+            <span class="text-muted small">
+                <a href="/registro" class="text-warning">Regístrate</a> o <a href="/login" class="text-warning">inicia sesión</a> para agregar contactos.
+            </span>
+            {% endif %}
+        </div>
     </div>
-    <div class="accordion-item">
-      <h2 class="accordion-header" id="flush-headingTwo">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo" aria-expanded="false" aria-controls="flush-collapseTwo">
-            listas de cambio/venta: {{listas_venta.count}}
-        </button>
-      </h2>
-      <div id="flush-collapseTwo" class="accordion-collapse collapse" aria-labelledby="flush-headingTwo" data-bs-parent="#accordionFlushExample">
-        <div class="accordion-body">
-            {% for l2 in listas_venta %}
-            <li>
-                <a href="/list/share/{{l2.id}}" target="_blank">  {{l2.nombre}}( {{l2.items.count}} Cartas) </a> 
-            </li>
-            {% endfor %}
+
+    <!-- Stats row -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="text-center py-3 rounded-3" style="background-color: #2e2e45; border: 1px solid rgba(247,126,13,0.3);">
+                <div class="fs-2 fw-bold text-warning">{{ user.listas.count }}</div>
+                <div class="text-muted small">Listas totales</div>
             </div>
-      </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="text-center py-3 rounded-3" style="background-color: #2e2e45; border: 1px solid rgba(247,126,13,0.3);">
+                <div class="fs-2 fw-bold text-warning">{{ listas_busqueda.count }}</div>
+                <div class="text-muted small">Listas de Búsqueda</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="text-center py-3 rounded-3" style="background-color: #2e2e45; border: 1px solid rgba(247,126,13,0.3);">
+                <div class="fs-2 fw-bold text-warning">{{ listas_venta.count }}</div>
+                <div class="text-muted small">Listas para Ofrecer</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="text-center py-3 rounded-3" style="background-color: #2e2e45; border: 1px solid rgba(247,126,13,0.3);">
+                <div class="fs-2 fw-bold text-warning">{{ n_contactos.count }}</div>
+                <div class="text-muted small">Contactos</div>
+            </div>
+        </div>
     </div>
-    
-  </div>
 
-<div>Cantidad de contactos: {{n_contactos.count}}</div>
+    <!-- Listas -->
+    <div class="row g-4">
+        <!-- Listas de Búsqueda -->
+        <div class="col-md-6">
+            <div class="rounded-3 overflow-hidden shadow" style="border: 1px solid rgba(247,126,13,0.3);">
+                <div style="background-color: #1a1a2e; border-bottom: 2px solid #F77e0d; padding: 12px 16px;">
+                    <span style="color: #F77e0d; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.06em;">
+                        <i class="bi bi-search me-1"></i> Listas de Búsqueda ({{ listas_busqueda.count }})
+                    </span>
+                </div>
+                <div style="background-color: #2e2e45;">
+                    {% if listas_busqueda %}
+                        {% for l in listas_busqueda %}
+                        <a href="/list/share/{{ l.id }}" target="_blank"
+                           class="d-flex align-items-center justify-content-between px-3 py-2 text-decoration-none"
+                           style="border-bottom: 1px solid rgba(255,255,255,0.05); background-color: {% cycle '#2e2e45' '#38385a' %}; transition: background 0.15s;"
+                           onmouseover="this.style.backgroundColor='rgba(247,126,13,0.12)'"
+                           onmouseout="this.style.backgroundColor=''"
+                        >
+                            <span style="color: #f0c060; font-weight: 600;">
+                                <i class="bi bi-caret-right-fill text-warning me-1" style="font-size: 0.7rem;"></i>
+                                {{ l.nombre }}
+                            </span>
+                            <span class="badge rounded-pill" style="background-color: rgba(247,126,13,0.2); color: #F77e0d; font-size: 0.75rem;">
+                                {{ l.items.count }} cartas
+                            </span>
+                        </a>
+                        {% endfor %}
+                    {% else %}
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-inbox" style="font-size: 1.5rem;"></i>
+                        <p class="mt-2 mb-0 small">Sin listas de búsqueda activas.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
 
-{% if user_login %}
-    {% if contacto_valido %}
-    <a href="/user/add_contacto/{{user.id}}">Agregar a mis contactos</a>
-    {% else %}
-        {% if user %}
-            <u class="text-warning">Este usuario ya está en sus contactos.</u> 
-            <script>
-                $('#user_check').removeClass('d-none')
-            </script>
-        {% endif %}
-    {% endif %}
-{% else %}
-Debe <a href="/registro">registrarse</a>  o <a href="/login">ingresar</a>  para agregar este usuario a sus contactos
-{% endif %}
+        <!-- Listas para Ofrecer -->
+        <div class="col-md-6">
+            <div class="rounded-3 overflow-hidden shadow" style="border: 1px solid rgba(247,126,13,0.3);">
+                <div style="background-color: #1a1a2e; border-bottom: 2px solid #F77e0d; padding: 12px 16px;">
+                    <span style="color: #F77e0d; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.06em;">
+                        <i class="bi bi-shop me-1"></i> Listas para Ofrecer ({{ listas_venta.count }})
+                    </span>
+                </div>
+                <div style="background-color: #2e2e45;">
+                    {% if listas_venta %}
+                        {% for l2 in listas_venta %}
+                        <a href="/list/share/{{ l2.id }}" target="_blank"
+                           class="d-flex align-items-center justify-content-between px-3 py-2 text-decoration-none"
+                           style="border-bottom: 1px solid rgba(255,255,255,0.05); background-color: {% cycle '#2e2e45' '#38385a' %}; transition: background 0.15s;"
+                           onmouseover="this.style.backgroundColor='rgba(247,126,13,0.12)'"
+                           onmouseout="this.style.backgroundColor=''"
+                        >
+                            <span style="color: #f0c060; font-weight: 600;">
+                                <i class="bi bi-caret-right-fill text-warning me-1" style="font-size: 0.7rem;"></i>
+                                {{ l2.nombre }}
+                            </span>
+                            <span class="badge rounded-pill" style="background-color: rgba(247,126,13,0.2); color: #F77e0d; font-size: 0.75rem;">
+                                {{ l2.items.count }} cartas
+                            </span>
+                        </a>
+                        {% endfor %}
+                    {% else %}
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-bag-x" style="font-size: 1.5rem;"></i>
+                        <p class="mt-2 mb-0 small">Sin listas para ofrecer activas.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
 
-
+</div>
 {% endblock %}
 
-{% block libreria %}
-{% endblock %}
+{% block libreria %}{% endblock %}

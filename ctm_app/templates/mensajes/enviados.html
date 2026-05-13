@@ -1,147 +1,160 @@
 {% extends "../base.html" %}
 
-{% block titulo %}Mensajes Enviados{% endblock %}
+{% block titulo %}Mensajes Enviados - CTMagic{% endblock %}
 
 {% block contenido %}
 <div class="separador"></div>
-<h1>Mensajes Enviados</h1>
-<a href="/msg/get">Ir a Recibidos</a>
-<div class="container">
-    <div class="row">
-        {% if mensajes.count > 0 %}
+<div class="container my-4">
+
+    <div class="row mb-3 align-items-center">
+        <div class="col">
+            <h1 class="garde"><i class="bi bi-send-fill text-warning me-2"></i>Mensajes Enviados</h1>
+        </div>
+        <div class="col-auto">
+            <a href="/msg/get" class="btn btn-outline-warning rounded-pill px-4">
+                <i class="bi bi-inbox me-1"></i> Ir a Recibidos
+            </a>
+        </div>
+    </div>
+
+    <div class="row mb-4">
         <div class="col-12">
-            <div class="table-responsive" id="main_table">
-                <table id="lista_mensajes" class="table table-striped table-bordered" width="100%" >
+            {% if mensajes.count > 0 %}
+            <div class="table-responsive rounded-3 shadow mb-4" style="border: 1px solid rgba(247,126,13,0.3); overflow: hidden;">
+                <table id="lista_mensajes" class="table mb-0" width="100%">
                     <thead>
                         <tr>
-                            <th>Para</th>
-                            <th>Fecha</th>
+                            <th><i class="bi bi-person-fill me-1"></i> Para</th>
+                            <th><i class="bi bi-calendar3 me-1"></i> Fecha</th>
                             <th class="d-none">Estado</th>
-                            <th class="dt-center">Actions</th>
+                            <th class="text-center"><i class="bi bi-gear me-1"></i> Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for m in mensajes %}
                         <tr>
-                            <td class="dt-center"> 
-                                <a href="/user/{{m.to_user.id}}">{{m.to_user.name}}  </a>                          
+                            <td>
+                                <a href="/user/{{ m.to_user.id }}" style="color:#f0c060; font-weight:600; text-decoration:none;">
+                                    <i class="bi bi-person-circle me-1 text-warning"></i>{{ m.to_user.name }}
+                                </a>
                             </td>
-                            <td> {{m.created_at}}</td>
-                            <td  class="d-none">{{m.estado}}</td>
-                            <td class="dt-center"> 
-                                <a href="{% url 'mostrar_modal' m.id %}"  data-href="{% url 'mostrar_modal' m.id %}"  class="btn btn-sm btn-outline-primary btn-read-trv" data-toggle="modal" data-target="#confirm-read" title="Leer">
+                            <td>{{ m.created_at }}</td>
+                            <td class="d-none">{{ m.estado }}</td>
+                            <td class="text-center">
+                                <a href="{% url 'mostrar_modal' m.id %}" data-href="{% url 'mostrar_modal' m.id %}"
+                                   class="btn btn-sm btn-warning btn-shine text-dark fw-bold border-0 rounded-pill btn-read-trv"
+                                   data-toggle="modal" data-target="#confirm-read" title="Ver">
                                     <i class="bi bi-eye-fill"></i>
-                                </a>                                 
-                                
-                                    
+                                </a>
                             </td>
-                        </tr>      
-                    {% endfor %}
-                    </tbody>    
+                        </tr>
+                        {% endfor %}
+                    </tbody>
                 </table>
             </div>
-        </div>
-        {% else %}
-        <div class="row">
-            <div class="col">
-                No tiene mensajes enviados 
+            {% else %}
+            <div class="text-center py-4 rounded-3 mb-4" style="background-color: #2e2e45; border: 1px solid rgba(247,126,13,0.2);">
+                <i class="bi bi-send text-warning" style="font-size: 3rem;"></i>
+                <p class="text-muted mt-3">No has enviado mensajes todavía.</p>
             </div>
-        </div>            
-        {% endif %}    
-        <div class="col-5">
-            <div class="lector" id="msg_text"></div>        
+            {% endif %}
         </div>
     </div>
-</div>
-<div class="row mt-4 ">
-    <div class="col-6 border border-light mx-auto">
-        <div class="row b">
-            <div class="col">
-                <h3>Enviar Mensaje</h3>
-            </div>
-        </div>
-        <form action="/msg/send" method="POST">
-            {% csrf_token %}
-            <div class="row ">
-                <div class="col">
-                    <div class="row">
-                        <div class="col">
-                            Para: 
-                            <select class="form-select form-select-sm" name="destinatario_id" id="destinatario_id">
+
+    <!-- Formulario Enviar Mensaje -->
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="rounded-3 shadow overflow-hidden" style="border: 1px solid rgba(247,126,13,0.3);">
+                <div style="background-color: #1a1a2e; border-bottom: 2px solid #F77e0d; padding: 12px 16px;">
+                    <span style="color: #F77e0d; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.06em;">
+                        <i class="bi bi-pencil-square me-1"></i> Enviar Nuevo Mensaje
+                    </span>
+                </div>
+                <div style="background-color: #2e2e45; padding: 20px;">
+                    <form action="/msg/send" method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label" style="color:#aaa; font-size:0.85rem;">Para:</label>
+                            {% if contactos %}
+                            <select class="form-select" name="destinatario_id" id="destinatario_id"
+                                style="background-color: #252538; color: #F0F0FF; border: 1px solid rgba(247,126,13,0.4); border-radius: 8px;">
                                 <option value="">Seleccione un contacto</option>
                                 {% for c in contactos %}
-                                <option value="{{c.contacto.id}}">{{c.contacto.name}}</option>
+                                <option value="{{ c.contacto.id }}">{{ c.contacto.name }}</option>
                                 {% endfor %}
                             </select>
-
+                            {% else %}
+                            <div class="rounded-3 p-3 text-center" style="background-color: #1a1a2e; border: 1px dashed rgba(247,126,13,0.5);">
+                                <i class="bi bi-person-x text-warning" style="font-size: 2rem;"></i>
+                                <p class="mt-2 mb-1" style="color: #F0F0FF;">No tienes contactos agregados todavía.</p>
+                                <p class="text-muted small mb-2">Para enviar mensajes primero debes agregar contactos desde sus perfiles.</p>
+                                <a href="/user/contactos" class="btn btn-warning btn-shine text-dark fw-bold rounded-pill px-4">
+                                    <i class="bi bi-person-plus-fill me-1"></i> Ir a Mis Contactos
+                                </a>
+                            </div>
+                            {% endif %}
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col">
-                            <label for="mensaje"  class="form-label">Mensaje:</label>
-                            <textarea name="mensaje" id="mensaje"  rows="6" class="form-control"> </textarea>
+                        <div class="mb-3">
+                            <label for="mensaje" class="form-label" style="color:#aaa; font-size:0.85rem;">Mensaje:</label>
+                            <textarea name="mensaje" id="mensaje" rows="5" class="form-control"
+                                style="background-color: #252538; color: #F0F0FF; border: 1px solid rgba(247,126,13,0.4); border-radius: 8px;"></textarea>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col d-grid gap-2 d-md-flex justify-content-md-end">
-                            <button type="submit" class="btn btn-outline-light btn-sm my-3">Enviar</button>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-warning btn-shine text-dark fw-bold rounded-pill px-5">
+                                <i class="bi bi-send me-1"></i> Enviar
+                            </button>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 
- <!-- Modal -->
- <div class="modal fade" id="confirm-read" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-       
+<!-- Modal Ver Mensaje -->
+<div class="modal fade" id="confirm-read" tabindex="-1" role="dialog" aria-labelledby="readModalLabel">
     <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="myModalLabel">Mensaje de {{mensaje.from_user.name}} para {{mensaje.to_user.name}}</h4>
+        <div class="modal-content" style="background-color: #1e1e2e; border: 1px solid rgba(247,126,13,0.4);">
+            <div class="modal-header" style="border-bottom: 1px solid rgba(247,126,13,0.3);">
+                <h5 class="modal-title text-warning" id="readModalLabel">
+                    <i class="bi bi-envelope-open me-2"></i>
+                    Mensaje de {{ mensaje.from_user.name }} para {{ mensaje.to_user.name }}
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-            <p class="text-warning">{{ mensaje.contenido }}</p>
+                <p style="color: #F0F0FF;">{{ mensaje.contenido }}</p>
             </div>
-            <div class="modal-footer">
-            <a href="/msg/send" class="btn btn-danger text-light" >Cerrar</a>
+            <div class="modal-footer" style="border-top: 1px solid rgba(247,126,13,0.3);">
+                <a href="/msg/send" class="btn btn-secondary rounded-pill">Cerrar</a>
             </div>
         </div>
-    </div>       
+    </div>
 </div>
 
 <script>
     $(document).ready(function() {
-        $('#new_search').hide();
-
-        var oTblReport = $('#lista_mensajes')
-        
-
+        var oTblReport = $('#lista_mensajes');
         oTblReport.DataTable({
-            "language": { 
+            "dom": "<'row mb-2 align-items-center'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-4'f><'col-sm-12 col-md-4 d-flex justify-content-end'p>>" +
+                   "<'row'<'col-sm-12'tr>>" +
+                   "<'row mt-2'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7 d-flex justify-content-end'p>>",
+            "language": {
                 "search": 'Buscar',
-                "lengthMenu": "Mostrar _MENU_ registros por página",
-                //"info": "Mostrando _ENTRIES_ página _PAGE_ de _PAGES_",
-                "paginate":{
-                    previous: '‹',
-                    next:     '›'
-                }
+                "lengthMenu": "Mostrar _MENU_ por página",
+                "paginate": { previous: '‹', next: '›' }
             },
-            "aLengthMenu":[[5,10,20,40,-1],[5,10,20,40,"Todos"]],
-            "iDisplayLength":20
+            "aLengthMenu": [[5,10,20,40,-1],[5,10,20,40,"Todos"]],
+            "iDisplayLength": 20,
+            "order": [[1, "desc"]]
         });
 
         {% if mensaje.contenido|length > 0 %}
             $('#confirm-read').modal('show');
-            
         {% endif %}
     });
-    </script>
-
+</script>
 
 {% endblock %}
 
-{% block libreria %}
-{% endblock %}
+{% block libreria %}{% endblock %}

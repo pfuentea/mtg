@@ -14,12 +14,40 @@
         {% csrf_token %}
     
         {% for field in form %}
-        <div class="row mb-1  my-strip">
-            <div class='form-group col-3'>
-                <label for="{{ field.name }}">{{ field.label }}:</label>
+            {% if field.name == 'shared_with_users' or field.name == 'shared_with_groups' %}
+            <div class="row mb-3 my-strip d-none p-3 rounded-3" id="container_{{ field.name }}">
+                <div class="col-12">
+                    <label class="fw-bold mb-2">{{ field.label }}:</label>
+                    <div class="d-none">{{ field }}</div>
+                    
+                    <div class="row">
+                        <div class="col-5">
+                            <label class="small text-muted mb-1"><i class="bi bi-list-ul"></i> Disponibles para agregar:</label>
+                            <select multiple class="form-select border-secondary" id="available_{{ field.name }}" style="height: 160px; background-color: #2b2b36; color: #fff;"></select>
+                        </div>
+                        <div class="col-2 d-flex flex-column justify-content-center align-items-center gap-3">
+                            <button type="button" class="btn btn-warning btn-shine fw-bold text-dark border-0 rounded-pill px-3 py-2" onclick="moveItems('available_{{ field.name }}', 'selected_{{ field.name }}', '{{ field.name }}')" title="Agregar">
+                                <i class="bi bi-chevron-right fs-5"></i>
+                            </button>
+                            <button type="button" class="btn btn-warning btn-shine fw-bold text-dark border-0 rounded-pill px-3 py-2" onclick="moveItems('selected_{{ field.name }}', 'available_{{ field.name }}', '{{ field.name }}')" title="Quitar">
+                                <i class="bi bi-chevron-left fs-5"></i>
+                            </button>
+                        </div>
+                        <div class="col-5">
+                            <label class="small text-muted mb-1"><i class="bi bi-check2-all"></i> Agregados a la lista:</label>
+                            <select multiple class="form-select border-success" id="selected_{{ field.name }}" style="height: 160px; background-color: #2b2b36; color: #fff;"></select>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="col-4">{{ field }}</div>
-        </div>
+            {% else %}
+            <div class="row mb-1 my-strip align-items-center">
+                <div class='form-group col-3'>
+                    <label for="{{ field.name }}" class="fw-bold">{{ field.label }}:</label>
+                </div>
+                <div class="col-9">{{ field }}</div>
+            </div>
+            {% endif %}
         {% endfor %}
    
     <div class="row">
@@ -85,12 +113,72 @@
         });
 
 //send form with button id guardar in jquery?
-        $('#guardar').on('click',function () {
-            console.log("press")
+        $('#guardar').on('click',function (e) {
+            console.log("press");
+            syncOriginal('shared_with_users');
+            syncOriginal('shared_with_groups');
             $('#form_edit').submit();
-            
         });
+
+        // INIT DUAL LISTS
+        function initDualList(fieldName) {
+            let originalSelect = $('#id_' + fieldName);
+            let availableSelect = $('#available_' + fieldName);
+            let selectedSelect = $('#selected_' + fieldName);
+            
+            availableSelect.empty();
+            selectedSelect.empty();
+            
+            originalSelect.find('option').each(function() {
+                if ($(this).is(':selected')) {
+                    selectedSelect.append($(this).clone());
+                } else {
+                    availableSelect.append($(this).clone());
+                }
+            });
+        }
+        
+        initDualList('shared_with_users');
+        initDualList('shared_with_groups');
+
+        // TOGGLE PRIVACY
+        function togglePrivacy() {
+            let val = $('#id_privacidad').val();
+            $('#container_shared_with_users').addClass('d-none');
+            $('#container_shared_with_groups').addClass('d-none');
+            
+            if (val === 'SHARED') {
+                $('#container_shared_with_users').removeClass('d-none');
+            } else if (val === 'GROUP') {
+                $('#container_shared_with_groups').removeClass('d-none');
+            }
+        }
+        
+        $('#id_privacidad').on('change', togglePrivacy);
+        togglePrivacy();
     });
+
+    window.moveItems = function(fromId, toId, fieldName) {
+        let fromSelect = $('#' + fromId);
+        let toSelect = $('#' + toId);
+        
+        fromSelect.find('option:selected').each(function() {
+            $(this).prop('selected', false);
+            toSelect.append($(this));
+        });
+        
+        syncOriginal(fieldName);
+    };
+    
+    window.syncOriginal = function(fieldName) {
+        let originalSelect = $('#id_' + fieldName);
+        let selectedSelect = $('#selected_' + fieldName);
+        
+        originalSelect.find('option').prop('selected', false);
+        selectedSelect.find('option').each(function() {
+            originalSelect.find('option[value="'+$(this).val()+'"]').prop('selected', true);
+        });
+    };
 
     function copy(selector){
         var $temp = $("<div>");

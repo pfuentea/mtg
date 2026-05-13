@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block titulo %}Niveles de Suscripción (Tiers){% endblock %}
+
+{% block contenido %}
+<div class="container mt-5">
+    <div class="row text-center mb-5">
+        <div class="col-12">
+            <h1 class="display-4 font-weight-bold">Conoce nuestros planes</h1>
+            <p class="lead text-muted">Mejora tu experiencia en CTM.a.g.i.c con un plan que se adapte a tus necesidades.</p>
+        </div>
+    </div>
+    
+    <div class="row g-4 justify-content-center">
+        <!-- FREE Tier -->
+        <div class="col-12 col-md-4">
+            <div class="card h-100 shadow-sm {% if user.tier == 'FREE' %}border-primary{% endif %}">
+                <div class="card-header text-center bg-transparent {% if user.tier == 'FREE' %}text-primary{% endif %}">
+                    <h2 class="my-0 fw-normal">FREE</h2>
+                </div>
+                <div class="card-body text-center d-flex flex-column">
+                    <h1 class="card-title pricing-card-title">$0 <small class="text-muted fw-light">/mes</small></h1>
+                    <ul class="list-unstyled mt-3 mb-4 text-start mx-auto">
+                        <li><i class="bi bi-check text-success"></i> Acceso a listas de búsqueda y oferta</li>
+                        <li><i class="bi bi-check text-success"></i> Opciones de privacidad estándar</li>
+                        <li><i class="bi bi-check text-success"></i> Integración con grupos</li>
+                        <li><i class="bi bi-check text-success"></i> Importación masiva limitada a <strong>300 cartas</strong> por vez.</li>
+                    </ul>
+                    <div class="mt-auto">
+                        {% if user.tier == 'FREE' %}
+                            <button type="button" class="btn btn-lg btn-outline-primary w-100 disabled">Tu plan actual</button>
+                        {% else %}
+                            <button type="button" class="btn btn-lg btn-outline-primary w-100">Bajar de plan</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PRO Tier -->
+        <div class="col-12 col-md-4">
+            <div class="card h-100 shadow-sm border-warning {% if user.tier == 'PRO' %}bg-light{% endif %}">
+                <div class="card-header text-center bg-warning text-dark">
+                    <h2 class="my-0 fw-normal">PRO</h2>
+                </div>
+                <div class="card-body text-center d-flex flex-column">
+                    <h1 class="card-title pricing-card-title">$5 <small class="text-muted fw-light">/mes</small></h1>
+                    <ul class="list-unstyled mt-3 mb-4 text-start mx-auto">
+                        <li><i class="bi bi-check text-success"></i> Todo lo de FREE</li>
+                        <li><i class="bi bi-check text-success"></i> Importaciones masivas <strong>ilimitadas</strong> (Manabox, Moxfield)</li>
+                        <li><i class="bi bi-check text-success"></i> Sin anuncios publicitarios</li>
+                        <li><i class="bi bi-check text-success"></i> Insignia de usuario PRO</li>
+                    </ul>
+                    <div class="mt-auto">
+                        {% if user.tier == 'PRO' %}
+                            <button type="button" class="btn btn-lg btn-warning w-100 disabled">Tu plan actual</button>
+                        {% else %}
+                            <button type="button" class="btn btn-lg btn-warning w-100">Mejorar a PRO</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PREMIUM Tier -->
+        <div class="col-12 col-md-4">
+            <div class="card h-100 shadow-sm border-danger {% if user.tier == 'PREMIUM' %}bg-light{% endif %}">
+                <div class="card-header text-center bg-danger text-white">
+                    <h2 class="my-0 fw-normal">PREMIUM</h2>
+                </div>
+                <div class="card-body text-center d-flex flex-column">
+                    <h1 class="card-title pricing-card-title">$10 <small class="text-muted fw-light">/mes</small></h1>
+                    <ul class="list-unstyled mt-3 mb-4 text-start mx-auto">
+                        <li><i class="bi bi-check text-success"></i> Todo lo de PRO</li>
+                        <li><i class="bi bi-check text-success"></i> Límites de capacidad extendidos</li>
+                        <li><i class="bi bi-check text-success"></i> Acceso anticipado a nuevas funciones</li>
+                        <li><i class="bi bi-check text-success"></i> Soporte prioritario</li>
+                    </ul>
+                    <div class="mt-auto">
+                        {% if user.tier == 'PREMIUM' %}
+                            <button type="button" class="btn btn-lg btn-danger w-100 disabled">Tu plan actual</button>
+                        {% else %}
+                            <button type="button" class="btn btn-lg btn-danger w-100">Mejorar a PREMIUM</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
