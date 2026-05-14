@@ -14,12 +14,21 @@
       La plataforma para intercambiar cartas <strong style="color:#F77e0d;">Magic: The Gathering</strong> con otros jugadores.
     </p>
     <div class="d-flex justify-content-center gap-3 flex-wrap">
-      <a href="/registro" class="btn btn-primary btn-shine px-4 py-2">
-        <i class="bi bi-person-plus me-2"></i>Comenzar ahora
-      </a>
-      <a href="/login" class="btn btn-outline-warning px-4 py-2">
-        <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar sesión
-      </a>
+      {% if request.session.user %}
+        <a class="btn btn-primary px-4 py-2 disabled" aria-disabled="true" tabindex="-1">
+          <i class="bi bi-person-plus me-2"></i>Comenzar ahora
+        </a>
+        <a href="/index" class="btn btn-warning text-dark fw-bold btn-shine px-4 py-2">
+          <i class="bi bi-arrow-right-circle me-2"></i>Ir a mi panel
+        </a>
+      {% else %}
+        <a href="/registro" class="btn btn-primary btn-shine px-4 py-2">
+          <i class="bi bi-person-plus me-2"></i>Comenzar ahora
+        </a>
+        <a href="/login" class="btn btn-outline-warning px-4 py-2">
+          <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar sesión
+        </a>
+      {% endif %}
     </div>
   </div>
 

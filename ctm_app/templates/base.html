@@ -122,11 +122,16 @@
             <li><a class="dropdown-item" href="/grupos">Mis Comunidades</a></li>
           </ul>
         </li>
-        <li class="nav-item mt-2 border-top border-secondary pt-2">
-          <a class="nav-link fs-5 text-warning {% if '/about' in request.path %}active{% endif %}" href="/about"><i class="bi bi-info-circle fs-4"></i> <span class="sidebar-text">¿Qué es CTMagic?</span></a>
-        </li>
-        <li class="nav-item mt-2">
-          <a class="nav-link fs-5 text-warning {% if '/tiers' in request.path %}active{% endif %}" href="/tiers"><i class="bi bi-star fs-4"></i> <span class="sidebar-text">Tiers/Niveles</span></a>
+        <li class="nav-item dropdown dropend mt-2 border-top border-secondary pt-2">
+          <a class="nav-link fs-5 text-warning dropdown-toggle {% if '/about' in request.path or '/tiers' in request.path or '/changelog' in request.path %}active{% endif %}"
+             href="#" id="sidebarInfo" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-info-circle fs-4"></i> <span class="sidebar-text">Información</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-dark shadow" aria-labelledby="sidebarInfo">
+            <li><a class="dropdown-item {% if '/about' in request.path %}active{% endif %}" href="/about"><i class="bi bi-question-circle me-2"></i>Acerca de</a></li>
+            <li><a class="dropdown-item {% if '/changelog' in request.path %}active{% endif %}" href="/changelog"><i class="bi bi-clock-history me-2"></i>Actualizaciones</a></li>
+            <li><a class="dropdown-item {% if '/tiers' in request.path %}active{% endif %}" href="/tiers"><i class="bi bi-star me-2"></i>Planes y Tiers</a></li>
+          </ul>
         </li>
         {% endif %}
       </ul>
@@ -167,18 +172,18 @@
       <div class="container p-3 pt-0">
         <div class="row">
           <div class="col-lg-6 col-md-6 mb-2 text-start">
-            <h6 class="text-uppercase text-warning mb-2">Nosotros</h6>
+            <h6 class="text-uppercase text-warning mb-2">Información</h6>
             <ul class="list-unstyled mb-0 small">
-              <li><a href="/about" class="text-light text-decoration-none hover-warning">¿Quiénes somos?</a></li>
-              <li><a href="/about" class="text-light text-decoration-none hover-warning">¿Qué hace la APP?</a></li>
-              <li><a href="/about" class="text-light text-decoration-none hover-warning">¿Cómo funciona?</a></li>
+              <li><a href="/about" class="text-light text-decoration-none hover-warning">Acerca de CTM.a.g.i.c.</a></li>
+              <li><a href="/changelog" class="text-light text-decoration-none hover-warning">Actualizaciones y Novedades</a></li>
+              <li><a href="/tiers" class="text-light text-decoration-none hover-warning">Planes y Tiers</a></li>
             </ul>
           </div>
           <div class="col-lg-6 col-md-6 mb-2 text-start">
-            <h6 class="text-uppercase text-warning mb-2">Enlaces Útiles</h6>
+            <h6 class="text-uppercase text-warning mb-2">Comunidad</h6>
             <ul class="list-unstyled mb-0 small">
-              <li><a href="/tiers" class="text-light text-decoration-none hover-warning">Planes y Tiers</a></li>
-              <li><a href="/changelog" class="text-light text-decoration-none hover-warning">Actualizaciones</a></li>
+              <li><a href="/contacto" class="text-light text-decoration-none hover-warning">Contacto</a></li>
+              <li><a href="/list/view_all_hunt" class="text-light text-decoration-none hover-warning">Ver todas las búsquedas</a></li>
             </ul>
           </div>
         </div>

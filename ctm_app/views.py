@@ -41,9 +41,12 @@ def landing(request):
     if referer:
         print(f"Ref:{referer}")
 
+    if 'user' in request.session:
+        return redirect('/index')
+
     if request.user.is_authenticated:
         print(request.user.first_name)
-        
+
         if len(request.user.name) == 0:
             print("Nombre vacio...actualizando!")
             usuario = User.objects.get(pk=request.user.id)

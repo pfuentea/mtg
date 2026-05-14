@@ -4,6 +4,21 @@
 
 {% block contenido %}
 <div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="/about" class="btn btn-outline-secondary rounded-pill px-3 py-1">
+                    <i class="bi bi-question-circle me-1"></i>Acerca de
+                </a>
+                <a href="/changelog" class="btn btn-warning text-dark fw-bold rounded-pill px-3 py-1">
+                    <i class="bi bi-clock-history me-1"></i>Actualizaciones
+                </a>
+                <a href="/tiers" class="btn btn-outline-secondary rounded-pill px-3 py-1">
+                    <i class="bi bi-star me-1"></i>Planes y Tiers
+                </a>
+            </div>
+        </div>
+    </div>
     <div class="row mb-5">
         <div class="col-12 text-center">
             <h1 class="display-4 font-weight-bold text-warning">Actualizaciones y Novedades</h1>
@@ -23,10 +38,23 @@
                     </div>
                     <div class="card-body">
                         <ul class="list-unstyled">
-                            <li class="mb-2"><i class="bi bi-arrow-left-right text-warning me-2"></i><strong>Transferencia Bidireccional de Cartas:</strong> En la pantalla "Mover Cartas", ahora es posible mover cartas desde la lista destino de regreso a la origen. Las cartas se distinguen por color: naranja (origen → destino) y verde (destino → origen).</li>
-                            <li class="mb-2"><i class="bi bi-pencil-square text-warning me-2"></i><strong>Edición de Lista Rediseñada:</strong> La pantalla de edición de listas fue renovada con el estilo oscuro de la app, inputs estilizados, panel de información adicional y acciones claras.</li>
-                            <li class="mb-2"><i class="bi bi-share text-warning me-2"></i><strong>Vista de Compartir Rediseñada:</strong> La página pública de una lista ahora muestra correctamente la información del dueño, fecha de actualización, precio de referencia y permite alternar entre vista de tabla e imágenes con DataTables integrado.</li>
-                            <li class="mb-2"><i class="bi bi-lock text-warning me-2"></i><strong>Protección de Listas Privadas:</strong> Al intentar compartir una lista privada, se solicita confirmación antes de hacerla pública. Si alguien accede al enlace de una lista privada, se muestra un mensaje claro indicando que el contenido no está disponible.</li>
+                            <li class="mb-2"><i
+                                    class="bi bi-arrow-left-right text-warning me-2"></i><strong>Transferencia
+                                    Bidireccional de Cartas:</strong> En la pantalla "Mover Cartas", ahora es posible
+                                mover cartas desde la lista destino de regreso a la origen. Las cartas se distinguen por
+                                color: naranja (origen → destino) y verde (destino → origen).</li>
+                            <li class="mb-2"><i class="bi bi-pencil-square text-warning me-2"></i><strong>Edición de
+                                    Lista Rediseñada:</strong> La pantalla de edición de listas fue renovada con el
+                                estilo oscuro de la app, inputs estilizados, panel de información adicional y acciones
+                                claras.</li>
+                            <li class="mb-2"><i class="bi bi-share text-warning me-2"></i><strong>Vista de Compartir
+                                    Rediseñada:</strong> La página pública de una lista ahora muestra correctamente la
+                                información del dueño, fecha de actualización, precio de referencia y permite alternar
+                                entre vista de tabla e imágenes con DataTables integrado.</li>
+                            <li class="mb-2"><i class="bi bi-lock text-warning me-2"></i><strong>Protección de Listas
+                                    Privadas:</strong> Al intentar compartir una lista privada, se solicita confirmación
+                                antes de hacerla pública. Si alguien accede al enlace de una lista privada, se muestra
+                                un mensaje claro indicando que el contenido no está disponible.</li>
                         </ul>
                     </div>
                 </div>
@@ -39,11 +67,25 @@
                     </div>
                     <div class="card-body">
                         <ul class="list-unstyled">
-                            <li class="mb-2"><i class="bi bi-star-fill text-warning me-2"></i><strong>Parser Inteligente de Texto Plano:</strong> Ahora puedes pegar e importar tus listas directamente desde los archivos de texto nativos de Manabox.</li>
-                            <li class="mb-2"><i class="bi bi-star-fill text-warning me-2"></i><strong>Límites Flexibles de Importación:</strong> Se eliminó el bloqueo duro. Usuarios FREE ahora pueden subir listas truncadas automáticamente a 300 cartas. Los usuarios PRO/PREMIUM mantienen descargas ilimitadas.</li>
-                            <li class="mb-2"><i class="bi bi-star-fill text-warning me-2"></i><strong>Rediseño Visual Mágico:</strong> Nueva paleta de colores oscura optimizada (Mítico) para descansar la vista.</li>
-                            <li class="mb-2"><i class="bi bi-star-fill text-warning me-2"></i><strong>Sidebar Colapsable:</strong> La navegación superior se movió a un moderno panel lateral interactivo, dejando más espacio para visualizar tus cartas.</li>
-                            <li class="mb-2"><i class="bi bi-star-fill text-warning me-2"></i><strong>Páginas Informativas Independientes:</strong> Separación de las páginas 'Acerca de', 'Actualizaciones' y 'Niveles de cuenta'.</li>
+                            <li class="mb-2"><i class="bi bi-star-fill text-warning me-2"></i><strong>Parser Inteligente
+                                    de Texto Plano:</strong> Ahora puedes pegar e importar tus listas directamente desde
+                                los archivos de texto nativos de Manabox.</li>
+                            <li class="mb-2"><i class="bi bi-star-fill text-warning me-2"></i><strong>Límites Flexibles
+                                    de Importación:</strong> Se eliminó el bloqueo duro. Usuarios FREE ahora pueden
+                                subir listas truncadas automáticamente a 300 cartas. Los usuarios PRO/PREMIUM mantienen
+                                cargas ilimitadas.</li>
+                            <li class="mb-2"><i class="bi bi-star-fill text-warning me-2"></i><strong>Rediseño Visual
+                                    Mágico:</strong> Nueva paleta de colores oscura optimizada (Mítico) para descansar
+                                la vista.</li>
+                            <li class="mb-2"><i class="bi bi-star-fill text-warning me-2"></i><strong>Sidebar
+                                    Colapsable:</strong> La navegación superior se movió a un moderno panel lateral
+                                interactivo, dejando más espacio para visualizar tus cartas.</li>
+                            <li class="mb-2"><i class="bi bi-star-fill text-warning me-2"></i><strong>Páginas
+                                    Informativas Independientes:</strong> Separación de las páginas 'Acerca de',
+                                'Actualizaciones' y 'Niveles de cuenta'.</li>
+                            <li class="mb-2"><i class="bi bi-star-fill text-warning me-2"></i><strong>Niveles de
+                                    privacidad básicos y grupos.</strong></li>
+
                         </ul>
                     </div>
                 </div>
@@ -58,8 +100,6 @@
                         <ul class="list-unstyled text-muted">
                             <li>- Sistema base de búsqueda y matching.</li>
                             <li>- Integración con Scryfall API.</li>
-                            <li>- Niveles de privacidad básicos y grupos.</li>
-                            <li>- Importación por archivos CSV básicos.</li>
                         </ul>
                     </div>
                 </div>
