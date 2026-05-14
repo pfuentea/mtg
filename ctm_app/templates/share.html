@@ -1,151 +1,201 @@
 {% extends "base.html" %}
 
-{% block titulo %} {% if lista.tipo == 'B' %}Lista de busqueda de{% elif lista.tipo == 'O' %}Lista para ofrecer de{% endif %}  {{usuario}} {% endblock %}
+{% block titulo %}
+    {% if lista.tipo == 'B' %}Lista Busco de{% elif lista.tipo == 'O' %}Lista Ofrezco de{% endif %} {{ usuario }}
+{% endblock %}
+
+{% block css %}
+<style>
+    #lista_cartas thead th { background-color: #1a1a2e; color: #F77e0d; border-color: #444; }
+    #lista_cartas tbody tr { background-color: #2b2b36; color: #e0e0e0; }
+    #lista_cartas tbody tr:hover { background-color: #33334a; }
+    #lista_cartas td, #lista_cartas th { border-color: #444; vertical-align: middle; }
+    .card-img-grid { width: 6rem; transition: transform .15s; }
+    .card-img-grid:hover { transform: scale(1.08); }
+</style>
+{% endblock %}
 
 {% block contenido %}
+<div class="separador"></div>
+<div class="container my-4">
 
-    <div class="separador"></div>
-    <h2>
-    
-        {{lista.nombre}} by 
-        {% if nickname != '' %}
-            {% if request.session.user %}
-                <a href="/user/{{usuario_id}}">{{nickname}}</a>
-            {% else %}
-                {{nickname}}
+    <!-- Cabecera -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <h2 class="garde">
+                <i class="bi bi-card-list me-2 text-warning"></i>{{ lista.nombre }}
+            </h2>
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                <span class="badge {% if lista.tipo == 'B' %}bg-primary{% else %}bg-success{% endif %} fs-6">
+                    {% if lista.tipo == 'B' %}Busco{% elif lista.tipo == 'O' %}Venta / Cambio{% endif %}
+                </span>
+                <span class="text-muted">por</span>
+                {% if request.session.user %}
+                    <a href="/user/{{ usuario_id }}" class="text-warning fw-bold text-decoration-none">
+                        {% if nickname %}{{ nickname }}{% else %}{{ usuario }}{% endif %}
+                    </a>
+                {% else %}
+                    <span class="fw-bold text-light">{% if nickname %}{{ nickname }}{% else %}{{ usuario }}{% endif %}</span>
+                {% endif %}
+            </div>
+
+            <div class="d-flex flex-wrap gap-3 text-muted small">
+                {% if last_act %}
+                <span><i class="bi bi-clock me-1"></i>Última actualización: {{ last_act }}</span>
+                {% endif %}
+                {% if ubicacion %}
+                <span><i class="bi bi-geo-alt me-1"></i>{{ ubicacion }}</span>
+                {% endif %}
+            </div>
+
+            {% if lista.descripcion %}
+            <p class="mt-2 text-light">{{ lista.descripcion }}</p>
             {% endif %}
-        {% else %}
-        {% if request.session.user %}
-                <a href="/user/{{usuario_id}}">{{usuario}}</a>
-            {% else %}
-                {{usuario}}
-            {% endif %}
-            
-        {% endif %}
-        ( {% if lista.tipo == 'B' %}Busco{% elif lista.tipo == 'O' %}Venta/Cambio{% endif %} )
 
-    </h2>
-<h6>Última actualización: {{last_act}}</h6>
-
-<h3>
-    {% if ubicacion != '' %}Ubicación:{{ubicacion}} {% endif %}
-</h3>
-<h4>
-    {% if lista.descripcion != '' %}Descripcion:{{lista.descripcion}} {% endif %}
-</h4>
-<h5>
-    {% if lista.referencia_web != '' %}Precios desde :{{lista.referencia_web}} {% endif %}
-</h5>
-<h5>
-    {% if lista.referencia_precio != '' %}Valor tipo cambio(USD):{{lista.referencia_precio}} {% endif %}
-</h5>
-
-<a href="/list/share/{{lista.id}}?view=list">Ver listado con detalles </a>| 
-<a href="/list/share/{{lista.id}}?view=img">Ver Imagenes </a>
-
-{% if request.session.user.id == usuario_id %}
-    <div class="" >URL:
-        <span id="url"></span>
-        <button onclick="copy('#url')" id="to_copy">Copiar enlace al clipboard</button>
-    </div>
-{% endif %}
-{% if request.session.user %}
-    {% if request.session.user.id == usuario_id %}
-        {% if nickname == '' %}
-            Usted compartira el siguinte listado, con el nick: {{nickname}}
-            <p>Para poder compartir la lista, te solicitamos la creación de un Username 
-                y así resguardar información personal que solo debe ser compartida por miembros registrados.</p>
-            <p>En caso de no querer usar un nick, se mostrará su nombre. </p>
-    
-            <form action="/list/share/{{lista.id}}" method="POST" id="set_nick">
-                {% csrf_token %}
-                <input type="text" name="nick" >
-                <button id="send_nick" type="submit">Crear Nick</button>
-            </form>
-        {% endif %}
-    {% endif %}
-{% endif %}
-
-{% if vista == 'lista' %}
-<div class="container">
-    <div class="row">
-        <div class="col-10">
-            <p>Cartas en la lista : ({{items.count}})</p> 
-            <div class="table-responsive">
-                <table id="lista_cartas" class="table table-striped table-bordered" width="100%" >
-                    <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Edicion</th>
-                            <th>Cantidad</th>
-                            <th>Foil?</th>
-                            <th>Observaciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for i in items %}
-                        <tr>
-                            <td> 
-                                <a href="https://scryfall.com/card/{{i.carta.Edicion.set_code}}/{{i.carta.number_collector_txt}}"  title="Ver en scryfall">{{i.carta.nombre}}</a>                             
-                            </td>
-                            <td> {{i.carta.Edicion.nombre}}</td>
-                            <td>{{i.cantidad}}</td>   
-                            <td>{%if i.es_foi%} Si {% else %} No {% endif %}</td>  
-                            <th>{{i.observacion}}</th>                         
-                        </tr>       
-                    {% endfor %}
-                    </tbody>    
-                </table>
+            <div class="d-flex flex-wrap gap-3 mt-1 text-muted small">
+                {% if lista.referencia_web %}
+                <span><i class="bi bi-link-45deg me-1"></i>Precios desde: <span class="text-light">{{ lista.referencia_web }}</span></span>
+                {% endif %}
+                {% if lista.referencia_precio %}
+                <span><i class="bi bi-currency-dollar me-1"></i>Tipo de cambio: <span class="text-light">{{ lista.referencia_precio }} USD</span></span>
+                {% endif %}
             </div>
         </div>
     </div>
-</div>
-{% elif vista == 'imgs' %}
-    {% if items.count > 0 %}
-    <div class="row">
-        {% for i in items %}
-        <div class="card {% if i.es_foil %}foil{% endif %}" style="width: 7rem;">   
-            <a href="https://scryfall.com/card/{{i.carta.Edicion.set_code}}/{{i.carta.number_collector_txt}}" target="_blank" title="Ver en scryfall">
-            <img src="{{i.carta.small_image}}" style="width: 6rem;">
+
+    <!-- URL y acciones del dueño -->
+    {% if request.session.user.id == usuario_id %}
+    <div class="p-3 mb-4 bg-dark rounded-3 border border-secondary shadow-sm">
+        <div class="row align-items-center g-2">
+            <div class="col-md-8">
+                <label class="text-muted small d-block mb-1"><i class="bi bi-link me-1"></i>URL para compartir</label>
+                <div class="input-group">
+                    <input type="text" class="form-control bg-secondary text-light border-secondary" id="url" readonly>
+                    <button class="btn btn-outline-warning" type="button" onclick="copyUrl()" title="Copiar enlace">
+                        <i class="bi bi-clipboard me-1"></i>Copiar
+                    </button>
+                </div>
+            </div>
+            {% if nickname == '' %}
+            <div class="col-md-4">
+                <label class="text-muted small d-block mb-1"><i class="bi bi-person-badge me-1"></i>Crear nickname</label>
+                <form action="/list/share/{{lista.id}}" method="POST" id="set_nick" class="input-group">
+                    {% csrf_token %}
+                    <input type="text" name="nick" class="form-control bg-secondary text-light border-secondary" placeholder="Tu nick público">
+                    <button type="submit" class="btn btn-warning text-dark fw-bold">Crear</button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Tabs de vista -->
+    <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+        <span class="text-muted small"><i class="bi bi-stack me-1"></i>{{ items.count }} carta(s) en la lista</span>
+        <div class="btn-group" role="group">
+            <a href="/list/share/{{lista.id}}?view=list"
+               class="btn btn-sm {% if vista == 'lista' %}btn-warning text-dark{% else %}btn-outline-secondary{% endif %} rounded-start-pill">
+                <i class="bi bi-table me-1"></i>Tabla
             </a>
-            <div class="card-title mb-2 text-muted ">
-                {{i.carta.nombre}} x <b>{{i.cantidad}} ({{i.carta.Edicion.set_code}})</b>
-            </div>   
-          
+            <a href="/list/share/{{lista.id}}?view=img"
+               class="btn btn-sm {% if vista == 'imgs' %}btn-warning text-dark{% else %}btn-outline-secondary{% endif %} rounded-end-pill">
+                <i class="bi bi-images me-1"></i>Imágenes
+            </a>
+        </div>
+    </div>
+
+    <!-- Vista tabla -->
+    {% if vista == 'lista' %}
+    <div class="p-3 bg-dark rounded-3 border border-secondary shadow-sm">
+        {% if items.count > 0 %}
+        <div class="table-responsive">
+            <table id="lista_cartas" class="table table-bordered mb-0" width="100%">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Edición</th>
+                        <th>Cantidad</th>
+                        <th>Foil</th>
+                        <th>Observaciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in items %}
+                    <tr>
+                        <td>
+                            <a href="https://scryfall.com/card/{{i.carta.Edicion.set_code}}/{{i.carta.number_collector_txt}}"
+                               target="_blank" title="Ver en Scryfall" class="text-warning text-decoration-none">
+                                {{ i.carta.nombre }}
+                                <i class="bi bi-box-arrow-up-right ms-1 small"></i>
+                            </a>
+                        </td>
+                        <td class="text-muted small">{{ i.carta.Edicion.nombre }}</td>
+                        <td><span class="badge bg-secondary">{{ i.cantidad }}</span></td>
+                        <td>
+                            {% if i.es_foil %}
+                                <span class="badge bg-warning text-dark">Foil</span>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-muted small">{{ i.observacion }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted text-center py-4 mb-0"><i class="bi bi-inbox fs-3 d-block mb-2"></i>No hay cartas en esta lista.</p>
+        {% endif %}
+    </div>
+
+    <!-- Vista imágenes -->
+    {% elif vista == 'imgs' %}
+    {% if items.count > 0 %}
+    <div class="d-flex flex-wrap gap-2">
+        {% for i in items %}
+        <div class="text-center" style="width: 7rem;">
+            <a href="https://scryfall.com/card/{{i.carta.Edicion.set_code}}/{{i.carta.number_collector_txt}}"
+               target="_blank" title="Ver en Scryfall">
+                <img src="{{ i.carta.small_image }}" class="card-img-grid rounded {% if i.es_foil %}border border-warning{% endif %}" alt="{{ i.carta.nombre }}">
+            </a>
+            <div class="mt-1 small text-muted" style="font-size: 0.7rem; word-break: break-word;">
+                {{ i.carta.nombre }} <span class="text-warning">×{{ i.cantidad }}</span>
+                <span class="text-secondary">({{ i.carta.Edicion.set_code }})</span>
+                {% if i.es_foil %}<span class="badge bg-warning text-dark" style="font-size:0.6rem;">F</span>{% endif %}
+            </div>
         </div>
         {% endfor %}
     </div>
     {% else %}
-    <p>No existen elementos para esta lista</p>
-        
+    <p class="text-muted text-center py-4"><i class="bi bi-inbox fs-3 d-block mb-2"></i>No hay cartas en esta lista.</p>
     {% endif %}
-{% endif %}
+    {% endif %}
+
+</div>
 
 <script>
-    $( document ).ready(function() {
+    $(document).ready(function() {
+        $('#url').val(document.location.href);
 
-        url= document.location.href
-        url_ante= document.referrer
-        console.log(url_ante)
-        $("#url").text(url)
+        {% if vista == 'lista' and items.count > 0 %}
+        $('#lista_cartas').DataTable({
+            language: {
+                url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json'
+            },
+            pageLength: 25,
+        });
+        {% endif %}
     });
-    
 
-    function copy(selector){
-        var $temp = $("<div>");
-        $("body").append($temp);
-        $temp.attr("contenteditable", true)
-            .html($(selector).html()).select()
-            .on("focus", function() { document.execCommand('selectAll',false,null); })
-            .focus();
-        document.execCommand("copy");
-        $temp.remove();
-        toastr.success("Url copiada con exito!")
-        }
-   
+    function copyUrl() {
+        let url = $('#url').val();
+        navigator.clipboard.writeText(url).then(function() {
+            toastr.success("URL copiada al portapapeles.");
+        }).catch(function() {
+            toastr.error("No se pudo copiar la URL.");
+        });
+    }
 </script>
-{% endblock %}
-
-{% block libreria %}
-
 {% endblock %}

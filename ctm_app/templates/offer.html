@@ -58,7 +58,7 @@
                                 {%if l.estado == 'Expirada' %}
                                 <a href="/list/activar/{{l.id}}" class="btn btn-sm btn-outline-primary" title="Activar"> <i class="bi bi-play"></i></a>
                                 {% else %}
-                                <a href="/list/share/{{l.id}}" class="btn btn-sm btn-outline-primary" title="Compartir"> <i class="bi bi-share"></i></a>
+                                <a href="#" onclick="confirmShare({{l.id}}, '{{l.privacidad}}'); return false;" class="btn btn-sm btn-outline-primary" title="Compartir"><i class="bi bi-share"></i></a>
                                 {% endif %}  
                                
                         </td>
@@ -125,12 +125,34 @@
   </div>
 </div>
 
+<!-- Modal confirmación compartir lista privada -->
+<div class="modal fade" id="confirmShareModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark border border-warning">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title text-warning"><i class="bi bi-lock me-2"></i>Lista Privada</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-light">
+                <p>Esta lista es <strong class="text-warning">privada</strong>. Si la compartes, su privacidad cambiará a <strong class="text-success">pública</strong> y cualquier persona con el enlace podrá verla.</p>
+                <p class="text-muted mb-0 small">¿Deseas continuar y hacer la lista pública?</p>
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-secondary rounded-pill px-3" data-bs-dismiss="modal">Cancelar</button>
+                <a id="confirmShareBtn" href="#" class="btn btn-warning text-dark fw-bold rounded-pill px-4">
+                    <i class="bi bi-share me-1"></i>Sí, hacer pública y compartir
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     $(document).ready(function() {
        var oTblReport = $('#listas')
 
        oTblReport.DataTable({
-           "language": { 
+           "language": {
                "search": 'Buscar',
                "lengthMenu": "Mostrar _MENU_ registros por página",
                "paginate":{
@@ -146,6 +168,16 @@
    $('#confirm-delete').on('show.bs.modal', function(e) {
         $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
     });
+
+    function confirmShare(listaId, privacidad) {
+        if (privacidad === 'PRIVATE') {
+            $('#confirmShareBtn').attr('href', '/list/share/' + listaId + '?make_public=1');
+            var modal = new bootstrap.Modal(document.getElementById('confirmShareModal'));
+            modal.show();
+        } else {
+            window.location.href = '/list/share/' + listaId;
+        }
+    }
 </script>
 {% endblock %}
 

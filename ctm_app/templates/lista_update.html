@@ -1,134 +1,166 @@
 {% extends "base.html" %}
 
-{% block titulo %} {% if lista.tipo == 'B' %}Lista de busqueda de{% elif lista.tipo == 'O' %}Lista para ofrecer de{% endif %}  {{usuario}} {% endblock %}
+{% block titulo %}Editar Lista{% endblock %}
+
+{% block css %}
+<style>
+    #form_edit input[type="text"],
+    #form_edit input[type="number"],
+    #form_edit input[type="url"],
+    #form_edit textarea,
+    #form_edit select {
+        background-color: #2b2b36;
+        color: #e0e0e0;
+        border: 1px solid #6c757d;
+        border-radius: 0.375rem;
+        padding: 0.5rem 0.75rem;
+        width: 100%;
+    }
+    #form_edit input[type="checkbox"] {
+        width: 1.2em;
+        height: 1.2em;
+        accent-color: #F77e0d;
+    }
+    #form_edit input:focus,
+    #form_edit textarea:focus,
+    #form_edit select:focus {
+        border-color: #F77e0d;
+        outline: none;
+        box-shadow: 0 0 0 0.2rem rgba(247,126,13,0.25);
+    }
+</style>
+{% endblock %}
 
 {% block contenido %}
-
 <div class="separador"></div>
-<h2>
-    {{lista.nombre}} by {{usuario}} ( {% if lista.tipo == 'B' %}Busco{% elif lista.tipo == 'O' %}Dispone{% endif %} )
-</h2>
+<div class="container my-4">
 
-<div class="container">
+    <div class="row mb-3">
+        <div class="col-12">
+            <h2 class="garde">
+                <i class="bi bi-pencil-square me-2 text-warning"></i>Editar Lista
+            </h2>
+            <p class="text-muted mb-0">
+                <span class="badge {% if lista.tipo == 'B' %}bg-primary{% else %}bg-success{% endif %} me-2">
+                    {% if lista.tipo == 'B' %}Busco{% elif lista.tipo == 'O' %}Ofrezco{% endif %}
+                </span>
+                <strong class="text-light">{{ lista.nombre }}</strong>
+                <span class="ms-2">— {{ lista.items.count }} carta(s)</span>
+            </p>
+        </div>
+    </div>
+
     <form action="/list/edit/{{lista.id}}" method="post" id="form_edit" name="form_edit">
         {% csrf_token %}
-    
-        {% for field in form %}
-            {% if field.name == 'shared_with_users' or field.name == 'shared_with_groups' %}
-            <div class="row mb-3 my-strip d-none p-3 rounded-3" id="container_{{ field.name }}">
-                <div class="col-12">
-                    <label class="fw-bold mb-2">{{ field.label }}:</label>
-                    <div class="d-none">{{ field }}</div>
-                    
-                    <div class="row">
-                        <div class="col-5">
-                            <label class="small text-muted mb-1"><i class="bi bi-list-ul"></i> Disponibles para agregar:</label>
-                            <select multiple class="form-select border-secondary" id="available_{{ field.name }}" style="height: 160px; background-color: #2b2b36; color: #fff;"></select>
+
+        <div class="p-3 mb-4 bg-dark rounded-3 border border-secondary shadow-sm">
+            <div class="row g-3">
+                {% for field in form %}
+                    {% if field.name == 'shared_with_users' or field.name == 'shared_with_groups' %}
+                    <div class="col-12 d-none" id="container_{{ field.name }}">
+                        <label class="form-label fw-bold text-warning">
+                            <i class="bi bi-people me-1"></i>{{ field.label }}
+                        </label>
+                        <div class="d-none">{{ field }}</div>
+                        <div class="row">
+                            <div class="col-md-5">
+                                <label class="small text-muted mb-1"><i class="bi bi-list-ul me-1"></i>Disponibles:</label>
+                                <select multiple class="form-select border-secondary" id="available_{{ field.name }}" style="height: 160px; background-color: #2b2b36; color: #fff;"></select>
+                            </div>
+                            <div class="col-md-2 d-flex flex-column justify-content-center align-items-center gap-2">
+                                <button type="button" class="btn btn-warning btn-shine fw-bold text-dark border-0 rounded-pill px-3 py-2"
+                                    onclick="moveItems('available_{{ field.name }}', 'selected_{{ field.name }}', '{{ field.name }}')" title="Agregar">
+                                    <i class="bi bi-chevron-right fs-5"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary btn-shine fw-bold border-0 rounded-pill px-3 py-2"
+                                    onclick="moveItems('selected_{{ field.name }}', 'available_{{ field.name }}', '{{ field.name }}')" title="Quitar">
+                                    <i class="bi bi-chevron-left fs-5"></i>
+                                </button>
+                            </div>
+                            <div class="col-md-5">
+                                <label class="small text-muted mb-1"><i class="bi bi-check2-all me-1"></i>Seleccionados:</label>
+                                <select multiple class="form-select border-success" id="selected_{{ field.name }}" style="height: 160px; background-color: #2b2b36; color: #fff;"></select>
+                            </div>
                         </div>
-                        <div class="col-2 d-flex flex-column justify-content-center align-items-center gap-3">
-                            <button type="button" class="btn btn-warning btn-shine fw-bold text-dark border-0 rounded-pill px-3 py-2" onclick="moveItems('available_{{ field.name }}', 'selected_{{ field.name }}', '{{ field.name }}')" title="Agregar">
-                                <i class="bi bi-chevron-right fs-5"></i>
-                            </button>
-                            <button type="button" class="btn btn-warning btn-shine fw-bold text-dark border-0 rounded-pill px-3 py-2" onclick="moveItems('selected_{{ field.name }}', 'available_{{ field.name }}', '{{ field.name }}')" title="Quitar">
-                                <i class="bi bi-chevron-left fs-5"></i>
-                            </button>
-                        </div>
-                        <div class="col-5">
-                            <label class="small text-muted mb-1"><i class="bi bi-check2-all"></i> Agregados a la lista:</label>
-                            <select multiple class="form-select border-success" id="selected_{{ field.name }}" style="height: 160px; background-color: #2b2b36; color: #fff;"></select>
-                        </div>
+                    </div>
+                    {% else %}
+                    <div class="col-md-6">
+                        <label for="{{ field.html_name }}" class="form-label fw-bold text-light small">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <div class="text-danger small mt-1">{{ field.errors }}</div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="p-3 mb-4 bg-dark rounded-3 border border-secondary shadow-sm">
+            <div class="row align-items-center g-3">
+                <div class="col-12 mb-1">
+                    <span class="text-muted small fw-bold"><i class="bi bi-info-circle me-1"></i>Información adicional</span>
+                </div>
+                <div class="col-md-3">
+                    <span class="text-muted small d-block">Cantidad de cartas</span>
+                    <span class="fw-bold fs-4 text-warning">{{ lista.items.count }}</span>
+                </div>
+                <div class="col-md-9">
+                    <label class="text-muted small d-block mb-1">URL para compartir</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control bg-secondary text-light border-secondary" id="url" readonly>
+                        <button class="btn btn-outline-warning" type="button" onclick="copyUrl()" title="Copiar enlace">
+                            <i class="bi bi-clipboard me-1"></i>Copiar
+                        </button>
                     </div>
                 </div>
             </div>
-            {% else %}
-            <div class="row mb-1 my-strip align-items-center">
-                <div class='form-group col-3'>
-                    <label for="{{ field.name }}" class="fw-bold">{{ field.label }}:</label>
-                </div>
-                <div class="col-9">{{ field }}</div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 text-end">
+                <a href="/list/{% if lista.tipo == 'B' %}hunt{% else %}offer{% endif %}"
+                   class="btn btn-secondary btn-lg rounded-pill px-4 shadow me-2">
+                    <i class="bi bi-x-circle me-1"></i>Cancelar
+                </a>
+                <button id="guardar" type="button" class="btn btn-success btn-lg rounded-pill px-5 shadow">
+                    <i class="bi bi-save me-2"></i>Guardar Cambios
+                </button>
             </div>
-            {% endif %}
-        {% endfor %}
-   
-    <div class="row">
-        <div class="col-2"></div>
-        <div class="col-2">
-            <button id="guardar" class="btn btn-sm btn-primary m-2 p-2">
-                Guardar
-            </button>
-        </form>        
         </div>
-        <div class="col">           
-                <a href="/list/{% if lista.tipo == 'B' %}hunt{% else %}offer{% endif %}" class="btn btn-sm btn-outline-success p-2"> 
-                    A Listas 
-            </a>          
-        </div>
-    </div>
-
-    <div class="row  mt-3" >
-        <div class="col-8">
-            Otros datos:
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-3">
-            Cantidad de cartas:
-        </div>
-        <div class="col-3">
-            {{lista.items.count}}
-        </div>
-    </div>
+    </form>
 </div>
-
-
-
-
-
-
-<div class=" mt-3" >URL para compartir:
-    <span id="url" ></span>
-    <button onclick="copy('#url')" id="to_copy">Copiar enlace al clipboard</button>
-</div>
-
 
 <script>
-    $( document ).ready(function() {
+    $(document).ready(function() {
 
-        url= document.location.hostname
-        if(url=='localhost'){
-            url=url+':8000'
-        }
-        url2=url+'/list/share/{{lista.id}}?view=img'
-        console.log(url2)
-        $("#url").text(url2)
+        // URL de compartir
+        let host = document.location.hostname;
+        if (host === 'localhost') host += ':8000';
+        $('#url').val(host + '/list/share/{{lista.id}}?view=img');
 
-        $('#id_tipo').on('click',function(){
-            toastr.warning("Cambiar esto hara que la lista cambie de tipo y por tanto de lugar")           
+        $('#id_tipo').on('click', function() {
+            toastr.warning("Cambiar esto hará que la lista cambie de tipo y de lugar.");
         });
-        $('#id_referencia_web').on('focus',function(){
-            toastr.success("Página con los precios de referencia de la lista (EJ: CK,SCG,TCG) ")           
+        $('#id_referencia_web').on('focus', function() {
+            toastr.info("Página con los precios de referencia (EJ: CK, SCG, TCG).");
         });
-        $('#id_referencia_precio').on('focus',function(){
-            toastr.success("Precio de dolar para intercambio o venta de las cartas de la lista")           
+        $('#id_referencia_precio').on('focus', function() {
+            toastr.info("Precio de dólar para intercambio o venta de las cartas.");
         });
 
-//send form with button id guardar in jquery?
-        $('#guardar').on('click',function (e) {
-            console.log("press");
+        $('#guardar').on('click', function() {
             syncOriginal('shared_with_users');
             syncOriginal('shared_with_groups');
             $('#form_edit').submit();
         });
 
-        // INIT DUAL LISTS
         function initDualList(fieldName) {
             let originalSelect = $('#id_' + fieldName);
             let availableSelect = $('#available_' + fieldName);
             let selectedSelect = $('#selected_' + fieldName);
-            
             availableSelect.empty();
             selectedSelect.empty();
-            
             originalSelect.find('option').each(function() {
                 if ($(this).is(':selected')) {
                     selectedSelect.append($(this).clone());
@@ -137,23 +169,21 @@
                 }
             });
         }
-        
+
         initDualList('shared_with_users');
         initDualList('shared_with_groups');
 
-        // TOGGLE PRIVACY
         function togglePrivacy() {
             let val = $('#id_privacidad').val();
             $('#container_shared_with_users').addClass('d-none');
             $('#container_shared_with_groups').addClass('d-none');
-            
             if (val === 'SHARED') {
                 $('#container_shared_with_users').removeClass('d-none');
             } else if (val === 'GROUP') {
                 $('#container_shared_with_groups').removeClass('d-none');
             }
         }
-        
+
         $('#id_privacidad').on('change', togglePrivacy);
         togglePrivacy();
     });
@@ -161,40 +191,29 @@
     window.moveItems = function(fromId, toId, fieldName) {
         let fromSelect = $('#' + fromId);
         let toSelect = $('#' + toId);
-        
         fromSelect.find('option:selected').each(function() {
             $(this).prop('selected', false);
             toSelect.append($(this));
         });
-        
         syncOriginal(fieldName);
     };
-    
+
     window.syncOriginal = function(fieldName) {
         let originalSelect = $('#id_' + fieldName);
         let selectedSelect = $('#selected_' + fieldName);
-        
         originalSelect.find('option').prop('selected', false);
         selectedSelect.find('option').each(function() {
-            originalSelect.find('option[value="'+$(this).val()+'"]').prop('selected', true);
+            originalSelect.find('option[value="' + $(this).val() + '"]').prop('selected', true);
         });
     };
 
-    function copy(selector){
-        var $temp = $("<div>");
-        $("body").append($temp);
-        $temp.attr("contenteditable", true)
-            .html($(selector).html()).select()
-            .on("focus", function() { document.execCommand('selectAll',false,null); })
-            .focus();
-        document.execCommand("copy");
-        $temp.remove();
-        toastr.success("Url copiada con exito!")
-        }
-   
+    function copyUrl() {
+        let url = $('#url').val();
+        navigator.clipboard.writeText(url).then(function() {
+            toastr.success("URL copiada al portapapeles.");
+        }).catch(function() {
+            toastr.error("No se pudo copiar la URL.");
+        });
+    }
 </script>
-{% endblock %}
-
-{% block libreria %}
-
 {% endblock %}

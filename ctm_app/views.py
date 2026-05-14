@@ -16,7 +16,7 @@ from .models.carta import Carta
 from .models.edicion import Edicion
 from .models.actividad import Actividad
 from .models.grupo import Grupo
-from django.db.models import Q
+from django.db.models import Q, Count
 from .utils.parser import import_list_from_file
 
 from .models.comentario import Comentario
@@ -26,7 +26,7 @@ from .forms.listaForm import ListaForm
 from .models.mensaje import Mensaje
 
 from datetime import datetime, timedelta,timezone
-from django.http import HttpRequest
+from django.http import HttpRequest, JsonResponse
 import pytz
 from itertools import groupby
 from django.contrib.auth import logout
@@ -413,6 +413,20 @@ def share(request,lista_id):
         
         if 'user' in request.session:
             user= User.objects.get(id=request.session['user']['id'])
+
+        is_owner = user and user.id == usuario_id
+
+        if request.GET.get('make_public') == '1' and is_owner and lista.privacidad == 'PRIVATE':
+            lista.privacidad = 'PUBLIC'
+            lista.save()
+            messages.success(request, "La lista ahora es pública.")
+
+        if lista.privacidad == 'PRIVATE' and not is_owner:
+            return render(request, 'share_no_existe.html', {
+                'error_except': 'PrivateList',
+                'usuario_id': usuario_id,
+            })
+
         if 'view' in request.GET:
             if request.GET['view'] == 'list' :
                 vista="lista"
@@ -817,21 +831,32 @@ def changelog_view(request):
 
 @login_required
 def api_get_list_items(request, lista_id):
-    user = User.objects.get(id=request.session['user']['id'])
+    import traceback
+    try:
+        user = User.objects.get(id=request.session['user']['id'])
+    except Exception as e:
+        return JsonResponse({'error': f'[sesion] {str(e)}'}, status=401)
+
     try:
         lista = Listados.objects.get(id=lista_id, owner=user)
-    except Listados.DoesNotExist:
-        return JsonResponse({'error': 'Lista no encontrada o sin acceso'}, status=403)
-        
-    items = ItemLista.objects.filter(lista=lista).select_related('carta', 'carta__Edicion')
-    data = []
-    for item in items:
-        text = f"{item.carta.nombre} ({item.carta.Edicion.set_code.upper()}) #{item.carta.number_collector_txt} - Qty: {item.cantidad}"
-        if item.es_foil:
-            text += " [Foil]"
-        data.append({'id': item.id, 'text': text})
-        
-    return JsonResponse({'items': data})
+    except Exception as e:
+        return JsonResponse({'error': f'[lista] {str(e)}'}, status=403)
+
+    try:
+        items = list(ItemLista.objects.filter(lista=lista).select_related('carta'))
+        data = []
+        for item in items:
+            try:
+                edicion_code = item.carta.Edicion.set_code.upper()
+            except Exception:
+                edicion_code = '?'
+            text = f"{item.carta.nombre} ({edicion_code}) #{item.carta.number_collector_txt} - Qty: {item.cantidad}"
+            if item.es_foil:
+                text += " [Foil]"
+            data.append({'id': item.id, 'text': text})
+        return JsonResponse({'items': data})
+    except Exception as e:
+        return JsonResponse({'error': f'[items] {str(e)} | {traceback.format_exc()}'}, status=500)
 
 @login_required
 def transfer_cards(request):
@@ -842,10 +867,12 @@ def transfer_cards(request):
         target_list_id = request.POST.get('target_list')
         source_list_id = request.POST.get('source_list')
         
+        items_to_return = request.POST.getlist('moved_items_back')
+
         try:
             target_list = Listados.objects.get(id=target_list_id, owner=user)
             source_list = Listados.objects.get(id=source_list_id, owner=user)
-            
+
             moved_count = 0
             for item_id in items_to_move:
                 item = ItemLista.objects.filter(id=item_id, lista=source_list).first()
@@ -853,16 +880,34 @@ def transfer_cards(request):
                     item.lista = target_list
                     item.save()
                     moved_count += 1
-            
-            messages.success(request, f"Se movieron {moved_count} cartas exitosamente a {target_list.nombre}.")
+
+            returned_count = 0
+            for item_id in items_to_return:
+                item = ItemLista.objects.filter(id=item_id, lista=target_list).first()
+                if item:
+                    item.lista = source_list
+                    item.save()
+                    returned_count += 1
+
+            parts = []
+            if moved_count:
+                parts.append(f"{moved_count} carta(s) movida(s) a {target_list.nombre}")
+            if returned_count:
+                parts.append(f"{returned_count} carta(s) devuelta(s) a {source_list.nombre}")
+            if parts:
+                messages.success(request, ". ".join(parts) + ".")
+            else:
+                messages.warning(request, "No se realizó ningún cambio.")
         except Exception as e:
             messages.error(request, f"Error al mover cartas: {str(e)}")
             
-        return redirect('/list/transfer')
+        return redirect(f'/list/transfer?source={source_list_id}&target={target_list_id}')
 
-    listas = Listados.objects.filter(owner=user).order_by('tipo', 'nombre')
+    listas = Listados.objects.filter(owner=user).annotate(num_items=Count('items')).order_by('tipo', 'nombre')
     context = {
         'user': user,
-        'listas': listas
+        'listas': listas,
+        'source_id': request.GET.get('source', ''),
+        'target_id': request.GET.get('target', ''),
     }
     return render(request, 'transfer_cards.html', context)

@@ -14,8 +14,8 @@
 
     <form method="post" action="/list/transfer" id="transferForm">
         {% csrf_token %}
-        <!-- Hidden select for actually sending the data -->
         <select name="moved_items" id="moved_items" multiple class="d-none"></select>
+        <select name="moved_items_back" id="moved_items_back" multiple class="d-none"></select>
 
         <div class="row align-items-center mb-3 p-3 bg-dark rounded-3 border border-secondary shadow-sm">
             <div class="col-md-5">
@@ -23,7 +23,9 @@
                 <select name="source_list" id="source_list" class="form-select bg-secondary text-light border-secondary" required>
                     <option value="">-- Selecciona Lista Origen --</option>
                     {% for lista in listas %}
-                        <option value="{{ lista.id }}">[{{ lista.get_tipo_display }}] {{ lista.nombre }}</option>
+                        <option value="{{ lista.id }}" {% if lista.id|stringformat:"s" == source_id %}selected{% endif %}>
+                            [{{ lista.get_tipo_display }}] {{ lista.nombre }} ({{ lista.num_items }})
+                        </option>
                     {% endfor %}
                 </select>
             </div>
@@ -35,7 +37,9 @@
                 <select name="target_list" id="target_list" class="form-select bg-secondary text-light border-secondary" required>
                     <option value="">-- Selecciona Lista Destino --</option>
                     {% for lista in listas %}
-                        <option value="{{ lista.id }}">[{{ lista.get_tipo_display }}] {{ lista.nombre }}</option>
+                        <option value="{{ lista.id }}" {% if lista.id|stringformat:"s" == target_id %}selected{% endif %}>
+                            [{{ lista.get_tipo_display }}] {{ lista.nombre }} ({{ lista.num_items }})
+                        </option>
                     {% endfor %}
                 </select>
             </div>
@@ -43,20 +47,32 @@
 
         <div class="row mb-4">
             <div class="col-md-5">
-                <label class="small text-muted mb-1">Cartas en la Lista Origen:</label>
+                <label class="small text-muted mb-1">
+                    <i class="bi bi-box-arrow-right me-1 text-warning"></i>Cartas en la Lista Origen:
+                </label>
                 <select multiple class="form-select border-warning" id="source_items" style="height: 350px; background-color: #2b2b36; color: #fff;"></select>
             </div>
             <div class="col-md-2 d-flex flex-column justify-content-center align-items-center gap-3">
                 <button type="button" class="btn btn-warning btn-shine fw-bold text-dark border-0 rounded-pill px-3 py-2" onclick="moveCardsRight()" title="Mover a Destino">
                     <i class="bi bi-chevron-right fs-4"></i>
                 </button>
-                <button type="button" class="btn btn-warning btn-shine fw-bold text-dark border-0 rounded-pill px-3 py-2" onclick="moveCardsLeft()" title="Devolver a Origen">
+                <button type="button" class="btn btn-outline-secondary btn-shine fw-bold border-0 rounded-pill px-3 py-2" onclick="moveCardsLeft()" title="Devolver a Origen">
                     <i class="bi bi-chevron-left fs-4"></i>
                 </button>
             </div>
             <div class="col-md-5">
-                <label class="small text-muted mb-1">Cartas a Transferir al Destino:</label>
+                <label class="small text-muted mb-1">
+                    <i class="bi bi-box-arrow-in-right me-1 text-success"></i>Cartas en la Lista Destino:
+                    <span class="text-warning ms-2" id="target_pending_label" style="display:none;">
+                        (<span id="target_pending_count">0</span> por mover)
+                    </span>
+                </label>
                 <select multiple class="form-select border-success" id="target_items" style="height: 350px; background-color: #2b2b36; color: #fff;"></select>
+                <div class="mt-1">
+                    <span class="badge bg-secondary me-1" style="color:#aaa;">&#9679; Ya en destino</span>
+                    <span class="badge bg-warning text-dark me-1">&#9679; Origen → Destino</span>
+                    <span class="badge bg-success">&#9679; Destino → Origen</span>
+                </div>
             </div>
         </div>
 
@@ -71,90 +87,174 @@
 
 <script>
     $(document).ready(function() {
-        $('#source_list, #target_list').on('change', function() {
-            let sourceId = $('#source_list').val();
+
+        $('#source_list').on('change', function() {
+            let sourceId = $(this).val();
             let targetId = $('#target_list').val();
-            
+
             if (sourceId && targetId && sourceId === targetId) {
                 toastr.error('La lista origen y destino no pueden ser la misma.');
                 $(this).val('');
                 return;
             }
+            if (sourceId) {
+                loadListItems(sourceId, '#source_items', 'source');
+            } else {
+                $('#source_items').empty();
+            }
+            $('#target_items option[data-origin="source"]').remove();
+            updatePendingCount();
+        });
 
-            if ($(this).attr('id') === 'source_list' && sourceId) {
-                loadSourceItems(sourceId);
+        $('#target_list').on('change', function() {
+            let targetId = $(this).val();
+            let sourceId = $('#source_list').val();
+
+            if (targetId && sourceId && sourceId === targetId) {
+                toastr.error('La lista origen y destino no pueden ser la misma.');
+                $(this).val('');
+                return;
+            }
+            if (targetId) {
+                loadListItems(targetId, '#target_items', 'target');
+            } else {
+                $('#target_items').empty();
+                updatePendingCount();
             }
         });
 
+        let preSource = '{{ source_id }}';
+        let preTarget = '{{ target_id }}';
+        if (preSource) loadListItems(preSource, '#source_items', 'source');
+        if (preTarget) loadListItems(preTarget, '#target_items', 'target');
+
         $('#transferForm').on('submit', function(e) {
             let targetId = $('#target_list').val();
-            let targetItems = $('#target_items option');
-            
+            let toTarget = $('#target_items option[data-origin="source"]');
+            let toSource = $('#source_items option[data-origin="target"]');
+
             if (!targetId) {
                 e.preventDefault();
                 toastr.warning('Selecciona una lista destino.');
                 return;
             }
-            if (targetItems.length === 0) {
+            if (toTarget.length === 0 && toSource.length === 0) {
                 e.preventDefault();
-                toastr.warning('No hay cartas para transferir.');
+                toastr.warning('No has seleccionado cartas para mover.');
                 return;
             }
 
-            let hiddenSelect = $('#moved_items');
-            hiddenSelect.empty();
-            targetItems.each(function() {
-                hiddenSelect.append(new Option($(this).text(), $(this).val(), true, true));
+            let hiddenToTarget = $('#moved_items');
+            hiddenToTarget.empty();
+            toTarget.each(function() {
+                hiddenToTarget.append(new Option($(this).text(), $(this).val(), true, true));
+            });
+
+            let hiddenToSource = $('#moved_items_back');
+            hiddenToSource.empty();
+            toSource.each(function() {
+                hiddenToSource.append(new Option($(this).text(), $(this).val(), true, true));
             });
         });
     });
 
-    function loadSourceItems(listaId) {
-        let sourceSelect = $('#source_items');
-        let targetSelect = $('#target_items');
-        
-        sourceSelect.empty().append('<option disabled>Cargando cartas...</option>');
-        targetSelect.empty();
-        
+    function loadListItems(listaId, selector, origin) {
+        let select = $(selector);
+        select.empty().append('<option disabled>Cargando cartas...</option>');
+
         $.ajax({
             url: '/list/api/items/' + listaId,
             type: 'GET',
+            dataType: 'json',
             success: function(response) {
-                sourceSelect.empty();
+                select.empty();
+                if (response.error) {
+                    select.append('<option disabled>Error: ' + response.error + '</option>');
+                    toastr.error(response.error);
+                    return;
+                }
                 if (response.items && response.items.length > 0) {
                     response.items.forEach(function(item) {
-                        sourceSelect.append(new Option(item.text, item.id));
+                        let opt = new Option(item.text, item.id);
+                        $(opt).attr('data-origin', origin);
+                        if (origin === 'target') {
+                            $(opt).css('color', '#888');
+                        }
+                        select.append(opt);
                     });
                 } else {
-                    sourceSelect.append('<option disabled>No hay cartas en esta lista.</option>');
+                    select.append('<option disabled>No hay cartas en esta lista.</option>');
                 }
+                updatePendingCount();
             },
-            error: function(err) {
-                sourceSelect.empty().append('<option disabled>Error al cargar cartas.</option>');
-                toastr.error('Ocurrió un error cargando la lista.');
+            error: function(xhr) {
+                select.empty();
+                let status = xhr.status;
+                let msg = 'Error ' + status;
+                if (xhr.responseJSON && xhr.responseJSON.error) {
+                    msg += ': ' + xhr.responseJSON.error;
+                } else if (status === 0) {
+                    msg = 'Sin respuesta del servidor';
+                } else if (status === 302 || status === 301) {
+                    msg = 'Redirigido a login — recarga la página';
+                }
+                select.append('<option disabled>' + msg + '</option>');
+                toastr.error(msg);
             }
         });
     }
 
+    function updatePendingCount() {
+        let toTarget = $('#target_items option[data-origin="source"]').length;
+        let toSource = $('#source_items option[data-origin="target"]').length;
+        let total = toTarget + toSource;
+        if (total > 0) {
+            $('#target_pending_count').text(total);
+            $('#target_pending_label').show();
+        } else {
+            $('#target_pending_label').hide();
+        }
+    }
+
     window.moveCardsRight = function() {
-        let selected = $('#source_items option:selected');
-        if (selected.length === 0) return;
-        
+        if (!$('#target_list').val()) {
+            toastr.warning('Debes seleccionar una <strong>Lista Destino</strong> antes de mover cartas.');
+            $('#target_list').focus();
+            return;
+        }
+        let selected = $('#source_items option:selected:not(:disabled)');
+        if (selected.length === 0) {
+            toastr.info('Selecciona cartas de la lista origen primero.');
+            return;
+        }
         selected.each(function() {
-            if ($(this).prop('disabled')) return;
             $(this).prop('selected', false);
+            if ($(this).attr('data-origin') === 'source') {
+                $(this).css('color', '#F77e0d');
+            } else {
+                $(this).css('color', '#888');
+            }
             $('#target_items').append($(this));
         });
+        updatePendingCount();
     };
 
     window.moveCardsLeft = function() {
-        let selected = $('#target_items option:selected');
-        if (selected.length === 0) return;
-        
+        let selected = $('#target_items option:selected:not(:disabled)');
+        if (selected.length === 0) {
+            toastr.info('Selecciona cartas del panel destino primero.');
+            return;
+        }
         selected.each(function() {
             $(this).prop('selected', false);
+            if ($(this).attr('data-origin') === 'target') {
+                $(this).css('color', '#28a745');
+            } else {
+                $(this).css('color', '#fff');
+            }
             $('#source_items').append($(this));
         });
+        updatePendingCount();
     };
 </script>
 {% endblock %}

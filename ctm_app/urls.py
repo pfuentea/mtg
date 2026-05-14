@@ -22,13 +22,13 @@ urlpatterns = [
     path('list/hunt/new', views.list_hunt),
 
     path('list/edit/<int:list_id>', views.list_edit),
+    path('list/transfer', views.transfer_cards),
+    path('list/api/items/<int:lista_id>', views.api_get_list_items),
 
     path('list/<int:lista_id>', views.list_detail),
     path('list/add/<int:lista_id>', views.add_to_list),
     path('list/remove/<int:lista_id>', views.delete_list),
     path('list/import/<int:lista_id>', views.import_list),
-    path('list/transfer', views.transfer_cards),
-    path('list/api/items/<int:lista_id>', views.api_get_list_items),
     path('list/search/', views.list_detail),
 
     path('list/view_all_hunt', views.view_all_hunt),

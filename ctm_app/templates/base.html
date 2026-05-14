@@ -40,9 +40,9 @@
   {% load static %}
   <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}">
   {% if user.modo_oscuro  %}
-  <link rel="stylesheet" type="text/css" href='{% static "/css/style_dark.css" %}?v=2.001'>
+  <link rel="stylesheet" type="text/css" href='{% static "/css/style_dark.css" %}?v=2.002'>
   {% else %}
-  <link rel="stylesheet" type="text/css" href='{% static "/css/style.css" %}?v=2.001'>
+  <link rel="stylesheet" type="text/css" href='{% static "/css/style.css" %}?v=2.002'>
   {% endif %}
 
   <link rel="preload" href='{% static "/fonts/Garde.woff2" %}' as="font" type="font/woff2" crossorigin>
@@ -75,6 +75,8 @@
           <ul class="dropdown-menu dropdown-menu-dark shadow" aria-labelledby="sidebarListas">
             <li><a class="dropdown-item" href="/list/hunt">Busco</a></li>
             <li><a class="dropdown-item" href="/list/offer">Ofrezco</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="/list/transfer"><i class="bi bi-arrow-left-right me-2"></i>Mover cartas</a></li>
           </ul>
         </li>
         <li class="nav-item dropdown dropend">
@@ -158,7 +160,7 @@
       <!-- Minimal state (always visible) -->
       <div class="footer-min-bar" id="footerMinBar">
         <span class="small fw-bold">© 2026 CTM.a.g.i.c.</span>
-        <span class="badge bg-secondary">Ver. 2.001</span>
+        <span class="badge bg-secondary">Ver. 2.002</span>
       </div>
       
       <!-- Expanded content -->

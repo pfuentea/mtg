@@ -1,23 +1,59 @@
 {% extends "base.html" %}
 
-{% block titulo %} {% if lista.tipo == 'B' %}Lista de busqueda de{% elif lista.tipo == 'O' %}Lista para ofrecer de{% endif %}  {{usuario}} {% endblock %}
+{% block titulo %}Lista no disponible{% endblock %}
 
 {% block contenido %}
+<div class="separador"></div>
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 text-center">
 
-    <div class="separador"></div>
-    {% if error_except == 'NoList' %}
-    <h2>Esta Lista fue eliminada o no existe, te recomendamos consultar nuevamente por el enlace de la lista 
-        o si estás registrado, volver a alguna de las secciones:</h2>
-    <ul>
-        <li><a href="/index">Home</a>   </li>
-        <li><a href="/list/hunt">Tus Listas de Busquedas</a> </li>
-        <li><a href="/list/offer"></a> Tus Listas para Vender/Cambiar</li>
-    </ul>
-    {% else %}
-    <h2>Esta Lista no posee cartas. Invita a su <a href="/user/{{usuario_id}}">dueño</a>  a agregar nuevas cartas.</h2>
-    {% endif %}
-{% endblock %}
+            {% if error_except == 'PrivateList' %}
+            <i class="bi bi-lock-fill text-secondary" style="font-size: 4rem;"></i>
+            <h2 class="garde mt-3 text-light">Lista Privada</h2>
+            <p class="text-muted mt-2">
+                El dueño de esta lista la mantiene como <strong class="text-warning">privada</strong>.<br>
+                No es posible visualizarla con este enlace.
+            </p>
+            {% if usuario_id %}
+            <a href="/user/{{ usuario_id }}" class="btn btn-outline-warning rounded-pill px-4 mt-2">
+                <i class="bi bi-person me-1"></i>Ver perfil del dueño
+            </a>
+            {% endif %}
 
-{% block libreria %}
+            {% elif error_except == 'NoList' %}
+            <i class="bi bi-trash text-secondary" style="font-size: 4rem;"></i>
+            <h2 class="garde mt-3 text-light">Lista no encontrada</h2>
+            <p class="text-muted mt-2">
+                Esta lista fue eliminada o el enlace ya no es válido.
+            </p>
 
+            {% else %}
+            <i class="bi bi-inbox text-secondary" style="font-size: 4rem;"></i>
+            <h2 class="garde mt-3 text-light">Lista sin cartas</h2>
+            <p class="text-muted mt-2">
+                Esta lista aún no tiene cartas.
+                {% if usuario_id %}
+                Puedes invitar a su <a href="/user/{{ usuario_id }}" class="text-warning">dueño</a> a agregarlas.
+                {% endif %}
+            </p>
+            {% endif %}
+
+            <div class="mt-4 d-flex justify-content-center gap-3 flex-wrap">
+                <a href="/index" class="btn btn-secondary rounded-pill px-4">
+                    <i class="bi bi-house me-1"></i>Inicio
+                </a>
+                {% if request.session.user %}
+                <a href="/list/hunt" class="btn btn-outline-secondary rounded-pill px-4">
+                    <i class="bi bi-search me-1"></i>Mis Búsquedas
+                </a>
+                <a href="/list/offer" class="btn btn-outline-secondary rounded-pill px-4">
+                    <i class="bi bi-tags me-1"></i>Mis Ofertas
+                </a>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+</div>
 {% endblock %}
