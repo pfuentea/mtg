@@ -85,7 +85,7 @@ def index(request):
 
     listas_hunt= Listados.objects.filter(owner=user,tipo='B').order_by('-updated_at')[:10]
     listas_off= Listados.objects.filter(owner=user,tipo='O').order_by('-updated_at')[:10]
-    last_act=Actividad.objects.filter(objetivo__isnull=True).order_by('-updated_at')[:10]
+    last_act=Actividad.objects.filter(objetivo__isnull=True, lista__isnull=False, lista__privacidad='PUBLIC').order_by('-updated_at')[:10]
     last_act_propia=Actividad.objects.filter(objetivo=user).order_by('-updated_at')[:10]
 
     recibidos=Mensaje.objects.filter(to_user=user).order_by('-updated_at')[:10]
