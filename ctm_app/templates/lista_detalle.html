@@ -322,51 +322,79 @@
     </div>
 </div>
 
-<!-- Modal Importar CSV -->
+<!-- Modal Importar -->
 <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
   <div class="modal-dialog">
-    <div class="modal-content">
-      <form action="/list/import/{{lista_id}}" method="post" enctype="multipart/form-data" id="importForm">
-        {% csrf_token %}
-        <div class="modal-header">
-          <h5 class="modal-title" id="importModalLabel">Importar Cartas desde CSV</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-content" style="background:#1a1a2e; border:1px solid #444;">
+        <div class="modal-header border-secondary">
+          <h5 class="modal-title text-warning" id="importModalLabel"><i class="bi bi-upload me-2"></i>Importar Cartas</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
-            <p>Sube un archivo exportado de Manabox o Moxfield para agregar automáticamente las cartas a tu lista.</p>
-            
-            <div class="mb-3">
-                <label class="form-label">Formato de Exportación:</label>
-                <select name="format_choice" class="form-select" required>
-                    <option value="moxfield_csv">Moxfield (CSV)</option>
-                    <option value="manabox_csv">Manabox (CSV)</option>
-                    <option value="manabox_txt">Manabox (Texto Plain / TXT)</option>
-                </select>
-            </div>
 
-            <div class="mb-3">
-                <label class="form-label">Archivo:</label>
-                <input type="file" name="csv_file" class="form-control" accept=".csv,.txt" required>
-            </div>
+            <!-- Pestañas -->
+            <ul class="nav nav-pills mb-3" id="importTabs">
+                <li class="nav-item">
+                    <button class="nav-link active" id="tab-file-btn" onclick="switchImportTab('file')">
+                        <i class="bi bi-file-earmark-arrow-up me-1"></i>Archivo
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="tab-url-btn" onclick="switchImportTab('url')">
+                        <i class="bi bi-link-45deg me-1"></i>URL (Manabox / Moxfield)
+                    </button>
+                </li>
+            </ul>
 
-            <div class="form-check mb-3">
-                <input class="form-check-input" type="checkbox" name="truncate_limit" id="truncate_limit">
-                <label class="form-check-label text-warning" for="truncate_limit">
-                    <strong>Usuarios FREE:</strong> Truncar a 300 cartas si mi archivo excede el límite. <br>
-                    <small class="text-muted">(Si no marcas esto y excedes el límite, se cancelará la subida. <a href="/tiers" target="_blank">Mejorar Plan</a>)</small>
-                </label>
-            </div>
+            <!-- Formulario archivo -->
+            <form action="/list/import/{{lista_id}}" method="post" enctype="multipart/form-data" id="importForm">
+                {% csrf_token %}
+                <div id="tab-file">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-light">Formato de exportación</label>
+                        <select name="format_choice" class="form-select" style="background:#2b2b36; color:#e0e0e0; border-color:#6c757d;">
+                            <option value="moxfield_csv">Moxfield (CSV)</option>
+                            <option value="manabox_csv">Manabox (CSV)</option>
+                            <option value="manabox_txt">Manabox (Texto / TXT)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-light">Archivo</label>
+                        <input type="file" name="csv_file" class="form-control" accept=".csv,.txt"
+                               style="background:#2b2b36; color:#e0e0e0; border-color:#6c757d;">
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" name="truncate_limit" id="truncate_limit">
+                        <label class="form-check-label text-warning small" for="truncate_limit">
+                            <strong>FREE:</strong> Truncar a 300 cartas si el archivo excede el límite.
+                            <a href="/tiers" target="_blank" class="text-warning">Ver planes</a>
+                        </label>
+                    </div>
+                </div>
 
-            <p class="text-muted small">Nota: Puede demorar unos segundos si tiene que buscar las cartas en Scryfall por primera vez.</p>
+                <div id="tab-url" style="display:none;">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-light">URL del deck</label>
+                        <input type="url" name="deck_url" id="deck_url_input"
+                               class="form-control"
+                               style="background:#2b2b36; color:#e0e0e0; border-color:#6c757d;"
+                               placeholder="https://manabox.app/decks/... o https://moxfield.com/decks/...">
+                        <div class="form-text text-muted">Compatible con Manabox y Moxfield. El deck debe ser público.</div>
+                    </div>
+                </div>
+
+                <p class="text-muted small mb-0"><i class="bi bi-info-circle me-1"></i>Puede demorar unos segundos si hay cartas nuevas en Scryfall.</p>
+
+                <div class="mt-3 text-end">
+                    <button type="button" class="btn btn-secondary rounded-pill px-3 me-2" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success rounded-pill px-4" id="btnImportar">
+                        <span class="spinner-border spinner-border-sm d-none me-1" id="importSpinner" role="status"></span>
+                        <span id="importText">Importar</span>
+                    </button>
+                </div>
+            </form>
+
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-          <button type="submit" class="btn btn-success" id="btnImportar">
-              <span class="spinner-border spinner-border-sm d-none me-1" id="importSpinner" role="status" aria-hidden="true"></span>
-              <span id="importText">Importar</span>
-          </button>
-        </div>
-      </form>
     </div>
   </div>
 </div>
@@ -629,7 +657,20 @@
         }
     });
 
-    // Spinner para botón de Importación Masiva
+    function switchImportTab(tab) {
+        if (tab === 'file') {
+            $('#tab-file').show(); $('#tab-url').hide();
+            $('#tab-file-btn').addClass('active'); $('#tab-url-btn').removeClass('active');
+            $('#deck_url_input').val('').prop('required', false);
+            $('input[name=csv_file]').prop('required', true);
+        } else {
+            $('#tab-file').hide(); $('#tab-url').show();
+            $('#tab-url-btn').addClass('active'); $('#tab-file-btn').removeClass('active');
+            $('input[name=csv_file]').prop('required', false);
+            $('#deck_url_input').prop('required', true);
+        }
+    }
+
     $('#importForm').on('submit', function() {
         $('#btnImportar').prop('disabled', true);
         $('#importSpinner').removeClass('d-none');

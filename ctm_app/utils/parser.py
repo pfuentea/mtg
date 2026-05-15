@@ -1,11 +1,149 @@
 import csv
+import json
 import requests
 import time
 import re
+from html import unescape
 from django.db import transaction
 from ctm_app.models.carta import Carta
 from ctm_app.models.edicion import Edicion
 from ctm_app.models.item_lista import ItemLista
+
+
+def _decode_astro(val):
+    """Decodifica el formato de serialización de Astro ([type, value])."""
+    if not isinstance(val, list) or len(val) == 0:
+        return val
+    t = val[0]
+    v = val[1] if len(val) > 1 else None
+    if t == 0:
+        if isinstance(v, dict):
+            return {k: _decode_astro(vv) for k, vv in v.items()}
+        return v
+    if t == 1:
+        return [_decode_astro(x) for x in v]
+    return val
+
+
+def import_from_manabox_url(url, lista, limit=None):
+    """
+    Importa cartas desde una URL pública de Manabox (manabox.app/decks/...).
+    Extrae los datos del HTML servido por Astro SSR.
+    """
+    try:
+        r = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=15)
+        r.raise_for_status()
+    except Exception as e:
+        return False, f"No se pudo acceder a la URL: {e}"
+
+    islands = re.findall(r'<astro-island[^>]+props="([^"]+)"', r.text)
+    deck_data = None
+    for props in islands:
+        try:
+            raw = json.loads(unescape(props))
+            if 'deck' in raw:
+                deck_data = _decode_astro(raw['deck'])
+                break
+        except Exception:
+            continue
+
+    if not deck_data or not isinstance(deck_data, dict) or 'cards' not in deck_data:
+        return False, "No se encontraron cartas en la URL. Verifica que sea un enlace público de Manabox."
+
+    cards = deck_data['cards']
+    if not isinstance(cards, list):
+        return False, "Formato de cartas inesperado en la URL."
+
+    success_count = 0
+    errors = []
+    count = 0
+
+    with transaction.atomic():
+        for i, card in enumerate(cards):
+            if not isinstance(card, dict):
+                continue
+            if limit is not None and count >= limit:
+                break
+            name             = str(card.get('name', '')).strip()
+            set_code         = str(card.get('setId', '')).lower().strip()
+            collector_number = str(card.get('collectorNumber', ''))
+            quantity         = int(card.get('quantity', 1))
+            variant          = str(card.get('variant', 'Normal'))
+            is_foil          = variant.lower() in ('foil', 'etched')
+
+            if not name or not set_code:
+                continue
+
+            success = _process_card(lista, quantity, name, set_code, 'NM', 'en',
+                                    is_foil, collector_number, i + 1, errors)
+            if success:
+                success_count += 1
+                count += 1
+
+    return True, {"success_count": success_count, "errors": errors}
+
+def import_from_moxfield_url(url, lista, limit=None):
+    """
+    Importa cartas desde una URL pública de Moxfield (moxfield.com/decks/...).
+    Usa la API pública api2.moxfield.com/v2/decks/all/{publicId}.
+    """
+    match = re.search(r'moxfield\.com/decks/([A-Za-z0-9_-]+)', url)
+    if not match:
+        return False, "No se pudo extraer el ID del deck desde la URL de Moxfield."
+    public_id = match.group(1)
+
+    api_url = f"https://api2.moxfield.com/v2/decks/all/{public_id}"
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Referer': 'https://moxfield.com/',
+        'Accept': 'application/json',
+    }
+    try:
+        r = requests.get(api_url, headers=headers, timeout=15)
+        r.raise_for_status()
+    except Exception as e:
+        return False, f"No se pudo acceder a la API de Moxfield: {e}"
+
+    try:
+        data = r.json()
+    except Exception:
+        return False, "La respuesta de Moxfield no es JSON válido."
+
+    # Boards to import: mainboard, commanders, companions, sideboard
+    boards = ['mainboard', 'commanders', 'companions', 'sideboard']
+    success_count = 0
+    errors = []
+    count = 0
+
+    with transaction.atomic():
+        for board_name in boards:
+            board = data.get(board_name)
+            if not board or not isinstance(board, dict):
+                continue
+            for i, (_, entry) in enumerate(board.items()):
+                if not isinstance(entry, dict):
+                    continue
+                if limit is not None and count >= limit:
+                    break
+                card = entry.get('card', {})
+                name = str(card.get('name', '')).strip()
+                set_code = str(card.get('set', '')).lower().strip()
+                collector_number = str(card.get('cn', ''))
+                quantity = int(entry.get('quantity', 1))
+                is_foil = bool(entry.get('isFoil', False))
+
+                if not name or not set_code:
+                    continue
+
+                row_num = count + 1
+                success = _process_card(lista, quantity, name, set_code, 'NM', 'en',
+                                        is_foil, collector_number, row_num, errors)
+                if success:
+                    success_count += 1
+                    count += 1
+
+    return True, {"success_count": success_count, "errors": errors}
+
 
 def import_list_from_file(file_content_str, lista, format_choice, limit=None):
     """

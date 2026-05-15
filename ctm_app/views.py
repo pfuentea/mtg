@@ -17,7 +17,7 @@ from .models.edicion import Edicion
 from .models.actividad import Actividad
 from .models.grupo import Grupo
 from django.db.models import Q, Count
-from .utils.parser import import_list_from_file
+from .utils.parser import import_list_from_file, import_from_manabox_url, import_from_moxfield_url
 
 from .models.comentario import Comentario
 from .forms.comentarioForm import ComentarioForm
@@ -825,6 +825,35 @@ def import_list(request, lista_id):
         messages.error(request, "No tienes permiso para modificar esta lista.")
         return redirect('/index')
         
+    if request.method == 'POST' and request.POST.get('deck_url'):
+        url = request.POST.get('deck_url', '').strip()
+        limit = 300 if user.tier == 'FREE' else None
+        if limit:
+            messages.warning(request, "Importando solo las primeras 300 cartas debido a límite de cuenta FREE.")
+        try:
+            if 'manabox.app/decks/' in url:
+                success, result = import_from_manabox_url(url, lista, limit=limit)
+            elif 'moxfield.com/decks/' in url:
+                success, result = import_from_moxfield_url(url, lista, limit=limit)
+            else:
+                messages.error(request, "URL no reconocida. Usa una URL de Manabox o Moxfield.")
+                return redirect(f'/list/{lista.id}')
+
+            if success:
+                messages.success(request, "Proceso de importación finalizado con éxito.")
+                messages.add_message(request, messages.SUCCESS,
+                    f"Se cargaron {result['success_count']} cartas desde la URL.", extra_tags='import_summary')
+                if result['errors']:
+                    for err in result['errors'][:5]:
+                        messages.warning(request, err)
+                    if len(result['errors']) > 5:
+                        messages.warning(request, f"...y {len(result['errors']) - 5} errores más.")
+            else:
+                messages.error(request, f"Error al importar desde URL: {result}")
+        except Exception as e:
+            messages.error(request, f"Error procesando URL: {str(e)}")
+        return redirect(f'/list/{lista.id}')
+
     if request.method == 'POST' and request.FILES.get('csv_file'):
         csv_file = request.FILES['csv_file']
         format_choice = request.POST.get('format_choice', 'moxfield_csv')
