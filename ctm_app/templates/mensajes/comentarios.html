@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block titulo %}Comentarios de Contacto{% endblock %}
+
+{% block contenido %}
+<div class="separador"></div>
+<div class="container my-4">
+
+    <div class="row mb-3 align-items-center">
+        <div class="col">
+            <h2 class="garde">
+                <i class="bi bi-chat-left-text me-2 text-warning"></i>Comentarios de Contacto
+            </h2>
+            <p class="text-muted mb-0">Mensajes enviados desde el formulario público de contacto.</p>
+        </div>
+        <div class="col-auto">
+            {% if no_leidos > 0 %}
+            <form method="post" action="/msg/comentarios" class="d-inline">
+                {% csrf_token %}
+                <input type="hidden" name="marcar_todos" value="1">
+                <button type="submit" class="btn btn-outline-warning rounded-pill px-3">
+                    <i class="bi bi-check2-all me-1"></i>Marcar todos como leídos
+                    <span class="badge bg-warning text-dark ms-1">{{ no_leidos }}</span>
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if comentarios %}
+    <div class="d-flex flex-column gap-3">
+        {% for c in comentarios %}
+        <div class="p-3 rounded-3 border shadow-sm {% if not c.leido %}border-warning bg-dark{% else %}border-secondary{% endif %}"
+             style="background-color: {% if not c.leido %}#1e1e2e{% else %}#161623{% endif %};">
+            <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap">
+                <div class="flex-grow-1">
+                    <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                        {% if not c.leido %}
+                        <span class="badge bg-warning text-dark"><i class="bi bi-circle-fill me-1" style="font-size:.5rem;"></i>Nuevo</span>
+                        {% else %}
+                        <span class="badge bg-secondary"><i class="bi bi-check2 me-1"></i>Leído</span>
+                        {% endif %}
+                        <span class="text-muted small"><i class="bi bi-clock me-1"></i>{{ c.created_at|date:"d/m/Y H:i" }}</span>
+                    </div>
+
+                    <div class="mb-1 d-flex align-items-center flex-wrap gap-2">
+                        <span class="fw-bold text-light"><i class="bi bi-person me-1 text-warning"></i>{{ c.remitente }}</span>
+                        <span class="text-muted small"><i class="bi bi-envelope me-1"></i>{{ c.email }}</span>
+                        {% if c.usuario_registrado %}
+                        <a href="/user/{{ c.usuario_registrado.id }}" class="badge bg-success text-decoration-none" title="Usuario registrado en la plataforma">
+                            <i class="bi bi-patch-check-fill me-1"></i>{{ c.usuario_registrado.name }}
+                        </a>
+                        {% else %}
+                        <span class="badge bg-secondary" title="Email no registrado en la plataforma">
+                            <i class="bi bi-person-x me-1"></i>No registrado
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    <p class="text-light mb-0 mt-2" style="white-space: pre-wrap;">{{ c.mensaje }}</p>
+                </div>
+
+                {% if not c.leido %}
+                <div class="flex-shrink-0">
+                    <form method="post" action="/msg/comentarios">
+                        {% csrf_token %}
+                        <input type="hidden" name="marcar_leido" value="{{ c.id }}">
+                        <button type="submit" class="btn btn-sm btn-outline-secondary rounded-pill px-3"
+                                title="Marcar como leído">
+                            <i class="bi bi-check2"></i>
+                        </button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="text-center py-5 text-muted">
+        <i class="bi bi-chat-left fs-1 d-block mb-3"></i>
+        <p>No hay comentarios de contacto todavía.</p>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

@@ -1,86 +1,218 @@
 {% extends "../base.html" %}
 
-{% block titulo %}Ranking de cartas Buscadas{% endblock %}
+{% block titulo %}Ranking de Cartas{% endblock %}
 
-{% block contenido %}
-
-<h1 class="garde">Ranking cartas buscadas</h1>
-
-<h2 class="garde">Ranking por carta </h2>
-<div class="row">
-    <div class="col-10">
-        <div class="table-responsive" id="main_table">
-            <table id="lista_cartas" class="table table-striped table-bordered" width="100%" >
-                <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Edicion</th>
-                        <th>Cantidad</th>
-                        <th>Imagen</th>
-                        <th class="dt-center">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for i in rank1 %}
-                    <tr>
-                        <td> 
-                            <a href="/card/{{i.id}}">{{i.carta.nombre}}</a>                             
-                        </td>
-                        <td> {{i.carta.Edicion.nombre}}</td>
-                        <td>{{i.cantidad}}</td>
-                        <td> <img src="{{i.carta.small_image}}" alt="" class="carta_tumb"></td>
-                        <td class="dt-center"> 
-                                
-                                <a href="#"  data-href="/card/remove/{{lista_id}}/{{i.id}}"  class="btn btn-sm btn-outline-danger btn-delete-trv" data-bs-toggle="modal" data-bs-target="#confirm-delete" title="Borrar">
-                                    <i class="bi bi-trash"></i>
-                                </a>
-                        </td>
-                    </tr>       
-                {% endfor %}
-                </tbody>    
-            </table>
-        </div>
-    </div>
-</div>
-
-
-<h2 class="garde">Ranking por nombre </h2>
-<div class="row">
-    <div class="col-10">
-        <div class="table-responsive" id="main_table2">
-            <table id="lista_cartas" class="table table-striped table-bordered" width="100%" >
-                <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Edicion</th>
-                        <th>Cantidad</th>
-                        <th>Imagen</th>
-                        <th class="dt-center">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for i in rank2 %}
-                    <tr>
-                        <td> 
-                            <a href="/card/{{i.id}}">{{i.carta.nombre}}</a>                             
-                        </td>
-                        <td> {{i.carta.Edicion.nombre}}</td>
-                        <td>{{i.cantidad}}</td>
-                        <td> <img src="{{i.carta.small_image}}" alt="" class="carta_tumb"></td>
-                        <td class="dt-center"> 
-                                
-                                <a href="#"  data-href="/card/remove/{{lista_id}}/{{i.id}}"  class="btn btn-sm btn-outline-danger btn-delete-trv" data-bs-toggle="modal" data-bs-target="#confirm-delete" title="Borrar">
-                                    <i class="bi bi-trash"></i>
-                                </a>
-                        </td>
-                    </tr>       
-                {% endfor %}
-                </tbody>    
-            </table>
-        </div>
-    </div>
-</div>
+{% block css %}
+<style>
+    .ranking-table thead th { background-color: #1a1a2e; color: #F77e0d; border-color: #444; }
+    .ranking-table tbody tr { background-color: #2b2b36; color: #e0e0e0; }
+    .ranking-table tbody tr:hover { background-color: #33334a; }
+    .ranking-table td, .ranking-table th { border-color: #444; vertical-align: middle; }
+    .rank-num { font-size: 1.1rem; font-weight: bold; color: #F77e0d; min-width: 2rem; text-align: center; }
+</style>
 {% endblock %}
 
-{% block libreria %}
+{% block contenido %}
+<div class="separador"></div>
+<div class="container my-4">
+
+    <div class="row mb-4 align-items-center">
+        <div class="col">
+            <h2 class="garde"><i class="bi bi-trophy me-2 text-warning"></i>Ranking de Cartas</h2>
+            <p class="text-muted mb-0">Las cartas más buscadas en la plataforma.</p>
+        </div>
+        <div class="col-auto">
+            <a href="/estadisticas" class="btn btn-outline-secondary rounded-pill px-3">
+                <i class="bi bi-arrow-left me-1"></i>Estadísticas
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- Ranking por carta (instancia) -->
+        <div class="col-12">
+            <div class="p-3 bg-dark rounded-3 border border-secondary shadow-sm">
+                <h5 class="text-warning mb-3"><i class="bi bi-card-image me-2"></i>Ranking por versión de carta</h5>
+                {% if rank1 %}
+                <div class="table-responsive">
+                    <table class="table table-bordered ranking-table mb-0">
+                        <thead>
+                            <tr>
+                                <th style="width:3rem;">#</th>
+                                <th>Carta</th>
+                                <th>Edición</th>
+                                <th style="width:7rem;">Img</th>
+                                <th style="width:6rem;" class="text-center">Buscada</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in rank1 %}
+                            <tr>
+                                <td class="rank-num">
+                                    {% if forloop.counter == 1 %}<i class="bi bi-trophy-fill text-warning"></i>
+                                    {% elif forloop.counter == 2 %}<i class="bi bi-trophy-fill text-secondary"></i>
+                                    {% elif forloop.counter == 3 %}<i class="bi bi-trophy-fill" style="color:#cd7f32;"></i>
+                                    {% else %}{{ forloop.counter }}{% endif %}
+                                </td>
+                                <td>
+                                    <a href="#" class="text-warning text-decoration-none fw-bold open-searchers"
+                                       data-carta-id="{{ i.carta.id }}" data-img="{{ i.carta.small_image }}">
+                                        {{ i.carta.nombre }}
+                                    </a>
+                                </td>
+                                <td class="text-muted small">{{ i.carta.Edicion.nombre }}</td>
+                                <td>
+                                    <img src="{{ i.carta.small_image }}" alt="{{ i.carta.nombre }}" style="width:3.5rem; border-radius:4px;">
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-warning text-dark fw-bold">{{ i.cantidad }}</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4 text-muted">
+                    <i class="bi bi-inbox fs-2 d-block mb-2"></i>Sin datos de ranking disponibles.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Ranking por nombre -->
+        <div class="col-12">
+            <div class="p-3 bg-dark rounded-3 border border-secondary shadow-sm">
+                <h5 class="text-warning mb-3"><i class="bi bi-sort-down me-2"></i>Ranking por nombre de carta</h5>
+                {% if rank2 %}
+                <div class="table-responsive">
+                    <table class="table table-bordered ranking-table mb-0">
+                        <thead>
+                            <tr>
+                                <th style="width:3rem;">#</th>
+                                <th>Carta</th>
+                                <th>Edición</th>
+                                <th style="width:7rem;">Img</th>
+                                <th style="width:6rem;" class="text-center">Buscada</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in rank2 %}
+                            <tr>
+                                <td class="rank-num">
+                                    {% if forloop.counter == 1 %}<i class="bi bi-trophy-fill text-warning"></i>
+                                    {% elif forloop.counter == 2 %}<i class="bi bi-trophy-fill text-secondary"></i>
+                                    {% elif forloop.counter == 3 %}<i class="bi bi-trophy-fill" style="color:#cd7f32;"></i>
+                                    {% else %}{{ forloop.counter }}{% endif %}
+                                </td>
+                                <td>
+                                    <a href="#" class="text-warning text-decoration-none fw-bold open-searchers"
+                                       data-nombre="{{ i.carta.nombre }}" data-img="{{ i.carta.small_image }}">
+                                        {{ i.carta.nombre }}
+                                    </a>
+                                </td>
+                                <td class="text-muted small">{{ i.carta.Edicion.nombre }}</td>
+                                <td>
+                                    <img src="{{ i.carta.small_image }}" alt="{{ i.carta.nombre }}" style="width:3.5rem; border-radius:4px;">
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-warning text-dark fw-bold">{{ i.cantidad }}</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4 text-muted">
+                    <i class="bi bi-inbox fs-2 d-block mb-2"></i>Sin datos de ranking disponibles.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Modal buscadores -->
+<div class="modal fade" id="searchersModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" style="background:#1a1a2e; border:1px solid #444;">
+            <div class="modal-header border-secondary">
+                <div class="d-flex align-items-center gap-3">
+                    <img id="modal-carta-img" src="" alt="" style="width:3rem; border-radius:4px; display:none;">
+                    <div>
+                        <h5 class="modal-title text-warning mb-0" id="modal-carta-nombre">Buscadores</h5>
+                        <small class="text-muted" id="modal-carta-sub"></small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <div class="text-center py-4 text-muted">
+                    <div class="spinner-border text-warning" role="status"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.querySelectorAll('.open-searchers').forEach(function(el) {
+    el.addEventListener('click', function(e) {
+        e.preventDefault();
+        var cartaId = this.dataset.cartaId;
+        var nombre  = this.dataset.nombre;
+        var img     = this.dataset.img;
+
+        var modalImg = document.getElementById('modal-carta-img');
+        var modalNombre = document.getElementById('modal-carta-nombre');
+        var modalSub    = document.getElementById('modal-carta-sub');
+        var modalBody   = document.getElementById('modal-body');
+
+        modalNombre.textContent = cartaId ? this.textContent.trim() : nombre;
+        modalSub.textContent    = cartaId ? 'Versión exacta' : 'Todas las ediciones';
+        if (img) { modalImg.src = img; modalImg.style.display = ''; }
+        else { modalImg.style.display = 'none'; }
+
+        modalBody.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-warning" role="status"></div></div>';
+        new bootstrap.Modal(document.getElementById('searchersModal')).show();
+
+        var url = '/ranking/api/searchers?' + (cartaId ? 'carta_id=' + cartaId : 'nombre=' + encodeURIComponent(nombre));
+        fetch(url)
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (!data.searchers.length) {
+                    modalBody.innerHTML = '<p class="text-muted text-center py-3">Sin buscadores registrados.</p>';
+                    return;
+                }
+                var rows = data.searchers.map(function(u, idx) {
+                    return '<tr style="background:#2b2b36; color:#e0e0e0;">' +
+                        '<td class="text-center text-warning fw-bold">' + (idx + 1) + '</td>' +
+                        '<td><a href="/user/' + u.id + '" class="text-warning text-decoration-none fw-bold">' +
+                            '<i class="bi bi-person-circle me-1"></i>' + u.name + '</a>' +
+                            (u.nick ? ' <span class="badge bg-secondary ms-1">' + u.nick + '</span>' : '') + '</td>' +
+                        '<td class="text-muted small">' + (u.ubicacion ? '<i class="bi bi-geo-alt me-1"></i>' + u.ubicacion : '—') + '</td>' +
+                        '<td><a href="/list/' + u.lista_id + '" class="text-muted small text-decoration-none">' +
+                            '<i class="bi bi-list-ul me-1"></i>' + u.lista_nombre + '</a></td>' +
+                        '<td class="text-center"><span class="badge bg-warning text-dark fw-bold">' + u.cantidad + '</span></td>' +
+                    '</tr>';
+                }).join('');
+                modalBody.innerHTML =
+                    '<div class="table-responsive">' +
+                    '<table class="table table-bordered mb-0" style="border-color:#444;">' +
+                    '<thead style="background:#1a1a2e;"><tr>' +
+                        '<th style="color:#F77e0d; border-color:#444; width:2.5rem;">#</th>' +
+                        '<th style="color:#F77e0d; border-color:#444;">Usuario</th>' +
+                        '<th style="color:#F77e0d; border-color:#444;">Ubicación</th>' +
+                        '<th style="color:#F77e0d; border-color:#444;">Lista</th>' +
+                        '<th style="color:#F77e0d; border-color:#444; width:5rem;" class="text-center">Cant.</th>' +
+                    '</tr></thead>' +
+                    '<tbody>' + rows + '</tbody>' +
+                    '</table></div>';
+            });
+    });
+});
+</script>
 {% endblock %}

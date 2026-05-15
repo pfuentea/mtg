@@ -1,9 +1,10 @@
 from django.contrib import messages
-from django.shortcuts import redirect, render,get_object_or_404
+from django.shortcuts import redirect, render, get_object_or_404
 from .decorators import login_required
 from .models.user import User
 from .models.mensaje import Mensaje
 from .models.contacto import Contacto
+from .models.comentario import Comentario
 
 
 @login_required
@@ -54,6 +55,38 @@ def VerMensaje(request, msg_id):
     if previous_url[-1]=='get':
         return render(request, 'mensajes/recibidos.html', context)
     return render(request, 'mensajes/enviados.html', context)
+
+@login_required
+def comentarios_view(request):
+    user = User.objects.get(id=request.session['user']['id'])
+    if user.role != 'admin':
+        return redirect('/index')
+
+    if request.method == 'POST':
+        comentario_id = request.POST.get('marcar_leido')
+        if comentario_id:
+            Comentario.objects.filter(id=comentario_id).update(leido=True)
+        marcar_todos = request.POST.get('marcar_todos')
+        if marcar_todos:
+            Comentario.objects.filter(leido=False).update(leido=True)
+        return redirect('/msg/comentarios')
+
+    todos = list(Comentario.objects.all().order_by('-created_at'))
+
+    # Buscar usuarios registrados por email en un solo query
+    emails = {c.email for c in todos}
+    user_map = {u.email: u for u in User.objects.filter(email__in=emails)}
+    for c in todos:
+        c.usuario_registrado = user_map.get(c.email)
+
+    no_leidos = sum(1 for c in todos if not c.leido)
+    context = {
+        'user': user,
+        'comentarios': todos,
+        'no_leidos': no_leidos,
+    }
+    return render(request, 'mensajes/comentarios.html', context)
+
 
 @login_required
 def new(request):

@@ -76,6 +76,9 @@ def index(request):
             "id" : user.id,
             "name": f"{user.name}",
             "email": user.email,
+            "role": user.role,
+            "nick": user.nick,
+            "ubicacion": user.ubicacion,
             "modo_oscuro":user.modo_oscuro
         }
 
@@ -84,18 +87,24 @@ def index(request):
     listas_off= Listados.objects.filter(owner=user,tipo='O').order_by('-updated_at')[:10]
     last_act=Actividad.objects.filter(objetivo__isnull=True).order_by('-updated_at')[:10]
     last_act_propia=Actividad.objects.filter(objetivo=user).order_by('-updated_at')[:10]
-    
+
     recibidos=Mensaje.objects.filter(to_user=user).order_by('-updated_at')[:10]
+
+    comentarios_nuevos = []
+    if user.role == 'admin':
+        from .models.comentario import Comentario
+        comentarios_nuevos = Comentario.objects.filter(leido=False).order_by('-created_at')[:5]
 
     print(f"u_act:{last_act_propia}")
     context = {
             'saludo': 'Hola',
-            "listas_hunt":listas_hunt, 
+            "listas_hunt":listas_hunt,
             "listas_off":listas_off,
             "actividades":last_act,
             "user":user,
             "last_act_propia":last_act_propia,
-            "recibidos":recibidos
+            "recibidos":recibidos,
+            "comentarios_nuevos": comentarios_nuevos,
         }
     #print (f"USer:{request.session['user']}")
     return render(request, 'index.html', context=context )
@@ -126,9 +135,10 @@ def list_hunt(request):
                             'id':l.id,
                             'items':l.items,
                             'estado':estado,
+                            'dias': int(dias),
                             'privacidad': l.privacidad
                         }
-            result.append(new_elem)       
+            result.append(new_elem)
 
         context = {
             'saludo': 'Hola',
@@ -197,9 +207,10 @@ def list_offer(request):
                             'id':l.id,
                             'items':l.items,
                             'estado':estado,
+                            'dias': int(dias),
                             'privacidad': l.privacidad
                         }
-            result.append(new_elem)  
+            result.append(new_elem)
         context = {
             'saludo': 'Hola',
             "listas":result,
@@ -647,23 +658,23 @@ def card_detail(request,item_id):
     #print(item)
     
     if request.method == "POST":
-        print(request.POST)
-        form=ItemListaForm(request.POST,instance=item_lista)
+        form = ItemListaForm(request.POST, instance=item_lista)
         if form.is_valid():
             item_lista = form.save(commit=False)
             item_lista.save()
             messages.success(request, "Se ha actualizado con éxito!")
+            if request.POST.get('action') == 'volver':
+                return redirect(f'/list/{item_lista.lista.id}')
         else:
-            print(form.errors)
-            messages.warning(request, "Algo va mal")
+            messages.warning(request, "Hay errores en el formulario.")
     else:
-        form=ItemListaForm(instance=item_lista)
+        form = ItemListaForm(instance=item_lista)
 
     context = {
-                "carta":item_lista,
-                "user":user,
-                'form':form
-            }
+        "carta": item_lista,
+        "user":  user,
+        'form':  form,
+    }
     return render(request, 'detalle_carta.html', context)
 
 @login_required
@@ -740,12 +751,15 @@ def custom_logout(request):
 
 @login_required
 def grupos(request):
-    user_id=request.session['user']['id']
-    user= User.objects.get(id=user_id)
+    from .models.contacto import Contacto
+    user_id = request.session['user']['id']
+    user = User.objects.get(id=user_id)
     if request.method == "GET":
         mis_grupos = Grupo.objects.filter(Q(owner=user) | Q(miembros=user)).distinct()
+        contactos = Contacto.objects.filter(usuario=user).select_related('contacto')
         context = {
             "grupos": mis_grupos,
+            "contactos": contactos,
             "user": user
         }
         return render(request, 'grupos.html', context)
@@ -755,7 +769,51 @@ def grupos(request):
         if nombre:
             nuevo_grupo = Grupo.objects.create(owner=user, nombre=nombre, descripcion=descripcion)
             nuevo_grupo.miembros.add(user)
+            member_ids = request.POST.getlist('miembros')
+            for mid in member_ids:
+                nuevo_grupo.miembros.add(mid)
         return redirect('/grupos')
+
+
+@login_required
+def grupo_edit(request, grupo_id):
+    from .models.contacto import Contacto
+    user = User.objects.get(id=request.session['user']['id'])
+    grupo = get_object_or_404(Grupo, id=grupo_id)
+
+    if grupo.owner != user:
+        messages.error(request, "Solo el creador puede editar el grupo.")
+        return redirect('/grupos')
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'add_members':
+            for mid in request.POST.getlist('miembros'):
+                grupo.miembros.add(mid)
+        elif action == 'remove_member':
+            target_id = request.POST.get('user_id')
+            if target_id:
+                target = User.objects.get(id=target_id)
+                if target != grupo.owner:
+                    grupo.miembros.remove(target)
+        elif action == 'update_info':
+            grupo.nombre = request.POST.get('nombre', grupo.nombre).strip() or grupo.nombre
+            grupo.descripcion = request.POST.get('descripcion', '').strip()
+            grupo.save()
+            messages.success(request, "Grupo actualizado correctamente.")
+        return redirect(f'/grupo/{grupo_id}/edit')
+
+    contactos_usuario = Contacto.objects.filter(usuario=user).select_related('contacto')
+    miembros_ids = set(grupo.miembros.values_list('id', flat=True))
+    contactos_disponibles = [c for c in contactos_usuario if c.contacto.id not in miembros_ids]
+
+    context = {
+        'grupo': grupo,
+        'user': user,
+        'miembros': grupo.miembros.select_related().all(),
+        'contactos_disponibles': contactos_disponibles,
+    }
+    return render(request, 'grupo_edit.html', context)
 
 @login_required
 def import_list(request, lista_id):

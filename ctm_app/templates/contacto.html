@@ -1,63 +1,83 @@
 {% extends "public.html" %}
+{% load static %}
 
-{% block titulo %}Registro CTMagic{% endblock %}
+{% block titulo %}Contacto — CTM.a.g.i.c.{% endblock %}
 
 {% block contenido %}
-    <div class="container contenido logo_orange mt-5 p-5">
-        <h1 class="garde d-none d-md-block d-xl-none ">
-            CTM.a.g.i.c.
-        </h1>
+<div class="container py-5">
+    <div class="row justify-content-center align-items-center g-4">
 
-        <h2 class="garde  d-xs-block d-md-none naranjo">
-            CTM.a.g.i.c.
-        </h2>
-        {% load static %}
-        <img src='{% static "/imgs/logo_02.png" %}' alt="" class="logo_orange">
+        <!-- Lado izquierdo: branding -->
+        <div class="col-12 col-md-5 text-center">
+            <img src='{% static "/imgs/logo_02.png" %}' alt="CTM.a.g.i.c." style="max-height: 110px;" class="mb-3">
+            <h1 class="garde mb-2" style="color: #F77e0d;">CTM.a.g.i.c.</h1>
+            <p style="color: #C0C0C0; max-width: 320px; margin: 0 auto; font-size: 0.95rem;">
+                ¿Tienes sugerencias, reportes o simplemente quieres saludarnos?<br>Escríbenos, leemos cada mensaje.
+            </p>
 
-
-    </div>
-   
-
-    <div class="container contenido logo_orange mt-5 p-5">
-        <div class="row">
-
-            <div class="col-sm-6">
-                <h2 >
-                    Deja acá tu comentario
-                </h2>
-            </div>
-            <div class="col-sm-6">
-                <form action="/contacto" method="post">
-                    {% csrf_token %}
-                    <div class="form-group col-3">
-                        <label for="remitente">Nombre</label>                
-                    </div>
-                    <div class="col-10">
-                        {{ form.remitente }}
-                    </div>
-                    <div class="form-group col-3">
-                        <label for="email">Email</label>
-                        
-                    </div>
-                    <div class="col-10 ">
-                        {{ form.email }}
-                    </div>
-                    <div class="form-group col-3">
-                        <label for="mensaje">Mensaje</label>
-                        
-                    </div>
-                    <div class="col-10 mb-3">
-                        {{ form.mensaje }}
-                    </div>
-        
-                    <div class="row ms-1 mb-3 d-flex justify-content-left">                   
-                            <button type="submit" class="btn btn-primary w-75">Enviar</button>                 
-                    </div>
-                </form>
+            <div class="mt-4 d-flex flex-column gap-2 align-items-center" style="color: #888; font-size: 0.85rem;">
+                <span><i class="bi bi-envelope me-2" style="color:#F77e0d;"></i>Respuesta en menos de 48 horas</span>
+                <span><i class="bi bi-shield-check me-2" style="color:#F77e0d;"></i>Tu información es confidencial</span>
             </div>
         </div>
-        
+
+        <!-- Separador vertical -->
+        <div class="col-md-1 d-none d-md-flex justify-content-center">
+            <div style="width:1px; min-height:320px; background: linear-gradient(to bottom, transparent, #F77e0d55, transparent);"></div>
+        </div>
+
+        <!-- Lado derecho: formulario -->
+        <div class="col-12 col-md-5">
+            <div class="public-card">
+                <h4 class="garde mb-1" style="color:#F77e0d;">Deja tu comentario</h4>
+                <p class="mb-4" style="color:#888; font-size:0.85rem;">Todos los campos son requeridos.</p>
+
+                <form action="/contacto" method="post" novalidate>
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label for="{{ form.remitente.id_for_label }}" class="form-label small fw-bold" style="color:#C0C0C0;">
+                            <i class="bi bi-person me-1" style="color:#F77e0d;"></i>Nombre
+                        </label>
+                        {{ form.remitente }}
+                        {% if form.remitente.errors %}
+                            <div class="text-danger small mt-1">{{ form.remitente.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.email.id_for_label }}" class="form-label small fw-bold" style="color:#C0C0C0;">
+                            <i class="bi bi-envelope me-1" style="color:#F77e0d;"></i>Email
+                        </label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                            <div class="text-danger small mt-1">{{ form.email.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="{{ form.mensaje.id_for_label }}" class="form-label small fw-bold" style="color:#C0C0C0;">
+                            <i class="bi bi-chat-text me-1" style="color:#F77e0d;"></i>Mensaje
+                        </label>
+                        {{ form.mensaje }}
+                        {% if form.mensaje.errors %}
+                            <div class="text-danger small mt-1">{{ form.mensaje.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-shine fw-bold py-2">
+                            <i class="bi bi-send me-2"></i>Enviar mensaje
+                        </button>
+                    </div>
+                </form>
+
+                <p class="text-center mt-3 mb-0" style="color:#666; font-size:0.8rem;">
+                    ¿Ya tienes cuenta? <a href="/login" style="color:#F77e0d;">Inicia sesión</a>
+                </p>
+            </div>
+        </div>
 
     </div>
-    
+</div>
 {% endblock %}

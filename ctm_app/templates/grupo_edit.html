@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block titulo %}{{ grupo.nombre }} — Editar comunidad{% endblock %}
+
+{% block css %}
+<style>
+    .edit-input {
+        background-color: #2b2b36; color: #e0e0e0;
+        border: 1px solid #6c757d; border-radius: .375rem;
+        padding: .5rem .75rem; width: 100%;
+    }
+    .edit-input:focus { border-color: #F77e0d; outline: none; box-shadow: 0 0 0 .2rem rgba(247,126,13,.25); }
+    textarea.edit-input { resize: vertical; min-height: 70px; }
+    .member-row { display: flex; align-items: center; gap: .75rem; padding: .6rem .75rem;
+                  background: #1a1a2e; border-radius: .375rem; margin-bottom: .4rem; }
+    .member-row:hover { background: #252540; }
+    .contact-check { display: flex; align-items: center; gap: .5rem; padding: .4rem .6rem;
+                     border-radius: .375rem; background: #1a1a2e; margin-bottom: .4rem; }
+    .contact-check:hover { background: #252540; }
+    .contact-check input[type=checkbox] { accent-color: #F77e0d; width: 1.1rem; height: 1.1rem; }
+</style>
+{% endblock %}
+
+{% block contenido %}
+<div class="separador"></div>
+<div class="container my-4">
+
+    <div class="row mb-4 align-items-center">
+        <div class="col">
+            <h2 class="garde"><i class="bi bi-people me-2 text-warning"></i>{{ grupo.nombre }}</h2>
+            <p class="text-muted mb-0">{{ grupo.descripcion|default:"Sin descripción" }}</p>
+        </div>
+        <div class="col-auto">
+            <a href="/grupos" class="btn btn-outline-secondary rounded-pill px-3">
+                <i class="bi bi-arrow-left me-1"></i>Mis comunidades
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- Columna izquierda: miembros actuales -->
+        <div class="col-lg-7">
+            <div class="p-3 bg-dark rounded-3 border border-secondary shadow-sm h-100">
+                <h5 class="text-warning mb-3">
+                    <i class="bi bi-person-check me-2"></i>Miembros
+                    <span class="badge bg-secondary ms-2">{{ miembros|length }}</span>
+                </h5>
+
+                {% for m in miembros %}
+                <div class="member-row">
+                    <i class="bi bi-person-circle text-warning fs-5"></i>
+                    <div class="flex-grow-1">
+                        <a href="/user/{{ m.id }}" class="text-warning text-decoration-none fw-bold">
+                            {{ m.name|default:m.email }}
+                        </a>
+                        {% if m.nick %}<span class="badge bg-secondary ms-1">{{ m.nick }}</span>{% endif %}
+                        {% if m == grupo.owner %}<span class="badge bg-warning text-dark ms-1"><i class="bi bi-star-fill me-1"></i>Creador</span>{% endif %}
+                        {% if m.ubicacion %}<small class="text-muted d-block"><i class="bi bi-geo-alt me-1"></i>{{ m.ubicacion }}</small>{% endif %}
+                    </div>
+                    {% if grupo.owner == user and m != grupo.owner %}
+                    <form method="post" action="/grupo/{{ grupo.id }}/edit" class="mb-0">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="remove_member">
+                        <input type="hidden" name="user_id" value="{{ m.id }}">
+                        <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-2"
+                                title="Quitar del grupo"
+                                onclick="return confirm('¿Quitar a {{ m.name|default:m.email }} del grupo?')">
+                            <i class="bi bi-person-x"></i>
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+                {% empty %}
+                <p class="text-muted text-center py-3"><i class="bi bi-inbox d-block fs-3 mb-2"></i>Sin miembros.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Columna derecha: agregar + editar info -->
+        <div class="col-lg-5">
+
+            {% if grupo.owner == user %}
+            <!-- Agregar contactos -->
+            <div class="p-3 bg-dark rounded-3 border border-secondary shadow-sm mb-4">
+                <h5 class="text-warning mb-3"><i class="bi bi-person-plus me-2"></i>Agregar miembros</h5>
+                {% if contactos_disponibles %}
+                <form method="post" action="/grupo/{{ grupo.id }}/edit">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="add_members">
+                    <div style="max-height:220px; overflow-y:auto;" class="mb-3 pe-1">
+                        {% for c in contactos_disponibles %}
+                        <div class="contact-check">
+                            <input type="checkbox" name="miembros" value="{{ c.contacto.id }}" id="nc_{{ c.contacto.id }}">
+                            <label for="nc_{{ c.contacto.id }}" class="text-light mb-0" style="cursor:pointer; flex:1;">
+                                <strong>{{ c.contacto.name|default:c.contacto.email }}</strong>
+                                {% if c.contacto.nick %}<span class="badge bg-secondary ms-1">{{ c.contacto.nick }}</span>{% endif %}
+                                {% if c.contacto.ubicacion %}<small class="text-muted ms-2"><i class="bi bi-geo-alt"></i> {{ c.contacto.ubicacion }}</small>{% endif %}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <button type="submit" class="btn btn-warning text-dark fw-bold rounded-pill px-4 w-100">
+                        <i class="bi bi-person-plus me-1"></i>Agregar seleccionados
+                    </button>
+                </form>
+                {% else %}
+                <p class="text-muted small mb-0">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Todos tus contactos ya son miembros, o no tienes contactos disponibles.
+                    <a href="/user/contactos" class="text-warning">Ver contactos</a>
+                </p>
+                {% endif %}
+            </div>
+
+            <!-- Editar info del grupo -->
+            <div class="p-3 bg-dark rounded-3 border border-secondary shadow-sm">
+                <h5 class="text-warning mb-3"><i class="bi bi-pencil me-2"></i>Editar información</h5>
+                <form method="post" action="/grupo/{{ grupo.id }}/edit">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="update_info">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-light">Nombre</label>
+                        <input type="text" name="nombre" value="{{ grupo.nombre }}" class="edit-input" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-light">Descripción</label>
+                        <textarea name="descripcion" class="edit-input">{{ grupo.descripcion }}</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-outline-warning rounded-pill px-4 w-100">
+                        <i class="bi bi-save me-1"></i>Guardar cambios
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+{% endblock %}

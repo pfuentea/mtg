@@ -18,9 +18,13 @@
 
         <div class="my-3">
             {% if lista.tipo == 'B' %}
-            <a href="/list/hunt" ><button>Volver a mis listas</button></a>
+            <a href="/list/hunt" class="btn btn-outline-secondary rounded-pill px-4">
+                <i class="bi bi-arrow-left me-1"></i>Volver a mis listas
+            </a>
             {% else %}
-            <a href="/list/offer"><button>Volver a mis listas</button></a>
+            <a href="/list/offer" class="btn btn-outline-secondary rounded-pill px-4">
+                <i class="bi bi-arrow-left me-1"></i>Volver a mis listas
+            </a>
             {% endif %}
         </div>        
     </div>
@@ -89,11 +93,17 @@
 
     <div class="row mt-2">
         <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center mb-2 bg-dark p-3 rounded-3 shadow-sm border border-secondary">
-                <p class="mb-0 fs-5 text-light fw-bold"><i class="bi bi-list-task me-2 text-warning"></i>Cartas en la lista: <span class="badge bg-warning text-dark ms-2">{{items.count}}</span></p> 
-                <div class="form-check form-switch fs-5 mb-0">
-                    <input class="form-check-input bg-secondary border-secondary" type="checkbox" id="toggleImages" checked style="cursor: pointer;">
-                    <label class="form-check-label text-warning" for="toggleImages" style="cursor: pointer;"><i class="bi bi-image me-1"></i> Imágenes</label>
+            <div class="d-flex justify-content-between align-items-center mb-2 bg-dark p-3 rounded-3 shadow-sm border border-secondary flex-wrap gap-2">
+                <p class="mb-0 fs-5 text-light fw-bold"><i class="bi bi-list-task me-2 text-warning"></i>Cartas en la lista: <span class="badge bg-warning text-dark ms-2">{{items.count}}</span></p>
+                <div class="d-flex align-items-center gap-4">
+                    <div class="form-check form-switch fs-5 mb-0">
+                        <input class="form-check-input bg-secondary border-secondary" type="checkbox" id="toggleImages" style="cursor: pointer;">
+                        <label class="form-check-label text-warning" for="toggleImages" style="cursor: pointer;"><i class="bi bi-image me-1"></i> Sin imágenes</label>
+                    </div>
+                    <div class="form-check form-switch fs-5 mb-0">
+                        <input class="form-check-input bg-secondary border-secondary" type="checkbox" id="toggleOnlyImages" style="cursor: pointer;">
+                        <label class="form-check-label text-warning" for="toggleOnlyImages" style="cursor: pointer;"><i class="bi bi-grid-3x3-gap me-1"></i> Solo imágenes</label>
+                    </div>
                 </div>
             </div>
 
@@ -130,8 +140,28 @@
                 </table>
             </div>
 
+            <!-- Grilla solo imágenes -->
+            <div id="image_grid" style="display:none;">
+                <div class="d-flex flex-wrap gap-2 py-2">
+                    {% for cartaitem in items %}
+                    <div class="text-center" style="width:100px;">
+                        <a href="/card/{{ cartaitem.id }}">
+                            <img src="{{ cartaitem.carta.small_image }}"
+                                 alt="{{ cartaitem.carta.nombre }}"
+                                 title="{{ cartaitem.carta.nombre }} — {{ cartaitem.carta.Edicion.nombre }}"
+                                 class="carta_tumb{% if cartaitem.es_foil %}_foil{% endif %}"
+                                 style="width:100%; border-radius:6px;">
+                        </a>
+                        <div class="mt-1" style="font-size:.68rem; color:#bbb; line-height:1.2; word-break:break-word;">
+                            {{ cartaitem.carta.nombre }}
+                            {% if cartaitem.es_foil %}<span class="badge bg-warning text-dark" style="font-size:.55rem;">F</span>{% endif %}
+                            {% if cartaitem.cantidad > 1 %}<span class="badge bg-secondary" style="font-size:.55rem;">x{{ cartaitem.cantidad }}</span>{% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
 
-           
         </div>
     </div>
     <!-- zona de resultados busqueda -->
@@ -248,6 +278,11 @@
 
 </form>
 
+
+<!-- Overlay zoom de carta -->
+<div class="card-zoom-overlay" id="cardZoomOverlay">
+    <img id="cardZoomImg" src="" alt="">
+</div>
 
 <div class="modal fade" id="confirm-delete" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -565,11 +600,33 @@
     });
     */
 
-    // Ocultar/Mostrar imágenes de la tabla principal
+    // "Sin imágenes": switch ON = oculta la columna de imágenes
     $('#toggleImages').on('change', function() {
-        var table = $('#lista_cartas').DataTable();
-        var isVisible = $(this).is(':checked');
-        table.column(2).visible(isVisible);
+        var sinImagenes = $(this).is(':checked');
+        $('#lista_cartas').DataTable().column(2).visible(!sinImagenes);
+        // Si se ocultan las imágenes mientras "solo imágenes" está activo, desactivarlo
+        if (sinImagenes && $('#toggleOnlyImages').is(':checked')) {
+            $('#toggleOnlyImages').prop('checked', false);
+            $('#image_grid').hide();
+            $('#main_table').show();
+        }
+    });
+
+    // "Solo imágenes": oculta la tabla y muestra la grilla
+    $('#toggleOnlyImages').on('change', function() {
+        var soloImg = $(this).is(':checked');
+        if (soloImg) {
+            $('#main_table').hide();
+            $('#image_grid').show();
+            // Asegurarse de que "Sin imágenes" esté apagado
+            if ($('#toggleImages').is(':checked')) {
+                $('#toggleImages').prop('checked', false);
+                $('#lista_cartas').DataTable().column(2).visible(true);
+            }
+        } else {
+            $('#image_grid').hide();
+            $('#main_table').show();
+        }
     });
 
     // Spinner para botón de Importación Masiva
@@ -585,34 +642,40 @@
         
     }
 
-    $(document).ready(function() {
-        anterior=""
-        $("img").click(function() {           
-            fuente=$(this).attr('src')
-            if(anterior!=""){                
-                if(anterior.attr('src')!=$(this).attr('src') && anterior !=""){                    
-                    anterior.removeClass('open');
-                }
-                else{
-                    console.log("misma")
-                }
-            }           
-                       
-            if ( $(this).hasClass('open') ) {
-                $(this).removeClass('open');
-                new_fuente=fuente.replace('large','small')
-            } else {
-                $('.element-card').removeClass('open');                
-                $(this).addClass('open');
-                new_fuente=fuente.replace('small','large')
-            }
-            
-            $(this).attr('src',new_fuente)
-        
-            anterior=$(this)
+    (function() {
+        var $overlay  = $('#cardZoomOverlay');
+        var $zoomImg  = $('#cardZoomImg');
+        var $current  = null;
 
+        function openCard($img) {
+            if ($current) $current.removeClass('open');
+            $current = $img;
+            $img.addClass('open');
+
+            var largeSrc = $img.attr('src').replace('/small/', '/large/').replace('small?', 'large?');
+            $zoomImg.attr('src', largeSrc).attr('alt', $img.attr('alt') || '');
+            $zoomImg.toggleClass('foil-glow', $img.hasClass('carta_tumb_foil'));
+            $overlay.addClass('active');
+        }
+
+        function closeCard() {
+            if ($current) { $current.removeClass('open'); $current = null; }
+            $overlay.removeClass('active');
+            $zoomImg.attr('src', '');
+        }
+
+        $(".carta_tumb, .carta_tumb_foil").on('click', function(e) {
+            e.stopPropagation();
+            if ($current && $current[0] === this) { closeCard(); }
+            else { openCard($(this)); }
         });
-    });
+
+        $overlay.on('click', function() { closeCard(); });
+
+        $(document).on('keydown', function(e) {
+            if (e.key === 'Escape') closeCard();
+        });
+    })();
 </script>
 
 {% endblock %}

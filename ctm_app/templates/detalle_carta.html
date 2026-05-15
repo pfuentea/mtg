@@ -1,98 +1,183 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block titulo %}Detalle Carta{% endblock %}
+{% block titulo %}Editar carta — {{ carta.carta.nombre }}{% endblock %}
+
+{% block css %}
+<style>
+    .edit-input {
+        background-color: #2b2b36;
+        color: #e0e0e0;
+        border: 1px solid #6c757d;
+        border-radius: .375rem;
+        padding: .5rem .75rem;
+        width: 100%;
+    }
+    .edit-input:focus {
+        border-color: #F77e0d;
+        outline: none;
+        box-shadow: 0 0 0 .2rem rgba(247,126,13,.25);
+    }
+    select.edit-input option { background: #2b2b36; }
+    textarea.edit-input { resize: vertical; min-height: 90px; }
+
+    /* Override Django radio widget */
+    .radio-group { display: flex; gap: 1.5rem; margin-top: .25rem; }
+    .radio-group label { color: #e0e0e0; cursor: pointer; display: flex; align-items: center; gap: .4rem; }
+    .radio-group input[type=radio] { accent-color: #F77e0d; width: 1.1rem; height: 1.1rem; }
+
+    .card-image-wrap { position: relative; text-align: center; }
+    .card-image-wrap img {
+        max-width: 220px;
+        border-radius: 8px;
+        transition: transform .2s;
+        cursor: zoom-in;
+        box-shadow: 0 4px 20px rgba(0,0,0,.5);
+    }
+    .card-image-wrap img.zoomed {
+        transform: scale(1.6);
+        cursor: zoom-out;
+        z-index: 10;
+        position: relative;
+    }
+    {% if carta.es_foil %}
+    .card-image-wrap img {
+        box-shadow: 0 0 18px 4px rgba(247,126,13,.55), 0 4px 20px rgba(0,0,0,.5);
+    }
+    {% endif %}
+    .info-row { display: flex; align-items: center; padding: .5rem 0; border-bottom: 1px solid #333; }
+    .info-row:last-child { border-bottom: none; }
+    .info-label { color: #aaa; font-size: .8rem; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; min-width: 6rem; }
+    .info-value { color: #e0e0e0; }
+</style>
+{% endblock %}
 
 {% block contenido %}
 <div class="separador"></div>
-<h1>
-    Agregar detalles 
-</h1>
-<form action="/card/update/{{carta.id}}" method="post">
-    {% csrf_token %}
-    <div class="container">
-        <div class="row">
-            <div class="col ">
+<div class="container my-4">
 
-                <div class="row my-strip">
-                    <div class="col">
-                        Nombre: {{carta.carta.nombre}}
-                    </div>
-                </div>
-                <div class="row my-strip">
-                    <div class="col">
-                        Edición: {{carta.carta.Edicion.nombre}}
-                    </div>
-                </div>
-                <div class="row my-strip">
-                    <div class="col">Pertece a la lista:</div>
-                    <div class="col">{{carta.lista.nombre}}
-                        {% if carta.lista.tipo == 'O' %}
-                            <i class="bi bi-box-arrow-up" title="Venta/Cambio"></i>
-                        {% else %}
-                            <i class="bi bi-box-arrow-in-down" title="Busqueda"></i>
-                        {% endif %}                        
-                    </div>
-                </div>
+    <div class="row mb-4 align-items-center">
+        <div class="col">
+            <h2 class="garde"><i class="bi bi-pencil-square me-2 text-warning"></i>Editar carta</h2>
+            <p class="text-muted mb-0">Modifica los detalles del ejemplar en tu lista.</p>
+        </div>
+        <div class="col-auto">
+            <a href="/list/{{ carta.lista.id }}" class="btn btn-outline-secondary rounded-pill px-3">
+                <i class="bi bi-arrow-left me-1"></i>Volver a la lista
+            </a>
+        </div>
+    </div>
 
-                {% for field in form %}
-                <div class="row my-strip">
-                    <div class='form-group col'>
-                        <label for="{{ field.name }}">{{ field.label }}:</label>
+    <form action="/card/update/{{ carta.id }}" method="post">
+        {% csrf_token %}
+        <div class="row g-4">
+
+            <!-- Columna izquierda: info + formulario -->
+            <div class="col-lg-8">
+
+                <!-- Info de la carta -->
+                <div class="p-3 mb-3 bg-dark rounded-3 border border-secondary shadow-sm">
+                    <h5 class="text-warning mb-3"><i class="bi bi-info-circle me-2"></i>Información</h5>
+                    <div class="info-row">
+                        <span class="info-label">Carta</span>
+                        <span class="info-value fw-bold">{{ carta.carta.nombre }}</span>
                     </div>
-                    <div class="col">{{ field }}</div>
-                </div>
-                {% endfor %}
-
-               
-
-
-                <div class="row mb-2">
-                    <div class="col-4">
-                        <button>Guardar</button>
+                    <div class="info-row">
+                        <span class="info-label">Edición</span>
+                        <span class="info-value">{{ carta.carta.Edicion.nombre }}</span>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col"> 
-                        <a href="/list/{{carta.lista.id}}" class="button">Regresar a lista</a>
-                        
+                    <div class="info-row">
+                        <span class="info-label">Lista</span>
+                        <span class="info-value">
+                            <a href="/list/{{ carta.lista.id }}" class="text-warning text-decoration-none">
+                                {{ carta.lista.nombre }}
+                            </a>
+                            {% if carta.lista.tipo == 'O' %}
+                                <span class="badge bg-success ms-2"><i class="bi bi-box-arrow-up me-1"></i>Ofrezco</span>
+                            {% else %}
+                                <span class="badge bg-primary ms-2"><i class="bi bi-box-arrow-in-down me-1"></i>Busco</span>
+                            {% endif %}
+                        </span>
                     </div>
                 </div>
 
+                <!-- Campos del formulario -->
+                <div class="p-3 bg-dark rounded-3 border border-secondary shadow-sm">
+                    <h5 class="text-warning mb-3"><i class="bi bi-sliders me-2"></i>Detalles del ejemplar</h5>
+                    <div class="row g-3">
+                        {% for field in form %}
+                        <div class="{% if field.name == 'observacion' %}col-12{% elif field.name == 'es_foil' %}col-12{% else %}col-md-6{% endif %}">
+                            <label class="form-label small fw-bold text-light" for="{{ field.id_for_label }}">
+                                {{ field.label }}
+                            </label>
+                            {% if field.name == 'es_foil' %}
+                                <div class="radio-group">
+                                    {% for radio in field %}
+                                        <label>{{ radio.tag }} {{ radio.choice_label }}</label>
+                                    {% endfor %}
+                                </div>
+                            {% elif field.field.widget.input_type == 'textarea' %}
+                                <textarea name="{{ field.html_name }}" id="{{ field.id_for_label }}"
+                                          class="edit-input">{{ field.value|default:'' }}</textarea>
+                            {% elif field.field.widget.input_type == 'select' %}
+                                <select name="{{ field.html_name }}" id="{{ field.id_for_label }}" class="edit-input">
+                                    {% for val, label in field.field.choices %}
+                                        <option value="{{ val }}" {% if field.value == val %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            {% else %}
+                                <input type="{{ field.field.widget.input_type }}"
+                                       name="{{ field.html_name }}"
+                                       id="{{ field.id_for_label }}"
+                                       value="{{ field.value|default:'' }}"
+                                       class="edit-input">
+                            {% endif %}
+                            {% if field.errors %}
+                                <div class="text-danger small mt-1">{{ field.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Botones -->
+                <div class="d-flex gap-3 mt-4 justify-content-end flex-wrap">
+                    <button type="submit" name="action" value="seguir"
+                            class="btn btn-outline-warning rounded-pill px-4">
+                        <i class="bi bi-check-lg me-2"></i>Guardar y seguir editando
+                    </button>
+                    <button type="submit" name="action" value="volver"
+                            class="btn btn-success rounded-pill px-5">
+                        <i class="bi bi-save me-2"></i>Guardar y volver a la lista
+                    </button>
+                </div>
             </div>
-            <div class="col">
-                <img src="{{carta.carta.small_image}}" alt="" class="carta_tumb{% if carta.es_foil  %}_foil{% endif %}" id="card_img">
-                <p>
-                    <a href="https://scryfall.com/card/{{carta.carta.Edicion.set_code}}/{{carta.carta.number_collector_txt}}" target="_blank">
-                        Ver en Scryfall
+
+            <!-- Columna derecha: imagen -->
+            <div class="col-lg-4">
+                <div class="p-3 bg-dark rounded-3 border border-secondary shadow-sm text-center">
+                    <div class="card-image-wrap mb-3">
+                        <img src="{{ carta.carta.small_image }}" alt="{{ carta.carta.nombre }}" id="card_img">
+                        {% if carta.es_foil %}
+                            <div class="mt-2">
+                                <span class="badge bg-warning text-dark"><i class="bi bi-stars me-1"></i>Foil</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <a href="https://scryfall.com/card/{{ carta.carta.Edicion.set_code }}/{{ carta.carta.number_collector_txt }}"
+                       target="_blank" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                        <i class="bi bi-box-arrow-up-right me-1"></i>Ver en Scryfall
                     </a>
-                    
-                </p>
+                </div>
             </div>
 
         </div>
-
-
-        
-        
-    </div>
-</form>
+    </form>
+</div>
 
 <script>
-    $(document).ready(function() {
-        $("#card_img").click(function() {
-            if ( $(this).hasClass('open') ) {
-			$(this).removeClass('open');
-		} else {
-			$('.element-card').removeClass('open');
-			$(this).addClass('open');
-		}
-        });
-    });
+document.getElementById('card_img').addEventListener('click', function() {
+    this.classList.toggle('zoomed');
+});
 </script>
-
-
-
-{% endblock %}
-
-{% block libreria %}
 {% endblock %}

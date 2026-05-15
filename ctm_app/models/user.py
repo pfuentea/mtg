@@ -25,6 +25,8 @@ class User(AbstractUser):
     name = models.CharField(max_length=255,blank=True)
     role = models.CharField(max_length=255, choices=CHOICES)
     tier = models.CharField(max_length=20, choices=TIER_CHOICES, default="FREE")
+    tier_inicio = models.DateField(blank=True, null=True)
+    tier_fin    = models.DateField(blank=True, null=True)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ['first_name','last_name']

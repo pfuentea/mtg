@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django import forms
 from ..models.item_lista import ItemLista
 
@@ -7,6 +8,23 @@ class ItemListaForm(forms.ModelForm):
         (False, 'No'),
     ]
     es_foil = forms.BooleanField(required=False, widget=forms.RadioSelect(choices=((True, 'Sí'), (False, 'No'))))
+
+    def clean_precio(self):
+        value = self.cleaned_data.get('precio')
+        if value is None or value == '':
+            return Decimal('0')
+        if value < 0:
+            raise forms.ValidationError("El precio no puede ser negativo.")
+        return value
+
+    def clean_cantidad(self):
+        value = self.cleaned_data.get('cantidad')
+        if value is None or value == '':
+            return 1
+        if value < 1:
+            raise forms.ValidationError("La cantidad debe ser al menos 1.")
+        return value
+
     class Meta:
         model=ItemLista
 

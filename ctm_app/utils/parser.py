@@ -21,8 +21,8 @@ def import_list_from_file(file_content_str, lista, format_choice, limit=None):
 
     with transaction.atomic():
         if format_choice == 'manabox_txt':
-            # regex: Qty Name (SetCode) CollectorNum
-            pattern = re.compile(r'^(\d+)\s+(.+?)\s+\((.+?)\)\s+(\d+.*?)$')
+            # regex: Qty Name (SetCode) CollectorNum [*F*]
+            pattern = re.compile(r'^(\d+)\s+(.+?)\s+\((.+?)\)\s+(\S+)\s*(\*F\*)?$', re.IGNORECASE)
             count = 0
             for i, line in enumerate(lines):
                 if limit is not None and count >= limit:
@@ -34,12 +34,13 @@ def import_list_from_file(file_content_str, lista, format_choice, limit=None):
                 if not match:
                     errors.append(f"Fila {i+1}: Formato no reconocido '{line}'")
                     continue
-                qty_str, name, set_code, collector_number = match.groups()
+                qty_str, name, set_code, collector_number, foil_marker = match.groups()
                 qty = int(qty_str)
                 name = name.strip()
                 set_code = set_code.lower().strip()
-                
-                success = _process_card(lista, qty, name, set_code, 'NM', 'en', False, collector_number, i+1, errors)
+                is_foil = foil_marker is not None
+
+                success = _process_card(lista, qty, name, set_code, 'NM', 'en', is_foil, collector_number, i+1, errors)
                 if success:
                     success_count += 1
                     count += 1

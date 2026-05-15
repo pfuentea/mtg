@@ -1,0 +1,146 @@
+{% extends "../base.html" %}
+
+{% block titulo %}Editar Usuario — {{ target.name }}{% endblock %}
+
+{% block css %}
+<style>
+    .edit-input {
+        background-color: #2b2b36;
+        color: #e0e0e0;
+        border: 1px solid #6c757d;
+        border-radius: .375rem;
+        padding: .5rem .75rem;
+        width: 100%;
+    }
+    .edit-input:focus {
+        border-color: #F77e0d;
+        outline: none;
+        box-shadow: 0 0 0 .2rem rgba(247,126,13,.25);
+    }
+    select.edit-input option { background: #2b2b36; }
+</style>
+{% endblock %}
+
+{% block contenido %}
+<div class="separador"></div>
+<div class="container my-4">
+
+    <div class="row mb-4 align-items-center">
+        <div class="col">
+            <h2 class="garde"><i class="bi bi-person-gear me-2 text-warning"></i>Editar Usuario</h2>
+            <p class="text-muted mb-0">ID #{{ target.id }} — registrado el {{ target.date_joined|date:"d/m/Y" }}</p>
+        </div>
+        <div class="col-auto">
+            <a href="/user_list" class="btn btn-outline-secondary rounded-pill px-3">
+                <i class="bi bi-arrow-left me-1"></i>Volver al listado
+            </a>
+        </div>
+    </div>
+
+    <form method="post" action="/user_admin/{{ target.id }}">
+        {% csrf_token %}
+
+        <div class="row g-3">
+
+            <!-- Datos personales -->
+            <div class="col-12">
+                <div class="p-3 bg-dark rounded-3 border border-secondary shadow-sm">
+                    <h5 class="text-warning mb-3"><i class="bi bi-person me-2"></i>Datos personales</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-light">Nombre</label>
+                            <input type="text" name="name" value="{{ target.name }}" class="edit-input" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-light">Email</label>
+                            <input type="email" name="email" value="{{ target.email }}" class="edit-input" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-light">Nick</label>
+                            <input type="text" name="nick" value="{{ target.nick }}" class="edit-input">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-light">Ubicación</label>
+                            <input type="text" name="ubicacion" value="{{ target.ubicacion }}" class="edit-input">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-light">Rol</label>
+                            <select name="role" class="edit-input">
+                                <option value="user" {% if target.role == 'user' %}selected{% endif %}>Usuario</option>
+                                <option value="admin" {% if target.role == 'admin' %}selected{% endif %}>Administrador</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-light">
+                                Nueva contraseña <span class="text-muted">(dejar vacío para no cambiar)</span>
+                            </label>
+                            <input type="password" name="password" class="edit-input" placeholder="••••••••">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Plan / Tier -->
+            <div class="col-12">
+                <div class="p-3 bg-dark rounded-3 border border-warning shadow-sm">
+                    <h5 class="text-warning mb-3"><i class="bi bi-star me-2"></i>Plan de suscripción</h5>
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-light">Plan</label>
+                            <select name="tier" class="edit-input" id="tierSelect">
+                                <option value="FREE"    {% if target.tier == 'FREE'    %}selected{% endif %}>FREE</option>
+                                <option value="PRO"     {% if target.tier == 'PRO'     %}selected{% endif %}>PRO</option>
+                                <option value="PREMIUM" {% if target.tier == 'PREMIUM' %}selected{% endif %}>PREMIUM</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4" id="tierInicioWrap">
+                            <label class="form-label small fw-bold text-light">Inicio del plan</label>
+                            <input type="date" name="tier_inicio" value="{{ target.tier_inicio|date:'Y-m-d' }}" class="edit-input">
+                        </div>
+                        <div class="col-md-4" id="tierFinWrap">
+                            <label class="form-label small fw-bold text-light">Vencimiento del plan</label>
+                            <input type="date" name="tier_fin" value="{{ target.tier_fin|date:'Y-m-d' }}" class="edit-input">
+                            <div class="form-text text-muted">Dejar vacío para plan sin vencimiento.</div>
+                        </div>
+                    </div>
+                    {% if target.tier != 'FREE' and target.tier_fin %}
+                    <div class="mt-2">
+                        <span class="badge {% if target.tier_fin < today %}bg-danger{% else %}bg-success{% endif %}">
+                            {% if target.tier_fin < today %}
+                                <i class="bi bi-exclamation-circle me-1"></i>Plan vencido el {{ target.tier_fin|date:"d/m/Y" }}
+                            {% else %}
+                                <i class="bi bi-check-circle me-1"></i>Activo hasta {{ target.tier_fin|date:"d/m/Y" }}
+                            {% endif %}
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12 text-end">
+                <a href="/user_list" class="btn btn-secondary btn-lg rounded-pill px-4 me-2">
+                    <i class="bi bi-x-circle me-1"></i>Cancelar
+                </a>
+                <button type="submit" class="btn btn-success btn-lg rounded-pill px-5">
+                    <i class="bi bi-save me-2"></i>Guardar cambios
+                </button>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+<script>
+    function toggleTierDates() {
+        var tier = document.getElementById('tierSelect').value;
+        var show = tier !== 'FREE';
+        document.getElementById('tierInicioWrap').style.display = show ? '' : 'none';
+        document.getElementById('tierFinWrap').style.display   = show ? '' : 'none';
+    }
+    document.getElementById('tierSelect').addEventListener('change', toggleTierDates);
+    toggleTierDates();
+</script>
+{% endblock %}

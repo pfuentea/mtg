@@ -1,33 +1,133 @@
 {% extends "../base.html" %}
 
-{% block titulo %}INDEX USUARIO{% endblock %}
+{% block titulo %}Estadísticas — CTM.a.g.i.c.{% endblock %}
 
 {% block contenido %}
-<h1>Bienvenid@: {{request.session.user.name}}</h1>
+<div class="separador"></div>
+<div class="container my-4">
 
-<div class="container">
-    
-    <div class="row mt-4">
-        <div class="col-8">
-            <h4>Resumen.(mejora: las cantidades llevan al detalle</h4>
+    <div class="row mb-4 align-items-center">
+        <div class="col">
+            <h2 class="garde"><i class="bi bi-bar-chart-line me-2 text-warning"></i>Estadísticas</h2>
+            <p class="text-muted mb-0">Resumen general de la plataforma.</p>
+        </div>
+        <div class="col-auto">
+            <a href="/user_list" class="btn btn-outline-warning rounded-pill px-3">
+                <i class="bi bi-people me-1"></i>Ver listado de usuarios
+            </a>
         </div>
     </div>
-    
-   
-    <div class="row">
-        <div class="col-10">
-          <table class="border">
-            <tr><td> Total de usuarios: <a href="/user_list">{{cantidad_users}}</a>  </td></tr>
-            <tr><td> Total de listas: {{cantidad_listas}}</td></tr>
-            <tr><td> Total de cartas: {{cantidad_cartas}}</td></tr>
-          </table>          
+
+    <!-- Métricas principales -->
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-md-4">
+            <div class="p-3 rounded-3 bg-dark border border-secondary shadow-sm text-center h-100">
+                <i class="bi bi-people-fill text-warning" style="font-size:2rem;"></i>
+                <p class="text-muted small mb-1 mt-2">Usuarios registrados</p>
+                <h2 class="fw-bold text-warning mb-0">{{ cantidad_users }}</h2>
+                <a href="/user_list" class="text-muted small text-decoration-none">Ver detalle →</a>
+            </div>
+        </div>
+        <div class="col-sm-6 col-md-4">
+            <div class="p-3 rounded-3 bg-dark border border-secondary shadow-sm text-center h-100">
+                <i class="bi bi-card-list text-info" style="font-size:2rem;"></i>
+                <p class="text-muted small mb-1 mt-2">Total de listas</p>
+                <h2 class="fw-bold text-info mb-0">{{ cantidad_listas }}</h2>
+                <span class="text-muted small">
+                    <span class="text-warning">{{ listas_busco }}</span> Busco /
+                    <span class="text-success">{{ listas_ofrezco }}</span> Ofrezco
+                </span>
+            </div>
+        </div>
+        <div class="col-sm-6 col-md-4">
+            <div class="p-3 rounded-3 bg-dark border border-secondary shadow-sm text-center h-100">
+                <i class="bi bi-collection-fill text-success" style="font-size:2rem;"></i>
+                <p class="text-muted small mb-1 mt-2">Cartas en el catálogo</p>
+                <h2 class="fw-bold text-success mb-0">{{ cantidad_cartas }}</h2>
+                <span class="text-muted small">Cartas únicas disponibles</span>
+            </div>
         </div>
     </div>
+
+    <div class="row g-3">
+        <!-- Distribución por tier -->
+        <div class="col-md-6">
+            <div class="p-3 rounded-3 bg-dark border border-secondary shadow-sm h-100">
+                <h5 class="text-warning mb-3"><i class="bi bi-star me-2"></i>Usuarios por plan</h5>
+                <div class="d-flex flex-column gap-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted">FREE</span>
+                        <div class="d-flex align-items-center gap-2 flex-grow-1 mx-3">
+                            <div class="progress flex-grow-1" style="height:8px; background:#2b2b36;">
+                                <div class="progress-bar bg-secondary" style="width:{% if cantidad_users %}{% widthratio users_free cantidad_users 100 %}{% else %}0{% endif %}%"></div>
+                            </div>
+                        </div>
+                        <span class="badge bg-secondary fw-bold">{{ users_free }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-warning">PRO</span>
+                        <div class="d-flex align-items-center gap-2 flex-grow-1 mx-3">
+                            <div class="progress flex-grow-1" style="height:8px; background:#2b2b36;">
+                                <div class="progress-bar bg-warning" style="width:{% if cantidad_users %}{% widthratio users_pro cantidad_users 100 %}{% else %}0{% endif %}%"></div>
+                            </div>
+                        </div>
+                        <span class="badge bg-warning text-dark fw-bold">{{ users_pro }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-danger">PREMIUM</span>
+                        <div class="d-flex align-items-center gap-2 flex-grow-1 mx-3">
+                            <div class="progress flex-grow-1" style="height:8px; background:#2b2b36;">
+                                <div class="progress-bar bg-danger" style="width:{% if cantidad_users %}{% widthratio users_premium cantidad_users 100 %}{% else %}0{% endif %}%"></div>
+                            </div>
+                        </div>
+                        <span class="badge bg-danger fw-bold">{{ users_premium }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Listas -->
+        <div class="col-md-3 col-sm-6">
+            <div class="p-3 rounded-3 bg-dark border border-secondary shadow-sm h-100">
+                <h5 class="text-warning mb-3"><i class="bi bi-card-list me-2"></i>Listas</h5>
+                <div class="d-flex justify-content-around text-center mt-3">
+                    <div>
+                        <div class="fw-bold fs-3 text-warning">{{ listas_busco }}</div>
+                        <div class="text-muted small">Busco</div>
+                    </div>
+                    <div class="border-start border-secondary"></div>
+                    <div>
+                        <div class="fw-bold fs-3 text-success">{{ listas_ofrezco }}</div>
+                        <div class="text-muted small">Ofrezco</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comentarios de contacto -->
+        <div class="col-md-3 col-sm-6">
+            <a href="/msg/comentarios" class="text-decoration-none">
+                <div class="p-3 rounded-3 bg-dark border {% if comentarios_no_leidos %}border-warning{% else %}border-secondary{% endif %} shadow-sm h-100">
+                    <h5 class="{% if comentarios_no_leidos %}text-warning{% else %}text-muted{% endif %} mb-3">
+                        <i class="bi bi-chat-left-text me-2"></i>Contacto
+                    </h5>
+                    <div class="d-flex justify-content-around text-center mt-3">
+                        <div>
+                            <div class="fw-bold fs-3 text-light">{{ comentarios_total }}</div>
+                            <div class="text-muted small">Total</div>
+                        </div>
+                        <div class="border-start border-secondary"></div>
+                        <div>
+                            <div class="fw-bold fs-3 {% if comentarios_no_leidos %}text-warning{% else %}text-muted{% endif %}">
+                                {{ comentarios_no_leidos }}
+                            </div>
+                            <div class="text-muted small">Sin leer</div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
 </div>
-
-
-
-{% endblock %}
-
-{% block libreria %}
 {% endblock %}

@@ -86,6 +86,17 @@
           <ul class="dropdown-menu dropdown-menu-dark shadow" aria-labelledby="sidebarMsg">
             <li><a class="dropdown-item" href="/msg/send">Enviados</a></li>
             <li><a class="dropdown-item" href="/msg/get">Recibidos</a></li>
+            {% if request.session.user.role == 'admin' %}
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item d-flex align-items-center justify-content-between" href="/msg/comentarios">
+                <span>Comentarios</span>
+                {% if comentarios_no_leidos > 0 %}
+                <span class="badge bg-warning text-dark ms-2">{{ comentarios_no_leidos }}</span>
+                {% endif %}
+              </a>
+            </li>
+            {% endif %}
           </ul>
         </li>
         {% if request.session.user.role == 'admin' %} 

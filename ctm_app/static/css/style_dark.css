@@ -203,45 +203,75 @@ td a{
 
 .carta_tumb{
    position: relative;
-   width:auto;
-   height:  150px;
+   width: auto;
+   height: 150px;
    border: 1px solid #fff;
-   transform-style: preserve-3d;
-	transform: rotatey(0deg) translatex(0px) translatey(0px);
-	transition: all 0.6s cubic-bezier(0.680, -0.550, 0.265, 1.550);
-   z-index: 0;
+   cursor: pointer;
+   transition: opacity 0.2s;
 
-   &.open{
-      position:fixed;
-      top: 20%;
-      left: 40%;
-      transform: rotatey(-360deg) translatex(0px) translatey(0px);
-      height:  350px;
-      z-index: 1;
-      
-   }
-
+   &.open { opacity: 0.5; }
 }
 
 .carta_tumb_foil{
-   width:auto;
-   height:  150px;
-   box-shadow: 0px 1px 32px 2px rgba(194,189,56,1);
-   -webkit-box-shadow: 0px 1px 32px 2px rgba(194,189,56,1);
-   -moz-box-shadow: 0px 1px 32px 2px rgba(194,189,56,1);
-   transform-style: preserve-3d;
-	transform: rotatey(0deg) translatex(0px) translatey(0px);
-	transition: all 0.6s cubic-bezier(0.680, -0.550, 0.265, 1.550);
-   z-index: 0;
+   width: auto;
+   height: 150px;
+   cursor: pointer;
+   border-radius: 4px;
+   animation: foilShimmer 3.5s ease-in-out infinite;
+   transition: opacity 0.2s;
 
-   &.open{
-      position:fixed;
-      top: 20%;
-      left: 40%;
-      transform: rotatey(-360deg) translatex(0px) translatey(0px);
-      height:  350px;
-      z-index: 1;
+   &.open { opacity: 0.5; animation-play-state: paused; }
+}
+
+@keyframes foilShimmer {
+   0%, 100% {
+      box-shadow: 0 0 10px 3px rgba(255, 215, 0, 0.85),
+                  0 0 28px 6px rgba(255, 180, 50, 0.3);
+      filter: brightness(1.05) saturate(1.3);
    }
+   25% {
+      box-shadow: 0 0 14px 4px rgba(100, 210, 255, 0.9),
+                  0 0 32px 8px rgba(50, 180, 255, 0.35);
+      filter: brightness(1.2) saturate(1.7) hue-rotate(40deg);
+   }
+   50% {
+      box-shadow: 0 0 14px 4px rgba(200, 100, 255, 0.9),
+                  0 0 32px 8px rgba(180, 50, 255, 0.35);
+      filter: brightness(1.25) saturate(1.8) hue-rotate(-25deg);
+   }
+   75% {
+      box-shadow: 0 0 14px 4px rgba(100, 255, 180, 0.9),
+                  0 0 32px 8px rgba(50, 220, 120, 0.35);
+      filter: brightness(1.2) saturate(1.6) hue-rotate(20deg);
+   }
+}
+
+/* Overlay para zoom de carta */
+.card-zoom-overlay {
+   display: none;
+   position: fixed;
+   inset: 0;
+   background: rgba(0, 0, 0, 0.85);
+   z-index: 1050;
+   justify-content: center;
+   align-items: center;
+   cursor: zoom-out;
+}
+.card-zoom-overlay.active { display: flex; }
+.card-zoom-overlay img {
+   max-height: 80vh;
+   max-width: 90vw;
+   border-radius: 10px;
+   box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
+   animation: cardZoomIn 0.55s cubic-bezier(0.680, -0.550, 0.265, 1.550);
+}
+.card-zoom-overlay img.foil-glow {
+   animation: cardZoomIn 0.55s cubic-bezier(0.680, -0.550, 0.265, 1.550),
+              foilShimmer 3.5s ease-in-out 0.55s infinite;
+}
+@keyframes cardZoomIn {
+   from { transform: rotateY(-360deg) scale(0.4); opacity: 0; }
+   to   { transform: rotateY(0deg)    scale(1);   opacity: 1; }
 }
 
 a.button {

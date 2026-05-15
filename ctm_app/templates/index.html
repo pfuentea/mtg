@@ -100,6 +100,46 @@
         </div>
     </div>
 
+    <!-- Comentarios de contacto (solo admin) -->
+    {% if request.session.user.role == 'admin' %}
+    <div class="col-md-6">
+        <div class="card h-100 bg-dark text-light shadow" style="border-radius: 20px; border: 1px solid {% if comentarios_nuevos %}#F77e0d{% else %}#2A2A2E{% endif %};">
+            <div class="card-header border-bottom border-secondary pt-3 pb-2 d-flex justify-content-between align-items-center"
+                style="border-top-left-radius: 20px; border-top-right-radius: 20px;">
+                <div>
+                    <h5 class="mb-0">
+                        <i class="bi bi-chat-left-text text-warning me-2"></i>Comentarios sin leer
+                        {% if comentarios_nuevos %}
+                        <span class="badge bg-warning text-dark ms-1">{{ comentarios_nuevos|length }}</span>
+                        {% endif %}
+                    </h5>
+                    <small class="text-muted">Formulario de contacto público</small>
+                </div>
+                <a href="/msg/comentarios" class="btn btn-sm btn-outline-warning rounded-circle px-2 py-1">
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+            <div class="card-body">
+                {% for c in comentarios_nuevos %}
+                <div class="mb-2 pb-2 border-bottom border-secondary">
+                    <small class="text-muted d-block" style="font-size: 0.75rem;">
+                        <i class="bi bi-clock me-1"></i>{{ c.created_at|date:"d/m/Y H:i" }}
+                    </small>
+                    <span class="text-light fw-bold"><i class="bi bi-person-fill me-1 text-warning"></i>{{ c.remitente }}</span>
+                    <p class="text-muted small mb-0 mt-1" style="overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">
+                        {{ c.mensaje }}
+                    </p>
+                </div>
+                {% empty %}
+                <p class="text-muted text-center mt-3">
+                    <i class="bi bi-check2-all fs-4 d-block mb-2 text-success"></i>Sin comentarios pendientes
+                </p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
     <!-- Última actividad -->
     <div class="col-md-6">
         <div class="card h-100 bg-dark text-light shadow" style="border-radius: 20px; border: 1px solid #2A2A2E;">

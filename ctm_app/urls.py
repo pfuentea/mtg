@@ -67,15 +67,19 @@ urlpatterns = [
     path('user/password/change', users.password_change), 
     
 
-    path('msg/send', mensajes.send), 
+    path('msg/send', mensajes.send),
     path('msg/get', mensajes.get),
-    path('msg/new', mensajes.new), 
+    path('msg/new', mensajes.new),
+    path('msg/comentarios', mensajes.comentarios_view),
     path('mostrar_modal/<int:msg_id>/', mensajes.VerMensaje, name='mostrar_modal'),
 
-    path('estadisticas', manage.stats), 
-    path('ranking', manage.ranking), 
-    path('user_list', manage.user_list),  
+    path('estadisticas', manage.stats),
+    path('ranking', manage.ranking),
+    path('ranking/api/searchers', manage.ranking_searchers),
+    path('user_list', manage.user_list),
+    path('user_admin/<int:user_id>', manage.edit_user),
     path('grupos', views.grupos),
+    path('grupo/<int:grupo_id>/edit', views.grupo_edit),
 
     path('accounts/login', TemplateView.as_view(template_name="accounts/login.html")),
     path('accounts/logout/', views.custom_logout, name='custom_logout'),

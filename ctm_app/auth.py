@@ -97,6 +97,9 @@ def registro(request):
             "id" : usuario_nuevo.id,
             "name": f"{usuario_nuevo.name}",
             "email": usuario_nuevo.email,
+            "role": usuario_nuevo.role,
+            "nick": usuario_nuevo.nick,
+            "ubicacion": usuario_nuevo.ubicacion,
             "modo_oscuro":usuario_nuevo.modo_oscuro
         }
         return redirect("/index")

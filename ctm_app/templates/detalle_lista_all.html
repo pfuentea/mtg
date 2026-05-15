@@ -17,9 +17,13 @@
 
         <div class="my-3">
             {% if tipo == 'B' %}
-            <a href="/list/hunt" ><button>Volver a mis listas</button></a>
+            <a href="/list/hunt" class="btn btn-outline-secondary rounded-pill px-4">
+                <i class="bi bi-arrow-left me-1"></i>Volver a mis listas
+            </a>
             {% else %}
-            <a href="/list/offer"><button>Volver a mis listas</button></a>
+            <a href="/list/offer" class="btn btn-outline-secondary rounded-pill px-4">
+                <i class="bi bi-arrow-left me-1"></i>Volver a mis listas
+            </a>
             {% endif %}
         </div>        
     </div>

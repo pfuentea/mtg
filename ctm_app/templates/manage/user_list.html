@@ -1,73 +1,168 @@
 {% extends "../base.html" %}
+{% load static %}
 
 {% block titulo %}Listado de Usuarios{% endblock %}
 
+{% block css %}
+<style>
+    #lista_users thead th { background-color: #1a1a2e; color: #F77e0d; border-color: #444; }
+    #lista_users tbody tr { background-color: #2b2b36; color: #e0e0e0; }
+    #lista_users tbody tr:hover { background-color: #33334a; }
+    #lista_users td, #lista_users th { border-color: #444; vertical-align: middle; }
+</style>
+{% endblock %}
+
 {% block contenido %}
-<div class="col"><h1>Listado de Usuarios</h1></div>
-<div class="col">
-    <div class="table-responsive" id="main_table">
-        <table id="lista_users" class="table table-striped table-bordered" width="100%" >
-            <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th>Correo</th>
-                    <th>Nick</th>
-                    <th>Ubicacion</th>
-                    <th>Fecha Unión</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for u in usuarios %}
-                <tr>
-                    <td class="dt-center"> 
-                        <a href="/user/{{u.id}}">{{u.name}}  </a>                          
-                    </td>
-                    <td> {{u.email}}</td>
-                    <td> {{u.nick}}</td>
-                    <td>{{u.ubicacion}}</td>
-                    <td> {{u.created_at}}</td> 
-                </tr>      
-                {% endfor %}
-            </tbody>    
-        </table>
+<div class="separador"></div>
+<div class="container my-4">
+
+    <div class="row mb-4 align-items-center">
+        <div class="col">
+            <h2 class="garde"><i class="bi bi-people me-2 text-warning"></i>Listado de Usuarios</h2>
+            <p class="text-muted mb-0">Todos los usuarios registrados en la plataforma.</p>
+        </div>
+        <div class="col-auto">
+            <a href="/estadisticas" class="btn btn-outline-secondary rounded-pill px-3">
+                <i class="bi bi-arrow-left me-1"></i>Estadísticas
+            </a>
+        </div>
     </div>
+
+    <!-- Tabla de usuarios -->
+    <div class="p-3 mb-4 bg-dark rounded-3 border border-secondary shadow-sm">
+        <div class="table-responsive">
+            <table id="lista_users" class="table table-bordered mb-0" width="100%">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Correo</th>
+                        <th>Nick</th>
+                        <th>Ubicación</th>
+                        <th>Plan</th>
+                        <th>Registro</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in usuarios %}
+                    <tr>
+                        <td>
+                            <a href="/user/{{ u.id }}" class="text-warning text-decoration-none fw-bold">
+                                <i class="bi bi-person-circle me-1"></i>{{ u.name }}
+                            </a>
+                        </td>
+                        <td class="text-muted small">{{ u.email }}</td>
+                        <td>
+                            {% if u.nick %}<span class="badge bg-secondary">{{ u.nick }}</span>
+                            {% else %}<span class="text-muted">—</span>{% endif %}
+                        </td>
+                        <td class="text-muted small">
+                            {% if u.ubicacion %}<i class="bi bi-geo-alt me-1 text-warning"></i>{{ u.ubicacion }}
+                            {% else %}—{% endif %}
+                        </td>
+                        <td>
+                            {% if u.tier == 'FREE' %}
+                                <span class="badge bg-secondary">FREE</span>
+                            {% elif u.tier_expirado %}
+                                <span class="badge bg-danger" title="Vencido el {{ u.tier_fin|date:'d/m/Y' }}">
+                                    <i class="bi bi-exclamation-circle me-1"></i>{{ u.tier }} vencido
+                                </span>
+                            {% elif u.tier == 'PRO' %}
+                                <span class="badge bg-warning text-dark">PRO</span>
+                                {% if u.tier_fin %}<small class="text-muted d-block">hasta {{ u.tier_fin|date:"d/m/Y" }}</small>{% endif %}
+                            {% elif u.tier == 'PREMIUM' %}
+                                <span class="badge bg-danger">PREMIUM</span>
+                                {% if u.tier_fin %}<small class="text-muted d-block">hasta {{ u.tier_fin|date:"d/m/Y" }}</small>{% endif %}
+                            {% endif %}
+                        </td>
+                        <td class="text-muted small">{{ u.date_joined|date:"d/m/Y" }}</td>
+                        <td class="text-center">
+                            <a href="/user_admin/{{ u.id }}" class="btn btn-sm btn-outline-warning rounded-pill px-2" title="Editar usuario">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Gráficas -->
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="p-3 bg-dark rounded-3 border border-secondary shadow-sm">
+                <h5 class="text-warning mb-3"><i class="bi bi-calendar-day me-2"></i>Registros por día</h5>
+                <canvas id="chartDia" height="120"></canvas>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="p-3 bg-dark rounded-3 border border-secondary shadow-sm">
+                <h5 class="text-warning mb-3"><i class="bi bi-calendar-month me-2"></i>Registros por mes</h5>
+                <canvas id="chartMes" height="120"></canvas>
+            </div>
+        </div>
+    </div>
+
 </div>
 
-<div class="row">
-    <div class="col">
-        <h2>Registro</h2>
-        {% load static %}
-        <img src="data:image/png;base64,{{ image_base64_dia }}" alt="Gráfico usuarios por día" >
-    </div>
-    <div class="col">
-        <img src="data:image/png;base64,{{ image_base64_mes }}" alt="Gráfico usuarios por mes"  class="grafico">
-    </div>
-    
-</div>
 <script>
+const chartDefaults = {
+    plugins: { legend: { display: false } },
+    scales: {
+        x: { ticks: { color: '#aaa', font: { size: 11 } }, grid: { color: 'rgba(255,255,255,0.05)' } },
+        y: { ticks: { color: '#aaa', stepSize: 1, font: { size: 11 } }, grid: { color: 'rgba(255,255,255,0.08)' }, beginAtZero: true }
+    }
+};
+
+new Chart(document.getElementById('chartDia'), {
+    type: 'bar',
+    data: {
+        labels: {{ labels_dia|safe }},
+        datasets: [{
+            label: 'Registros',
+            data: {{ data_dia|safe }},
+            backgroundColor: 'rgba(247,126,13,0.7)',
+            borderColor: '#F77e0d',
+            borderWidth: 1,
+            borderRadius: 4,
+        }]
+    },
+    options: chartDefaults
+});
+
+new Chart(document.getElementById('chartMes'), {
+    type: 'line',
+    data: {
+        labels: {{ labels_mes|safe }},
+        datasets: [{
+            label: 'Registros',
+            data: {{ data_mes|safe }},
+            borderColor: '#F77e0d',
+            backgroundColor: 'rgba(247,126,13,0.15)',
+            pointBackgroundColor: '#F77e0d',
+            pointRadius: 5,
+            tension: 0.3,
+            fill: true,
+        }]
+    },
+    options: chartDefaults
+});
+
 $(document).ready(function() {
-    
-
-    var oTblReport = $('#lista_users')
-
-    oTblReport.DataTable({
-        "language": { 
-            "search": 'Buscar',
-            "lengthMenu": "Mostrar _MENU_ registros por página",
-            //"info": "Mostrando _ENTRIES_ página _PAGE_ de _PAGES_",
-            "paginate":{
-                previous: '‹',
-                next:     '›'
-            }
+    $('#lista_users').DataTable({
+        language: {
+            search: 'Buscar',
+            lengthMenu: 'Mostrar _MENU_ registros por página',
+            paginate: { previous: '‹', next: '›' },
+            zeroRecords: 'No se encontraron usuarios.',
+            info: 'Mostrando _START_ a _END_ de _TOTAL_ usuarios',
+            infoEmpty: 'Sin registros',
         },
-        "aLengthMenu":[[5,10,20,40,-1],[5,10,20,40,"Todos"]],
-        "iDisplayLength":20
+        aLengthMenu: [[10, 20, 50, -1], [10, 20, 50, 'Todos']],
+        iDisplayLength: 20,
+        order: [[4, 'desc']],
     });
 });
 </script>
-
-
-{% endblock %}
-
-{% block libreria %}
 {% endblock %}
