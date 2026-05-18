@@ -94,14 +94,24 @@ def view(request,user_id):
     hoy = datetime.now().date()
     limite = hoy - timedelta(days=14)
 
-    listas_busqueda=Listados.objects.filter(owner=user, tipo='B',expiracion__gt=hoy)
-    listas_venta=Listados.objects.filter(owner=user, tipo='O',expiracion__gt=hoy)
     n_contactos=Contacto.objects.filter(usuario=user)
     user_login=True
+    usuario = None
     if 'user' in request.session:
         usuario= User.objects.get(id=request.session['user']['id'])
     else:
         user_login=False
+
+    if user_login and usuario == user:
+        listas_busqueda=Listados.objects.filter(owner=user, tipo='B',expiracion__gt=hoy)
+        listas_venta=Listados.objects.filter(owner=user, tipo='O',expiracion__gt=hoy)
+    else:
+        if user_login:
+            visibility_q = Q(privacidad='PUBLIC') | Q(shared_with_users=usuario) | Q(shared_with_groups__miembros=usuario)
+        else:
+            visibility_q = Q(privacidad='PUBLIC')
+        listas_busqueda=Listados.objects.filter(owner=user, tipo='B',expiracion__gt=hoy).filter(visibility_q).distinct()
+        listas_venta=Listados.objects.filter(owner=user, tipo='O',expiracion__gt=hoy).filter(visibility_q).distinct()
 
     contacto_valido=False
     if user_login:
