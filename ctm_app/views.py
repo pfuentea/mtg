@@ -85,7 +85,13 @@ def index(request):
 
     listas_hunt= Listados.objects.filter(owner=user,tipo='B').order_by('-updated_at')[:10]
     listas_off= Listados.objects.filter(owner=user,tipo='O').order_by('-updated_at')[:10]
-    last_act=Actividad.objects.filter(objetivo__isnull=True, lista__isnull=False, lista__privacidad='PUBLIC').order_by('-updated_at')[:10]
+    last_act=Actividad.objects.filter(
+        objetivo__isnull=True, lista__isnull=False
+    ).filter(
+        Q(lista__privacidad='PUBLIC') |
+        Q(lista__shared_with_users=user) |
+        Q(lista__shared_with_groups__miembros=user)
+    ).order_by('-updated_at').distinct()[:10]
     last_act_propia=Actividad.objects.filter(objetivo=user).order_by('-updated_at')[:10]
 
     recibidos=Mensaje.objects.filter(to_user=user).order_by('-updated_at')[:10]
@@ -517,35 +523,26 @@ def share_all(request,lista_id):
 
 @login_required
 def list_edit(request,list_id):
+    from .models.contacto import Contacto
     lista=Listados.objects.get(id=list_id)
     usuario=lista.owner.name
     user= User.objects.get(id=request.session['user']['id'])
-    #form=ListaForm(instance=lista)
 
     if request.method == 'POST':
-        #print(request.POST)
         form = ListaForm(request.POST,instance=lista)
         if form.is_valid():
             form.save()
-            messages.success(request, "Lista modificada con exito.")
+            messages.success(request, "Lista modificada con éxito.")
+            if request.POST.get('action') == 'volver':
+                dest = 'hunt' if lista.tipo == 'B' else 'offer'
+                return redirect(f'/list/{dest}')
         else:
-            print(form.errors)
-            messages.warning(request, "Algo pasa.")
-            #messages.success(request, "Su comentario ha sido enviado correctamente.")
-            #return redirect('/contacto')
+            messages.warning(request, "Hay errores en el formulario.")
     else:
         form=ListaForm(instance=lista)
 
-    '''
-    if request.method == "POST":
-        lista.nombre=request.POST['nombre']
-        lista.tipo=request.POST['tipo']
-        lista.referencia_precio=request.POST['ref_precio']
-        lista.referencia_web=request.POST['ref_web']
-        lista.descripcion=request.POST['descripcion']
-        lista.save()
-        messages.success(request, "Lista modificada con exito.")
-        '''
+    contactos = Contacto.objects.filter(usuario=user).select_related('contacto')
+    contact_ids = list(contactos.values_list('contacto__id', flat=True))
 
     context = {
         'saludo': 'Hola',
@@ -553,7 +550,8 @@ def list_edit(request,list_id):
         "lista_id":list_id,
         "usuario":usuario,
         "user":user,
-        "form":form
+        "form":form,
+        "contact_ids": contact_ids,
         }
     return render(request, 'lista_update.html', context)
 

@@ -52,6 +52,7 @@
 
     <form action="/list/edit/{{lista.id}}" method="post" id="form_edit" name="form_edit">
         {% csrf_token %}
+        <input type="hidden" name="action" value="seguir">
 
         <div class="p-3 mb-4 bg-dark rounded-3 border border-secondary shadow-sm">
             <div class="row g-3">
@@ -118,14 +119,19 @@
         </div>
 
         <div class="row">
-            <div class="col-12 text-end">
+            <div class="col-12 d-flex justify-content-between align-items-center flex-wrap gap-2">
                 <a href="/list/{% if lista.tipo == 'B' %}hunt{% else %}offer{% endif %}"
-                   class="btn btn-secondary btn-lg rounded-pill px-4 shadow me-2">
+                   class="btn btn-outline-secondary btn-lg rounded-pill px-4">
                     <i class="bi bi-x-circle me-1"></i>Cancelar
                 </a>
-                <button id="guardar" type="button" class="btn btn-success btn-lg rounded-pill px-5 shadow">
-                    <i class="bi bi-save me-2"></i>Guardar Cambios
-                </button>
+                <div class="d-flex gap-2">
+                    <button id="guardar-seguir" type="button" class="btn btn-outline-warning btn-lg rounded-pill px-4">
+                        <i class="bi bi-save me-1"></i>Guardar
+                    </button>
+                    <button id="guardar-volver" type="button" class="btn btn-success btn-lg rounded-pill px-4">
+                        <i class="bi bi-save me-1"></i>Guardar y volver
+                    </button>
+                </div>
             </div>
         </div>
     </form>
@@ -149,9 +155,27 @@
             toastr.info("Precio de dólar para intercambio o venta de las cartas.");
         });
 
-        $('#guardar').on('click', function() {
+        const contactIds = new Set({{ contact_ids|safe }});
+
+        function filterAvailableUsers() {
+            $('#available_shared_with_users option').each(function() {
+                if (!contactIds.has(parseInt($(this).val()))) {
+                    $(this).remove();
+                }
+            });
+        }
+
+        $('#guardar-seguir').on('click', function() {
             syncOriginal('shared_with_users');
             syncOriginal('shared_with_groups');
+            $('input[name=action]').val('seguir');
+            $('#form_edit').submit();
+        });
+
+        $('#guardar-volver').on('click', function() {
+            syncOriginal('shared_with_users');
+            syncOriginal('shared_with_groups');
+            $('input[name=action]').val('volver');
             $('#form_edit').submit();
         });
 
@@ -171,6 +195,7 @@
         }
 
         initDualList('shared_with_users');
+        filterAvailableUsers();
         initDualList('shared_with_groups');
 
         function togglePrivacy() {
